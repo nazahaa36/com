@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
+<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"></head><body><meta charset="UTF-8">
+
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
   <title>نزاهة - المنتدى الشبابي للفكر والمشاركة المدنية</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts: Zain للشعار فقط، Cairo لبقية الموقع -->
-  <link href="https://fonts.googleapis.com/css2?family=Zain:wght@400;700;900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zain:wght@400;700;900&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -712,8 +712,8 @@
       .compact-details { justify-content: center; }
     }
   </style>
-</head>
-<body>
+
+
 
 <div class="container">
   <div class="ios-status-bar fade-up">
@@ -816,9 +816,9 @@
     <h2>تواصل معنا</h2>
     <div class="card">
       <form id="contactForm" onsubmit="sendContact(event)">
-        <input type="text" id="contactName" placeholder="الاسم الكامل *" required>
+        <input type="text" id="contactName" placeholder="الاسم الكامل *" required="">
         <input type="email" id="contactEmail" placeholder="البريد الإلكتروني (اختياري)">
-        <textarea id="contactMessage" rows="4" placeholder="رسالتك..." required></textarea>
+        <textarea id="contactMessage" rows="4" placeholder="رسالتك..." required=""></textarea>
         <button type="submit" class="btn btn-red"><i class="fas fa-paper-plane"></i> إرسال الرسالة</button>
       </form>
     </div>
@@ -846,7 +846,7 @@
 <!-- ========== النوافذ المنبثقة ========== -->
 <div id="termsModal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeModal('termsModal')">&times;</span>
+    <span class="close" onclick="closeModal('termsModal')">×</span>
     <h2 style="color: var(--primary-green);"><i class="fas fa-file-contract"></i> شروط <span id="termsType"></span></h2>
     <div id="termsText" class="terms-box"></div>
     <div style="display: flex; gap: 15px; margin-top: 25px;">
@@ -862,14 +862,14 @@
 
 <div id="choiceModal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeModal('choiceModal')">&times;</span>
+    <span class="close" onclick="closeModal('choiceModal')">×</span>
     <h3 style="color: var(--primary-green); font-size: 1.8rem;"><i class="fas fa-id-card"></i> كيف تريد التسجيل؟</h3>
     <div class="option-row">
       <button class="option-btn" id="optionSelf" onclick="selectOption('self')"><i class="fas fa-user"></i> عبر نفسي</button>
       <button class="option-btn" id="optionOffice" onclick="selectOption('office')"><i class="fas fa-building"></i> عبر مكتب الإعلام الآلي</button>
     </div>
     <div style="text-align: left; margin-top: 15px;">
-      <button class="btn" id="nextBtn" onclick="proceedToForm()" disabled><i class="fas fa-arrow-left"></i> التالي</button>
+      <button class="btn" id="nextBtn" onclick="proceedToForm()" disabled=""><i class="fas fa-arrow-left"></i> التالي</button>
     </div>
   </div>
 </div>
@@ -884,7 +884,7 @@
 
 <div id="bylawModal" class="modal">
   <div class="modal-content" style="max-width: 750px;">
-    <span class="close" onclick="closeModal('bylawModal')">&times;</span>
+    <span class="close" onclick="closeModal('bylawModal')">×</span>
     <h2 style="color: var(--primary-green);"><i class="fas fa-file-contract"></i> النظام الداخلي</h2>
     <div style="max-height: 60vh; overflow-y: auto; text-align: justify; padding-left: 15px;">
       <h3>الباب الأول: الأحكام العامة</h3>
@@ -901,14 +901,14 @@
     </div>
     <div style="display: flex; gap: 15px; margin-top: 25px;">
       <a href="https://drive.google.com/file/d/1FleUHmv4q40of3FM6Xlwdie05-Rfj6uY/view?usp=drivesdk" target="_blank" class="btn"><i class="fas fa-eye"></i> معاينة</a>
-      <a href="https://drive.google.com/uc?export=download&id=1FleUHmv4q40of3FM6Xlwdie05-Rfj6uY" class="btn btn-red"><i class="fas fa-download"></i> تحميل</a>
+      <a href="https://drive.google.com/uc?export=download&amp;id=1FleUHmv4q40of3FM6Xlwdie05-Rfj6uY" class="btn btn-red"><i class="fas fa-download"></i> تحميل</a>
     </div>
   </div>
 </div>
 
 <div id="paymentModal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeModal('paymentModal')">&times;</span>
+    <span class="close" onclick="closeModal('paymentModal')">×</span>
     <h2 style="color: var(--primary-green);"><i class="fas fa-credit-card"></i> معلومات الدفع</h2>
     <p style="font-size: 1.3rem;">رسوم الاشتراك في المنتدى تتراوح بين:</p>
     <ul style="margin: 25px 0; padding-right: 25px; font-size: 1.4rem;">
@@ -1267,5 +1267,5 @@
 
   window.addEventListener('DOMContentLoaded', () => { renderCards(); });
 </script>
-</body>
-</html>
+
+</body></html>
