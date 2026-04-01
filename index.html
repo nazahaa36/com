@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>nazaha.dz</title>
+    
+    <!-- Favicon دائري NAZAHA -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%231a3a1f' stroke='%2334c759' stroke-width='2'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-family='Poppins, Arial' font-weight='bold' font-size='30' fill='white' filter='url(%23glow)'%3ENA%3C/text%3E%3Cdefs%3E%3Cfilter id='glow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur in='SourceAlpha' stdDeviation='3'/%3E%3CfeMerge%3E%3CfeMergeNode in='offsetblur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Noto+Kufi+Arabic:wght@300;500;700;900&family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-green: #34c759;
+            --accent-red: #ff3b30;
+            --ios-bg: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #1c1c1e;
+            --bottom-nav-bg: rgba(255, 255, 255, 0.92);
+            --card-shadow-red: rgba(255, 59, 48, 0.5);
+        }
+        body.dark {
+            --ios-bg: #000000;
+            --glass-bg: rgba(28, 28, 30, 0.9);
+            --text-main: #ffffff;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --bottom-nav-bg: rgba(28, 28, 30, 0.95);
+            --card-shadow-red: rgba(255, 59, 48, 0.7);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', 'Noto Kufi Arabic', sans-serif; }
+        body { background-color: var(--ios-bg); color: var(--text-main); transition: 0.4s; overflow-x: hidden; padding-bottom: 75px; }
+
+        header {
+            position: fixed; top: 0; width: 100%; padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; backdrop-filter: blur(20px); background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        /* شعار أيقونة شباب (أخضر + أحمر + أبيض) */
+        .youth-logo {
+            width: 52px;
+            height: 52px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 2px var(--primary-green), 0 0 0 5px rgba(255,59,48,0.3);
+            transition: all 0.2s ease;
+        }
+        .youth-logo svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--bottom-nav-bg);
+            backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around;
+            padding: 10px 12px 20px;
+            border-top: 1px solid var(--glass-border);
+            z-index: 1000;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 6px; cursor: pointer; opacity: 0.6;
+            transition: 0.2s; font-size: 12px; font-weight: 600;
+        }
+        .nav-item i { font-size: 22px; }
+        .nav-item.active { opacity: 1; color: var(--primary-green); }
+
+        .tab-content { display: none; padding: 85px 20px 25px; animation: slideUp 0.4s ease; max-width: 850px; margin: auto; }
+        .tab-content.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero-section {
+            border-radius: 25px;
+            margin-bottom: 20px;
+            padding: 20px 0;
+        }
+
+        .animated-card {
+            background: linear-gradient(135deg, #2b8c4e, #1e6a3b);
+            border-radius: 48px;
+            padding: 45px 35px;
+            text-align: center;
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .animated-card:hover {
+            transform: translateY(-6px);
+        }
+        .icon-container {
+            font-size: 64px;
+            color: white;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 8px rgba(0,0,0,0.3));
+            animation: gentlePulse 2s infinite ease-in-out;
+        }
+        @keyframes gentlePulse {
+            0% { transform: scale(1); opacity: 0.95; }
+            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 12px white; }
+            100% { transform: scale(1); opacity: 0.95; }
+        }
+        .dynamic-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            min-height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            line-height: 1.4;
+        }
+        .cursor {
+            display: inline-block;
+            width: 4px;
+            background-color: white;
+            animation: blink 0.8s infinite;
+            margin-right: 5px;
+            height: 38px;
+            vertical-align: middle;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .ios-card {
+            background: var(--glass-bg);
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .hero-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary-green);
+            margin-bottom: 18px;
+            text-align: center;
+            letter-spacing: -0.3px;
+        }
+        .section-desc, p, li {
+            line-height: 1.85;
+            font-size: 16px;
+            opacity: 0.92;
+        }
+        .btn-submit {
+            background: var(--primary-green);
+            color: white;
+            padding: 14px;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .btn-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(52,199,89,0.4);
+        }
+
+        .circle-icon {
+            width: 44px; height: 44px; background: rgba(52, 199, 89, 0.15);
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .social-circle {
+            width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: white; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease; margin: 0 auto;
+        }
+        .social-circle:hover { transform: scale(1.05); }
+
+        .form-input {
+            width: 100%; padding: 14px 18px; margin-bottom: 16px; border-radius: 20px;
+            border: 1px solid var(--glass-border); background: var(--glass-bg);
+            font-size: 15px; transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none; border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(52,199,89,0.2);
+        }
+        .toast {
+            position: fixed; top: 20px; right: 20px; left: 20px; max-width: 400px;
+            padding: 14px 18px; border-radius: 18px; box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+            display: none; align-items: center; gap: 12px; z-index: 9999;
+            backdrop-filter: blur(20px); font-weight: 600;
+        }
+        .toast.success { background: rgba(52,199,89,0.95); color: white; }
+        .toast.error { background: rgba(255,59,48,0.95); color: white; }
+
+        .location-card {
+            background: rgba(52,199,89,0.08);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .location-card h3 i {
+            margin-left: 10px;
+            color: var(--primary-green);
+        }
+        .extra-field { margin-top: -10px; margin-bottom: 16px; display: none; }
+        .extra-field input { width:100%; padding:12px 16px; border-radius:18px; border:1px solid var(--glass-border); background:var(--glass-bg); }
+
+        .social-grid { display: flex; justify-content: center; gap: 25px; margin-bottom: 25px; flex-wrap: wrap; }
+        .social-grid a { text-decoration: none; }
+
+        .mito-modal {
+            position: fixed; top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            z-index: 10000; display: none; align-items: center; justify-content: center; padding:20px;
+        }
+        .mito-content {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border-radius: 32px; max-width: 600px; width:100%; max-height:85vh;
+            overflow-y: auto; padding:24px; border:1px solid var(--glass-border);
+        }
+        .mito-data { background:rgba(0,0,0,0.05); border-radius:20px; padding:16px; margin:15px 0; font-size:14px; white-space:pre-wrap; }
+        .btn-copy, .btn-close { padding:10px 20px; border-radius:30px; border:none; font-weight:bold; cursor:pointer; }
+        .btn-copy { background:var(--primary-green); color:white; }
+        .btn-close { background:#ff3b30; color:white; }
+        iframe { border-radius: 20px; margin-top: 12px; width:100%; height:220px; border:0; }
+    </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<header>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <!-- أيقونة شباب (أخضر، أحمر، أبيض) -->
+        <div class="youth-logo">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="white" stroke="none"/>
+                <!-- شخصان أخضر وأحمر يمثلان الشباب -->
+                <path d="M35 60 L35 45 Q35 35 45 35 Q55 35 55 45 L55 60 L50 70 L35 60Z" fill="#34c759" opacity="0.9"/>
+                <path d="M55 60 L55 45 Q55 35 65 35 Q75 35 75 45 L75 60 L65 70 L55 60Z" fill="#ff3b30" opacity="0.9"/>
+                <circle cx="45" cy="30" r="8" fill="#ff3b30" opacity="0.7"/>
+                <circle cx="65" cy="30" r="8" fill="#34c759" opacity="0.8"/>
+                <path d="M40 80 L60 80 L55 90 L45 90 L40 80Z" fill="#34c759" opacity="0.6"/>
+            </svg>
+        </div>
+        <div style="font-weight: 800; font-size: 14px; color: var(--primary-green);">المنتدى الشبابي للفكر والمشاركة المدنية</div>
+    </div>
+    <div onclick="toggleTheme()" style="cursor: pointer;"><i class="fas fa-moon" id="theme-icon"></i></div>
+</header>
+
+<div class="bottom-nav">
+    <div class="nav-item active" data-tab="home"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+    <div class="nav-item" data-tab="about"><i class="fas fa-users"></i><span>من نحن</span></div>
+    <div class="nav-item" data-tab="extra"><i class="fas fa-circle-info"></i><span>معلومات</span></div>
+    <div class="nav-item" data-tab="contact"><i class="fas fa-headset"></i><span>تواصل</span></div>
+    <div class="nav-item" data-tab="news"><i class="fas fa-newspaper"></i><span>فعاليات</span></div>
+    <div class="nav-item" data-tab="register"><i class="fas fa-user-plus"></i><span>تسجيل</span></div>
+</div>
+
+<!-- الصفحة الرئيسية -->
+<div id="home" class="tab-content active">
+    <div class="hero-section">
+        <div class="animated-card">
+            <div class="icon-container" id="animatedIcon"><i class="fas fa-brain"></i></div>
+            <div class="dynamic-text"><span class="typed-text" id="typedText"></span><span class="cursor"></span></div>
+            <div style="margin-top: 30px; display: flex; justify-content: center;">
+                <button onclick="document.querySelector('[data-tab=\'register\']').click();" class="btn-submit" style="width: auto; padding: 12px 28px; background: white; color: #1e6a3b; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">سجّل الآن وكن صانع التغيير</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- من نحن: نصوص مفصلة مقنعة -->
+<div id="about" class="tab-content">
+    <div class="ios-card">
+        <h2 class="hero-title">منتدى نزاهة .. مشروع وطني شبابي بامتياز</h2>
+        <p class="section-desc" style="font-size: 17px; font-weight: 500;">نزاهة ليس مجرد منتدى عابر، إنه حركة فكرية شبابية منظمة تسعى لزرع الوعي النقدي والمشاركة المدنية الحقيقية في نسيج المجتمع الجزائري. نحن نؤمن بأن الشباب اليوم هو القوة المحركة للتغيير، وأن الاستثمار في العقول هو الضمان الأوحد لمستقبل مزدهر. يجمع المنتدى تحت لوائه شباباً طموحاً من مختلف التخصصات، يركّز على تمكين الفئة العمرية من 14 إلى 30 سنة، ويهدف لأن يكون حاضنة حقيقية للكفاءات التي ستقود المشهد الوطني غداً.</p>
+    </div>
+    <div class="ios-card">
+        <h2 class="hero-title">الرؤية: جيل واعٍ يقود التحول</h2>
+        <p class="section-desc">نتطلع لأن نكون النموذج الرائد في تأهيل الشباب فكرياً ومدنياً، بحيث يصبح كل شاب جزائري سفيراً للنزاهة والمواطنة الفاعلة. نريد أن نرى مؤسسات الدولة تتبنى نموذج “نزاهة” كأفضل ممارسة في التربية على المواطنة، وأن تصبح مبادراتنا منهاجاً معتمداً في دور الشباب والمراكز الثقافية. رؤيتنا هي جزائر يقودها شباب متسلح بالعلم، منفتح على العالم، متمسك بهويته، قادر على مواجهة التحديات بروح نقدية بناءة.</p>
+    </div>
+    <div class="ios-card">
+        <h2 class="hero-title">الرسالة: فكر يحرر، مشاركة تبني</h2>
+        <p class="section-desc">نعمل على تأطير الشباب عبر برامج توعوية عميقة، ندوات فكرية، مخيمات تكوينية، ومشاريع ميدانية تعزز قيم الشفافية والحوار. نؤمن بأن التغيير الحقيقي يبدأ من داخل العقل، لذا نركز على تنمية مهارات التحليل، التفكير النقدي، والوعي بالقضايا الوطنية. نمد جسور التعاون مع وزارة الشباب والرياضة، مديريات الشباب، والمجتمع المدني لنخلق بيئة داعمة للمبادرات الشبابية. رسالتنا هي تحويل الطاقة الشبابية إلى طاقة إيجابية فاعلة في المجتمع.</p>
+    </div>
+    <div class="ios-card">
+        <h2 class="hero-title">أهدافنا الاستراتيجية (لماذا ستدعمنا الوزارة؟)</h2>
+        <ul class="section-desc" style="list-style: none;">
+            <li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>معالجة ضعف الوعي الفكري:</strong> من خلال برامج فكرية منهجية تعزز ثقافة النقد البناء ومكافحة التطرف الفكري.</li>
+            <li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>تأهيل قادة المستقبل:</strong> إعداد كوادر شبابية قيادية قادرة على تسيير العمل الجمعوي والعمومي وفق معايير النزاهة.</li>
+            <li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>تعزيز المشاركة المدنية:</strong> تحويل الشباب من متفرجين إلى فاعلين في التنمية المحلية عبر مشاريع ملموسة.</li>
+            <li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>التكامل مع مؤسسات الدولة:</strong> تقديم نموذج عملي يمكن تعميمه على مستوى ولايات الجمهورية بالشراكة مع قطاع الشباب.</li>
+            <li><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>خلق فضاء آمن للحوار:</strong> بعيداً عن أي انتماء حزبي أو جهوي، ضمن إطار وطني خالص.</li>
+        </ul>
+        <div style="margin-top: 25px; background: rgba(52,199,89,0.1); border-radius: 20px; padding: 16px; text-align: center;">
+            <i class="fas fa-chart-line" style="color: var(--primary-green); font-size: 24px;"></i>
+            <p style="margin-top: 10px; font-weight: 600;">نحن نصنع المستقبل اليوم.. انضم إلى طليعة الشباب المؤثر في الجزائر الجديدة.</p>
+        </div>
+    </div>
+</div>
+
+<!-- معلومات إضافية -->
+<div id="extra" class="tab-content">
+    <div class="ios-card"><h2 class="hero-title">النظام الداخلي</h2><p><a href="https://drive.google.com/file/d/1FleUHmv4q40of3FM6Xlwdie05-Rfj6uY/view" target="_blank" style="color:var(--primary-green); font-weight: bold;">تحميل النظام الداخلي للمنتدى</a></p></div>
+    <div class="ios-card"><h2 class="hero-title">الاشتراكات والمساهمات</h2><p>الاشتراك السنوي رمزي (100 دج إلى 1000 دج) يُخصص لتغطية تكاليف الطباعة والبطاقات العضوية، مع إعفاء الفئات غير القادرة. العضوية مفتوحة للجميع.</p></div>
+    <div class="ios-card"><h2 class="hero-title">مجلس الإدارة والمؤسسون</h2><div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+        <div style="text-align: center; width: 240px; background: rgba(52,199,89,0.08); border-radius: 28px; padding: 20px;"><div class="circle-icon" style="width: 80px; height: 80px; margin: 0 auto 15px; font-size: 36px;"><i class="fas fa-user-tie"></i></div><h3>نزيه عبدالله بومهني</h3><p style="color: var(--primary-green);">المؤسس ورئيس المنتدى</p><div><a href="https://www.facebook.com/nazihboumahni" target="_blank"><i class="fab fa-facebook" style="color:var(--primary-green); font-size: 20px; margin: 0 5px;"></i></a><a href="https://www.instagram.com/nazihboumahni" target="_blank"><i class="fab fa-instagram" style="color:var(--primary-green); font-size: 20px;"></i></a></div></div>
+        <div style="text-align: center; width: 240px; background: rgba(52,199,89,0.08); border-radius: 28px; padding: 20px;"><div class="circle-icon" style="width: 80px; height: 80px; margin: 0 auto 15px; font-size: 36px;"><i class="fas fa-user-secret"></i></div><h3>صلاح الدين بن قسمية</h3><p style="color: var(--primary-green);">أمين السر</p></div>
+    </div></div>
+</div>
+
+<!-- تواصل معنا: خرائط دقيقة للموقعين فقط -->
+<div id="contact" class="tab-content">
+    <div class="ios-card" style="text-align: center;">
+        <h2 class="hero-title">قنوات التواصل الرسمية</h2>
+        <div class="social-grid">
+            <a href="https://facebook.com/nazaha.36" target="_blank"><div class="social-circle" style="background:#1877f2;"><i class="fab fa-facebook-f"></i></div></a>
+            <a href="https://instagram.com/nazaha.36" target="_blank"><div class="social-circle" style="background:#e4405f;"><i class="fab fa-instagram"></i></div></a>
+            <a href="https://x.com/nazaha.dz" target="_blank"><div class="social-circle" style="background:#000;"><i class="fab fa-x-twitter"></i></div></a>
+            <a href="https://wa.me/213541270738" target="_blank"><div class="social-circle" style="background:#25d366;"><i class="fab fa-whatsapp"></i></div></a>
+            <a href="mailto:nazahaa36.inf@gmail.com"><div class="social-circle" style="background:#34c759;"><i class="fas fa-envelope"></i></div></a>
+        </div>
+        
+        <!-- موقع دار الشباب أحمد بتشين بالطارف (إحداثيات دقيقة) -->
+        <div class="location-card">
+            <h3><i class="fas fa-building"></i> دار الشباب أحمد بتشين – الطارف</h3>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3199.5!2d8.3092733!3d36.7665032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12f1db227c7bcabb%3A0x1a3d2b3b77c6aca0!2sDar%20El%20Chabab%20Ahmed%20Betchine!5e0!3m2!1sar!2sdz!4v1712000000000" allowfullscreen="" loading="lazy"></iframe>
+            <p style="margin-top: 12px;"><i class="fas fa-map-pin" style="color: red;"></i> العنوان الدقيق: حي 350 مسكن، الطارف 36000</p>
+        </div>
+        
+        <!-- المركب الرياضي الجواري - القالة (إحداثيات دقيقة للموقع فقط) -->
+        <div class="location-card">
+            <h3><i class="fas fa-futbol"></i> المركب الرياضي الجواري – القالة</h3>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3199.8!2d8.4411139!3d36.8864757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12f1d6898afdb54f%3A0x1a0c6943b1cab1e3!2sComplexe%20Sportif%20de%20Proximit%C3%A9%20El%20Kala!5e0!3m2!1sar!2sdz!4v1712000000000" allowfullscreen="" loading="lazy"></iframe>
+            <p style="margin-top: 12px;"><i class="fas fa-map-pin" style="color: red;"></i> حي الزيتونة، القالة 36100</p>
+        </div>
+        <p><i class="fas fa-envelope"></i> nazahaa36.inf@gmail.com | <i class="fab fa-whatsapp"></i> +213541270738</p>
+    </div>
+    
+    <div class="ios-card">
+        <h2 class="hero-title">نموذج تواصل مع فريق الدعم</h2>
+        <form id="supportForm" onsubmit="handleSupportForm(event)">
+            <select id="support-type" class="form-input" required><option value="">نوع الاستفسار</option><option>استفسار عن العضوية</option><option>مشكلة في الدفع</option><option>طلب شراكة</option><option>أخرى</option></select>
+            <input type="text" id="support-name" placeholder="الاسم الكامل" class="form-input" required>
+            <input type="tel" id="support-phone" placeholder="رقم الهاتف" class="form-input" required>
+            <select id="support-state" class="form-input" required onchange="handleOtherState(this, 'support-other-state')"><option value="">اختر الولاية</option><option>الطارف</option><option>عنابة</option><option>سكيكدة</option><option>قسنطينة</option><option value="other">أخرى</option></select>
+            <div id="support-other-state" class="extra-field"><input type="text" placeholder="أدخل اسم الولاية"></div>
+            <textarea id="support-message" rows="4" placeholder="اكتب استفسارك بالتفصيل..." class="form-input" required></textarea>
+            <button type="submit" class="btn-submit">إرسال الطلب</button>
+        </form>
+    </div>
+</div>
+
+<div id="news" class="tab-content"><div class="ios-card"><h2 class="hero-title">فعاليات وأخبار المنتدى</h2><p>قريباً: ملتقى المواطنة الرقمية في دار الشباب الطارف.<br>مسابقة أحسن مبادرة مدنية للشباب (جوائز قيمة).<br>دورات تكوينية في التحليل السياسي والتفكير النقدي. تابعنا على إنستغرام للتفاصيل.</p></div></div>
+
+<!-- نموذج التسجيل -->
+<div id="register" class="tab-content">
+    <div class="ios-card">
+        <div style="text-align:center;"><div class="youth-logo" style="width:80px; height:80px; margin:0 auto 10px;"><svg viewBox="0 0 100 100" width="48" height="48"><path d="M35 60 L35 45 Q35 35 45 35 Q55 35 55 45 L55 60 L50 70 L35 60Z" fill="#34c759"/><path d="M55 60 L55 45 Q55 35 65 35 Q75 35 75 45 L75 60 L65 70 L55 60Z" fill="#ff3b30"/><circle cx="45" cy="30" r="8" fill="#ff3b30"/><circle cx="65" cy="30" r="8" fill="#34c759"/></svg></div></div>
+        <h2 class="hero-title">انضم إلى حركة النزاهة الآن</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+            <button onclick="selectRegistrationType('انخراط')" class="btn-submit">طلب عضوية (انخراط)</button>
+            <button onclick="selectRegistrationType('توظيف')" class="btn-submit">التطوع والانضمام للفرق</button>
+            <button onclick="selectRegistrationType('مشاركة')" class="btn-submit" style="grid-column:span 2;">المشاركة في الأنشطة والمسابقات</button>
+        </div>
+        <div id="conditions-card" class="ios-card" style="display:none;"><h3 id="conditions-title"></h3><div id="conditions-text"></div><label><input type="checkbox" id="agree-checkbox" onchange="toggleFormVisibility()"> أوافق على جميع الشروط والنظام الداخلي للمنتدى</label><button onclick="hideConditions()" class="btn-submit" style="margin-top:15px;background:#ff3b30;">رجوع</button></div>
+        <div id="dynamic-form-container" style="display:none;"><form id="regForm" onsubmit="handleDynamicForm(event)"><div id="dynamic-fields"></div><button type="submit" class="btn-submit" id="submit-btn">إرسال طلب التسجيل</button></form></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"><i id="toast-icon"></i><span id="toast-message"></span></div>
+<div id="mitoModal" class="mito-modal"><div class="mito-content"><h3><i class="fas fa-envelope-open-text"></i> خطة بديلة</h3><p>تعذر الإرسال عبر البريد الإلكتروني. يمكنك نسخ البيانات وإرسالها يدوياً.</p><div id="mitoData" class="mito-data"></div><div class="mito-buttons"><button class="btn-copy" onclick="copyMitoData()">نسخ البيانات</button><button class="btn-close" onclick="closeMitoModal()">إغلاق</button></div></div></div>
+
+<script>
+    emailjs.init("POCtDAFV9CECAu9ow");
+    let currentType = '';
+
+    // Typewriter مؤثر
+    const phrases = [
+        { text: "نزاهة .. لأن الفكر أول خطوة للتغيير", icon: "fas fa-brain" },
+        { text: "جيل واعٍ .. جزائر الغد", icon: "fas fa-chart-line" },
+        { text: "شارك في بناء الجمهورية الجديدة", icon: "fas fa-hand-peace" },
+        { text: "كن قائداً للنزاهة في مجتمعك", icon: "fas fa-users" },
+        { text: "منتدى شبابي رائد يُحدث الفارق", icon: "fas fa-rocket" }
+    ];
+    let phraseIndex = 0, charIndex = 0, isDeleting = false;
+    const typedTextSpan = document.getElementById('typedText');
+    const iconElement = document.getElementById('animatedIcon').querySelector('i');
+    function typeEffect() {
+        const current = phrases[phraseIndex].text;
+        if (isDeleting) typedTextSpan.textContent = current.substring(0, charIndex-1), charIndex--;
+        else typedTextSpan.textContent = current.substring(0, charIndex+1), charIndex++;
+        if (!isDeleting && charIndex === current.length) { isDeleting = true; setTimeout(typeEffect, 1800); return; }
+        if (isDeleting && charIndex === 0) {
+            isDeleting = false; phraseIndex = (phraseIndex+1)%phrases.length;
+            iconElement.className = phrases[phraseIndex].icon;
+            setTimeout(typeEffect, 200); return;
+        }
+        setTimeout(typeEffect, isDeleting ? 55 : 80);
+    }
+    setTimeout(typeEffect, 300);
+
+    function showToast(type, msg) { let t=document.getElementById('toast'), ic=document.getElementById('toast-icon'); t.className=`toast ${type}`; ic.className=type==='success'?'fas fa-check-circle':'fas fa-exclamation-triangle'; document.getElementById('toast-message').textContent=msg; t.style.display='flex'; setTimeout(()=>t.style.display='none',4500); }
+    function isOnline() { return navigator.onLine; }
+    function formatDataForMito(params,label){ let h=`<div style="direction:rtl"><strong>${label}</strong><br>`; for(let k in params) if(params[k]) h+=`<strong>${k}:</strong> ${params[k]}<br>`; h+=`<hr><small>أرسل إلى nazahaa36.inf@gmail.com أو واتساب 213541270738</small></div>`; return h; }
+    function showMitoModal(d){ document.getElementById('mitoData').innerHTML=d; document.getElementById('mitoModal').style.display='flex'; }
+    function closeMitoModal(){ document.getElementById('mitoModal').style.display='none'; }
+    function copyMitoData(){ let txt=document.getElementById('mitoData').innerText; navigator.clipboard.writeText(txt).then(()=>showToast('success','تم نسخ البيانات')).catch(()=>showToast('error','فشل النسخ')); }
+    document.querySelectorAll('.nav-item').forEach(i=>{ i.addEventListener('click',()=>{ let tab=i.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(tab).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); i.classList.add('active'); }); });
+    window.handleOtherState=(select,divId)=>{ document.getElementById(divId).style.display=select.value==='other'?'block':'none'; };
+    const wilayaData={"الطارف":["الطارف","القالة","بوثلجة"],"عنابة":["عنابة","الحدائق"],"سكيكدة":["سكيكدة","القل"],"قسنطينة":["قسنطينة","الخروب"]};
+    window.updateBaladiaSelect=function(wilaya){
+        let baladiaSelect=document.getElementById('address-baladia'); if(!baladiaSelect) return;
+        baladiaSelect.innerHTML='<option value="">اختر البلدية</option>';
+        if(wilayaData[wilaya]) wilayaData[wilaya].forEach(m=>{let opt=document.createElement('option'); opt.value=m; opt.textContent=m; baladiaSelect.appendChild(opt);});
+        let otherOpt=document.createElement('option'); otherOpt.value='other'; otherOpt.textContent='أخرى (أدخل يدوياً)'; baladiaSelect.appendChild(otherOpt);
+        baladiaSelect.onchange=()=>{ let f=document.getElementById('other-baladia-field'); if(baladiaSelect.value==='other'){ if(!f){ let div=document.createElement('div'); div.id='other-baladia-field'; div.className='extra-field'; div.innerHTML='<input type="text" placeholder="أدخل اسم البلدية">'; baladiaSelect.parentNode.insertAdjacentElement('afterend',div); div.style.display='block'; } else f.style.display='block'; } else if(f) f.style.display='none'; };
+    };
+    function selectRegistrationType(type){ currentType=type; document.getElementById('conditions-card').style.display='block'; document.getElementById('dynamic-form-container').style.display='none'; let title=document.getElementById('conditions-title'), text=document.getElementById('conditions-text'); if(type==='انخراط'){ title.textContent='شروط الانخراط في المنتدى'; text.innerHTML='السن: 14-30 سنة.<br>الجنسية جزائرية أو مقيم.<br>الالتزام بقيم المنتدى والنظام الداخلي.<br>دفع الاشتراك السنوي الرمزي بعد القبول.'; } else if(type==='توظيف'){ title.textContent='شروط التطوع والانضمام للخلايا'; text.innerHTML='العمر من 16 فما فوق.<br>توفر وقت وجدية.<br>اجتياز مقابلة بسيطة.'; } else{ title.textContent='شروط المشاركة في الأنشطة'; text.innerHTML='التسجيل المسبق في النشاط المطلوب.<br>الالتزام بمواعيد الفعاليات.<br>روح الفريق والإيجابية.'; } document.getElementById('agree-checkbox').checked=false; }
+    function toggleFormVisibility(){ if(document.getElementById('agree-checkbox').checked) renderDynamicForm(), document.getElementById('dynamic-form-container').style.display='block'; }
+    function hideConditions(){ document.getElementById('conditions-card').style.display='none'; document.getElementById('dynamic-form-container').style.display='none'; currentType=''; }
+    function renderDynamicForm(){
+        let container=document.getElementById('dynamic-fields');
+        container.innerHTML=`<div style="display:flex;gap:12px;margin-bottom:16px;"><div class="circle-icon"><i class="fas fa-user"></i></div><input type="text" id="full-name" placeholder="الاسم الكامل (ثلاثي)" class="form-input" required style="flex:1;"></div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;"><div class="circle-icon"><i class="fas fa-calendar"></i></div><input type="date" id="birth-date" class="form-input" required style="flex:1;"></div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;"><div class="circle-icon"><i class="fas fa-map-marker-alt"></i></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;"><input type="text" id="address-hay" placeholder="الحي / الشارع" class="form-input" required><select id="address-wilaya" class="form-input" required onchange="handleOtherState(this,'other-wilaya-field'); updateBaladiaSelect(this.value);"><option value="">الولاية</option><option>الطارف</option><option>عنابة</option><option>سكيكدة</option><option>قسنطينة</option><option value="other">أخرى</option></select></div></div>
+            <div id="other-wilaya-field" class="extra-field"><input type="text" placeholder="أدخل اسم الولاية"></div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;"><div class="circle-icon"><i class="fas fa-city"></i></div><select id="address-baladia" class="form-input" required style="flex:1;"><option value="">اختر البلدية</option></select></div>
+            <input type="text" id="address-country" value="الجزائر" class="form-input" readonly>
+            <div style="display:flex;gap:12px;margin-bottom:16px;"><div class="circle-icon"><i class="fas fa-phone"></i></div><input type="tel" id="phone" placeholder="رقم الهاتف (مهم)" class="form-input" required style="flex:1;"></div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;"><div class="circle-icon"><i class="fas fa-envelope"></i></div><input type="email" id="email" placeholder="البريد الإلكتروني" class="form-input" required style="flex:1;"></div>
+            ${currentType==='انخراط'?`<select id="nationality" class="form-input" required><option>جزائرية</option><option>أخرى</option></select><select id="interest-field" class="form-input" required><option>فكري وسياسي</option><option>مدني وتطوعي</option><option>تكنولوجي وإعلامي</option></select><input id="specialization" placeholder="مجال الاهتمام (اختياري)" class="form-input">`:''}
+            ${currentType==='توظيف'?`<textarea id="experience" rows="3" placeholder="اذكر خبراتك أو مهاراتك" class="form-input" required></textarea><select id="cell" class="form-input" required><option>خلية العلاقات العامة</option><option>خلية الإعلام والتواصل</option><option>خلية التنظيم</option></select>`:''}
+            ${currentType==='مشاركة'?`<input id="competition-name" placeholder="اسم المسابقة أو النشاط" class="form-input" required><input id="announce-link" placeholder="رابط الإعلان (فيسبوك/إنستغرام)" class="form-input" required>`:''}
+            <label><input type="checkbox" id="legal-approval" required> أوافق على جميع الشروط والنظام الداخلي</label>`;
+    }
+    function calculateAge(birth){ let today=new Date(), bd=new Date(birth), age=today.getFullYear()-bd.getFullYear(); if(today.getMonth()<bd.getMonth()||(today.getMonth()===bd.getMonth()&&today.getDate()<bd.getDate())) age--; return age; }
+    async function handleDynamicForm(e){
+        e.preventDefault(); if(!isOnline()){ showToast('error','الرجاء الاتصال بالإنترنت'); return; }
+        let name=document.getElementById('full-name').value.trim(), birth=document.getElementById('birth-date').value, phone=document.getElementById('phone').value.trim(), email=document.getElementById('email').value.trim();
+        if(!document.getElementById('legal-approval')?.checked){ showToast('error','يجب الموافقة على الشروط'); return; }
+        let age=calculateAge(birth); if(age<14&&currentType!=='توظيف'){ showToast('error','السن لا يقل عن 14 سنة للعضوية'); return; }
+        let wilaya=document.getElementById('address-wilaya').value, otherWilaya=document.getElementById('other-wilaya-field')?.querySelector('input')?.value; if(wilaya==='other'&&otherWilaya) wilaya=otherWilaya;
+        let baladia=document.getElementById('address-baladia').value, otherBaladia=document.getElementById('other-baladia-field')?.querySelector('input')?.value; if(baladia==='other'&&otherBaladia) baladia=otherBaladia;
+        let params={نوع_الطلب:currentType, الاسم_الكامل:name, تاريخ_الميلاد:birth, العمر:age, الحي:document.getElementById('address-hay').value, البلدية:baladia, الولاية:wilaya, الدولة:'الجزائر', الهاتف:phone, البريد:email};
+        if(currentType==='انخراط'){ params.الجنسية=document.getElementById('nationality').value; params.مجال_الاهتمام=document.getElementById('interest-field').value; params.تخصص=document.getElementById('specialization').value; }
+        else if(currentType==='توظيف'){ params.الخبرة=document.getElementById('experience').value; params.الخلية=document.getElementById('cell').value; }
+        else if(currentType==='مشاركة'){ params.اسم_المسابقة=document.getElementById('competition-name').value; params.رابط_الإعلان=document.getElementById('announce-link').value; }
+        let btn=document.getElementById('submit-btn'); btn.innerHTML='جاري الإرسال...'; btn.disabled=true;
+        try{ await emailjs.send('service_kbbvwbh','template_m1zojd7',params); showToast('success','تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً.'); document.getElementById('regForm').reset(); document.getElementById('dynamic-form-container').style.display='none'; document.getElementById('conditions-card').style.display='none'; currentType=''; } catch(err){ console.error(err); showToast('error','فشل الإرسال، استخدم الخطة البديلة'); let label=currentType==='انخراط'?'عضوية':(currentType==='توظيف'?'تطوع':'مشاركة'); showMitoModal(formatDataForMito(params,label)); } finally{ btn.innerHTML='إرسال الطلب'; btn.disabled=false; } }
+    async function handleSupportForm(e){ e.preventDefault(); if(!isOnline()){ showToast('error','لا يوجد اتصال'); return; } let wilaya=document.getElementById('support-state').value, other=document.getElementById('support-other-state')?.querySelector('input')?.value; if(wilaya==='other'&&other) wilaya=other; let params={نوع_الطلب:'دعم فني', نوع_الاستفسار:document.getElementById('support-type').value, الاسم:document.getElementById('support-name').value, الهاتف:document.getElementById('support-phone').value, الولاية:wilaya, الرسالة:document.getElementById('support-message').value}; let btn=e.target.querySelector('button[type="submit"]'), old=btn.innerHTML; btn.innerHTML='جاري...'; btn.disabled=true; try{ await emailjs.send('service_kbbvwbh','template_m1zojd7',params); showToast('success','تم إرسال طلب الدعم'); e.target.reset(); document.getElementById('support-other-state').style.display='none'; } catch(err){ showToast('error','فشل الإرسال'); showMitoModal(formatDataForMito(params,'دعم فني')); } finally{ btn.innerHTML=old; btn.disabled=false; } }
+    function toggleTheme(){ document.body.classList.toggle('dark'); document.getElementById('theme-icon').className=document.body.classList.contains('dark')?'fas fa-sun':'fas fa-moon'; }
+    window.onload=()=>{ console.log('منتدى نزاهة - جاهز'); };
+</script>
+<div style="text-align:center;padding:20px;font-size:12px;opacity:0.6;">جميع الحقوق محفوظة &copy; 2026 المنتدى الشبابي للفكر والمشاركة المدنية - nazaha.dz</div>
+</body>
+</html>
