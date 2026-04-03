@@ -3,17 +3,15 @@
     "id": "1270738‬‏",
     "password": "admin",
     "fullName": "نزيه عبدالله بومهني",
-    "cadreType": "مؤسس",
-    "hiringDate": "2020-01-01",
-    "position": "رئيس المنتدى",
+    "cadreType": "رئيس المنتدى ",
+    "hiringDate": "2026-01-02",
+    "position": "رئيس المنتدى", 
     "cell": "مجلس الإدارة",
     "evaluation": "ممتاز",
-    "expiryDate": "2030-12-31",
-    "birthDate": "1990-01-01",
+    "expiryDate": "2030-01-02",
+    "birthDate": "2008-07-19",
     "address": "الطارف"
   }
-]
-[
   {
     "id": "5569315",
     "password": "sal123",
