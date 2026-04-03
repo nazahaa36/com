@@ -1,0 +1,13 @@
+[
+  {
+    "id": "12345",
+    "password": "nazaha2026",
+    "fullName": "نزيه عبدالله بومهني",
+    "cadreType": "مؤسس",
+    "hiringDate": "2020-01-01",
+    "position": "رئيس",
+    "cell": "الإدارة",
+    "evaluation": "ممتاز",
+    "expiryDate": "2030-12-31"
+  }
+]
