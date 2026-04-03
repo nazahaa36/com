@@ -17,6 +17,8 @@
     
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- JsBarcode لإنشاء باركود حقيقي -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
     <style>
         /* جميع الأنماط الأصلية محفوظة مع إضافات جديدة */
@@ -268,7 +270,7 @@
         .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; }
         .info-label { font-weight: 600; opacity: 0.8; }
         .info-value { font-weight: 500; }
-        .barcode {
+        .barcode-container {
             background: white;
             padding: 10px;
             border-radius: 16px;
@@ -276,7 +278,7 @@
             margin-top: 12px;
             direction: ltr;
         }
-        .barcode svg { width: 100%; max-width: 200px; height: auto; }
+        .barcode-container svg { width: 100%; max-width: 200px; height: auto; }
         .admin-message {
             background: rgba(52,199,89,0.15);
             border-radius: 20px;
@@ -284,10 +286,10 @@
             margin-top: 16px;
             text-align: center;
             font-size: 13px;
-            cursor: pointer;
+            cursor: default;
             transition: 0.2s;
         }
-        .admin-message:hover { background: rgba(52,199,89,0.3); }
+        .admin-message i { margin-left: 6px; }
         .logout-btn {
             background: #ff3b30;
             width: 100%;
@@ -630,39 +632,39 @@
         return `${days} يوم و ${hours} ساعة`;
     }
 
-    // دالة توليد باركود بسيط
-    function generateBarcode(text) {
-        if (!text) return '<div style="text-align:center; font-size:12px;">لا يتوفر باركود</div>';
-        let barcode = '';
-        for (let i = 0; i < text.length; i++) {
-            let code = text.charCodeAt(i);
-            let pattern = '';
-            for (let j = 0; j < 8; j++) {
-                pattern += (code >> j) & 1 ? '1' : '0';
-            }
-            for (let j = 0; j < pattern.length; j++) {
-                if (pattern[j] === '1') {
-                    barcode += `<rect width="2" height="40" fill="black" x="${i * 8 + j * 2}"/>`;
-                }
-            }
-        }
-        return `<svg width="${text.length * 16}" height="50" viewBox="0 0 ${text.length * 16} 50" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/><g transform="translate(0,5)">${barcode}</g><text x="5" y="48" font-size="8" fill="black">${text}</text></svg>`;
+    // دالة توليد باركود حقيقي باستخدام JsBarcode
+    function generateRealBarcode(elementId, text) {
+        if (!text) return;
+        const canvas = document.createElement('canvas');
+        canvas.id = elementId;
+        canvas.width = 200;
+        canvas.height = 50;
+        JsBarcode(canvas, text, {
+            format: "CODE128",
+            lineColor: "#000",
+            width: 2,
+            height: 40,
+            displayValue: true,
+            fontSize: 12,
+            margin: 5
+        });
+        return canvas.outerHTML;
     }
 
-    // دالة إرسال رسالة من الإدارة (إشعار)
-    function sendAdminMessage(userName, message) {
+    // دالة إرسال إشعار جديد (رسالة من الإدارة)
+    function notifyUserWithMessage(userName, message) {
         if (Notification.permission === "granted") {
-            new Notification(`📩 رسالة من إدارة نزاهة`, {
+            new Notification(`📢 رسالة من إدارة نزاهة`, {
                 body: `${message.substring(0, 100)}`,
                 icon: "https://raw.githubusercontent.com/nazahaa36/com/main/logo.png"
             });
             const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
             audio.play().catch(e => console.log);
         }
-        // إضافة الإشعار في اللوحة الداخلية
+        // إضافة الإشعار في لوحة الإشعارات الداخلية
         const adminNotif = {
-            title: `رسالة من إدارة المنتدى`,
-            body: `إلى العضو ${userName}: ${message}`,
+            title: `رسالة من الإدارة`,
+            body: `${message}`,
             eventId: null,
             read: false,
             timestamp: Date.now()
@@ -672,7 +674,7 @@
         updateBadge();
         renderNotificationsPanel();
         saveNotifications();
-        showToast('success', 'تم إرسال الرسالة كإشعار');
+        showToast('info', '📩 لديك رسالة جديدة من الإدارة');
     }
 
     window.performLogin = async function() {
@@ -681,6 +683,15 @@
         if (membersList.length === 0) await fetchMemberFromJSON();
         const member = membersList.find(m => m.id === id && m.password === pwd);
         if (member) {
+            // التحقق من وجود رسالة جديدة لم يتم إشعاره بها
+            const lastMsgKey = `lastMsg_${member.id}`;
+            const lastMsg = localStorage.getItem(lastMsgKey);
+            const currentMsg = member.adminMessage || "";
+            if (currentMsg && currentMsg !== lastMsg) {
+                // إرسال إشعار بالرسالة الجديدة
+                notifyUserWithMessage(member.fullName, currentMsg);
+                localStorage.setItem(lastMsgKey, currentMsg);
+            }
             currentUser = member;
             localStorage.setItem('nazaha_user', JSON.stringify(member));
             closeProfileModal();
@@ -719,12 +730,21 @@
         const content = document.getElementById('profileContent');
         if (currentUser) {
             const remaining = calculateRemainingTime(currentUser.expiryDate);
-            const barcodeSvg = generateBarcode(currentUser.id);
-            // تصميم الملف الشخصي المحسن
+            // إنشاء باركود حقيقي
+            const barcodeId = "barcodeCanvas_" + Date.now();
+            const barcodeHtml = `<div class="barcode-container"><canvas id="${barcodeId}" width="200" height="50"></canvas></div>`;
+            // رسالة الإدارة إن وجدت
+            const adminMsgHtml = currentUser.adminMessage ? `
+                <div class="admin-message">
+                    <i class="fas fa-envelope"></i> رسالة من الإدارة:<br>
+                    ${escapeHtml(currentUser.adminMessage)}
+                </div>
+            ` : '';
+
             content.innerHTML = `
                 <div class="profile-container">
                     <!-- بطاقة العضوية الرئيسية -->
-                    <div class="profile-card">
+                    <div class="profile-card" id="membershipCard">
                         <div class="profile-header">
                             <div class="logo-small">
                                 <img src="logo.png" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%2334c759%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2750%27 text-anchor=%27middle%27 fill=%27white%27%3Eن%3C/text%3E%3C/svg%3E'">
@@ -739,12 +759,12 @@
                         <div class="info-row"><span class="info-label">تاريخ التعيين:</span><span class="info-value">${escapeHtml(currentUser.hiringDate) || '-'}</span></div>
                         <div class="info-row"><span class="info-label">الخلية:</span><span class="info-value">${escapeHtml(currentUser.cell) || '-'}</span></div>
                         <div class="info-row"><span class="info-label">تاريخ انتهاء العضوية:</span><span class="info-value">${remaining}</span></div>
-                        <div class="barcode">${barcodeSvg}</div>
+                        ${barcodeHtml}
                     </div>
                     
                     <!-- بطاقة التوظيف (للموظفين فقط) -->
                     ${currentUser.cell ? `
-                    <div class="profile-card">
+                    <div class="profile-card" id="jobCard">
                         <h4 style="margin-bottom:12px;">بطاقة التوظيف</h4>
                         <div class="info-row"><span class="info-label">المنصب:</span><span class="info-value">${escapeHtml(currentUser.position) || '-'}</span></div>
                         <div class="info-row"><span class="info-label">الخلية:</span><span class="info-value">${escapeHtml(currentUser.cell)}</span></div>
@@ -752,22 +772,34 @@
                     </div>
                     ` : ''}
                     
-                    <!-- رسالة من الإدارة -->
-                    <div class="admin-message" id="adminMessageBtn">
-                        <i class="fas fa-envelope"></i> رسالة من الإدارة
+                    <!-- رسالة الإدارة -->
+                    ${adminMsgHtml}
+                    
+                    <!-- أزرار تحميل البطاقات -->
+                    <div style="display: flex; gap: 10px; margin-top: 16px;">
+                        <button class="btn-submit" onclick="downloadCardAsImage('membershipCard')" style="background:var(--primary-green);">حفظ بطاقة العضوية</button>
+                        ${currentUser.cell ? `<button class="btn-submit" onclick="downloadCardAsImage('jobCard')" style="background:var(--primary-green);">حفظ بطاقة التوظيف</button>` : ''}
                     </div>
                     
                     <!-- زر تسجيل الخروج -->
                     <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
                 </div>
             `;
-            // إضافة حدث لزر رسالة الإدارة
-            document.getElementById('adminMessageBtn')?.addEventListener('click', () => {
-                const msg = prompt("أدخل الرسالة التي تريد إرسالها للعضو (ستظهر كإشعار):");
-                if(msg && msg.trim()) {
-                    sendAdminMessage(currentUser.fullName, msg.trim());
+            // بعد إضافة المحتوى، نقوم بإنشاء الباركود على الـ canvas
+            setTimeout(() => {
+                const canvas = document.getElementById(barcodeId);
+                if (canvas) {
+                    JsBarcode(canvas, currentUser.id, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 40,
+                        displayValue: true,
+                        fontSize: 12,
+                        margin: 5
+                    });
                 }
-            });
+            }, 50);
         } else {
             // نموذج تسجيل دخول مبسط
             content.innerHTML = `
@@ -853,12 +885,11 @@
         OneSignal.Notifications.addEventListener("click", (event) => { const eventId = event?.notification?.additionalData?.eventId; if(eventId) { const targetEvent = eventsData.find(e => e.id == eventId); if(targetEvent) openReadingModal(targetEvent); } });
     });
     
-    // دالة تشغيل الصوت الخارجي
     function playNotificationSound() {
         try {
             const audio = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
             audio.volume = 0.7;
-            audio.play().catch(e => console.log("صوت"));
+            audio.play().catch(e => console.log);
         } catch(e) {}
     }
     
@@ -878,7 +909,6 @@
         saveNotifications();
     }
     
-    // إشعار ترحيبي فوري بعد طلب الإذن
     setTimeout(() => {
         if (Notification.permission === "granted") {
             addLocalNotification("مرحباً بك في نزاهة", "نرحب بك في منتدى الفكر والمشاركة المدنية", 1);
