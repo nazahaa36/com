@@ -13,3 +13,18 @@
     "address": "الطارف"
   }
 ]
+[
+  {
+    "id": "5569315",
+    "password": "sal123",
+    "fullName": "صلاح الدين بن قسمية ",
+    "cadreType": "موظف",
+    "hiringDate": "2026-02-14",
+    "position": "أمين السر",
+    "cell": "مجلس الإدارة",
+    "evaluation": "جيد",
+    "expiryDate":"2030-01-14",
+    "birthDate":"2009-08-08",
+    "address": "حي جفال التركي شرق القالة"
+  }
+]
