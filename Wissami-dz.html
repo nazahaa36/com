@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>وسامي ديزاد</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            line-height: 1.5;
+            padding-bottom: 80px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.2rem 0; }
+        
+        /* شعارات شفافة */
+        .logo-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 0.5rem; }
+        .main-logo img { height: 90px; width: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); transition: transform 0.3s; background: transparent; }
+        .main-logo img:hover { transform: scale(1.03); }
+        .forum-badge {
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 0.2rem;
+            font-size: 0.85rem; font-weight: 500; color: #5b6e8c; background: #f8fafc;
+            padding: 0.4rem 1.2rem; border-radius: 60px;
+        }
+        .forum-logo { height: 32px; width: auto; background: transparent; transition: transform 0.2s; }
+        .forum-logo:hover { transform: scale(1.05); }
+
+        /* تبويبات سفلى */
+        .bottom-tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 0.6rem 1rem 0.9rem; border-top: 0.5px solid #eef2f8;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.03); z-index: 1000;
+        }
+        .tab-btn {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            background: transparent; border: none; font-family: 'Cairo', sans-serif;
+            font-size: 0.7rem; font-weight: 600; color: #94a3b8; cursor: pointer;
+            transition: all 0.2s; padding: 6px 0; border-radius: 30px;
+        }
+        .tab-btn i { font-size: 1.5rem; transition: transform 0.2s; }
+        .tab-btn.active { color: #006233; }
+        .tab-btn.active i { transform: translateY(-2px); }
+        .tab-content { display: none; animation: fadeSlide 0.35s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: white; border-radius: 36px; padding: 1.8rem; margin-bottom: 1.8rem;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.04); border: 0.5px solid #f0f2f6;
+        }
+        /* من نحن */
+        .hero-icon { text-align: center; margin-bottom: 1rem; }
+        .hero-icon img { height: 70px; width: auto; background: transparent; }
+        .about-title {
+            font-size: 2rem; font-weight: 800; text-align: center;
+            background: linear-gradient(135deg, #006233, #D21034);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+            margin-bottom: 1rem;
+        }
+        .about-text { font-size: 1rem; line-height: 1.7; color: #2d3e50; margin-bottom: 1.2rem; }
+        .vision-box {
+            background: linear-gradient(145deg, #f0fdf4, #e8f5e9);
+            border-radius: 28px; padding: 1rem; text-align: center; border-right: 4px solid #006233;
+        }
+
+        /* الأوسمة - جنب بعض */
+        .medals-scroll {
+            display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 1rem;
+            padding-bottom: 0.5rem; scrollbar-width: thin;
+        }
+        .medal-card {
+            flex: 0 0 180px; background: #fafcff; border-radius: 32px; padding: 1.2rem 0.8rem;
+            text-align: center; cursor: pointer; transition: all 0.25s;
+            border: 1px solid #edf2f8; border-top-width: 6px; border-top-style: solid;
+        }
+        .medal-card:hover { transform: translateY(-6px); background: white; box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1); }
+        .medal-card i { font-size: 2.2rem; width: 60px; height: 60px; line-height: 60px; border-radius: 30px; margin-bottom: 0.6rem; }
+        .medal-card h4 { font-size: 1rem; font-weight: 800; margin: 0.4rem 0; }
+        .medal-detail { background: #f8fafc; border-radius: 28px; padding: 1.2rem; margin: 1rem 0; border-right: 5px solid; }
+
+        /* المكرمون - بحث واحد بالولاية */
+        .wilaya-search {
+            width: 100%; padding: 0.9rem 1.2rem; border-radius: 60px; border: 1px solid #e2e8f0;
+            font-family: 'Cairo', sans-serif; font-size: 1rem; margin-bottom: 1rem;
+        }
+        .map-wrapper { height: 320px; border-radius: 28px; overflow: hidden; margin: 1rem 0; border: 1px solid #edf2f7; }
+        .honorees-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .honoree-card {
+            background: white; border-radius: 32px; overflow: hidden; transition: 0.25s;
+            border: 0.5px solid #edf2f8; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+        }
+        .honoree-card:hover { transform: translateY(-6px); box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1); }
+        .honoree-img { width: 100%; height: 170px; object-fit: cover; background: #eef2f6; }
+        .honoree-info { padding: 1rem; }
+        .honoree-name { font-size: 1.2rem; font-weight: 800; }
+        .medal-tag { display: inline-block; padding: 0.2rem 0.9rem; border-radius: 40px; font-size: 0.7rem; font-weight: 700; margin: 0.5rem 0; }
+
+        /* نموذج الترشيح مع رفع صورة */
+        .form-group { margin-bottom: 1rem; }
+        label { font-weight: 700; display: block; margin-bottom: 0.3rem; }
+        input, select, textarea { width: 100%; padding: 0.8rem 1rem; border-radius: 28px; border: 1px solid #e2e8f0; font-family: 'Cairo', sans-serif; }
+        .file-preview { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .preview-img { width: 60px; height: 60px; border-radius: 16px; object-fit: cover; }
+        .submit-btn { background: #006233; color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 44px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .contact-icons { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+        .contact-icon { background: #f1f5f9; width: 48px; height: 48px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #006233; text-decoration: none; }
+        .modal {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal-content { background: white; max-width: 500px; width: 90%; border-radius: 48px; padding: 1.5rem; max-height: 80vh; overflow-y: auto; }
+        .close-modal { float: left; font-size: 1.6rem; cursor: pointer; color: #94a3b8; }
+        footer { text-align: center; margin: 1rem 0 2rem; padding: 0.5rem; font-size: 0.7rem; color: #9aa9bc; }
+        @media (max-width: 720px) { .container { padding: 1rem; } .medal-card { flex: 0 0 150px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo-wrapper">
+        <div class="main-logo"><img id="wissamiLogo" src="wissami.png" alt="وسامي ديزاد" onerror="this.src='https://placehold.co/90x90?text=وسامي'"></div>
+        <div class="forum-badge"><img id="forumLogo" src="logo.png" class="forum-logo" onerror="this.src='https://placehold.co/32x32?text=نزاهة'"><span>المنتدى الشبابي للفكر والمشاركة المدنية</span></div>
+    </div>
+
+    <!-- محتوى التبويبات -->
+    <div id="aboutTab" class="tab-content active">
+        <div class="card">
+            <div class="hero-icon"><img id="aboutLogo" src="wissami.png" alt="وسامي ديزاد" style="height:70px;"></div>
+            <h1 class="about-title">وسامي ديزاد</h1>
+            <p class="about-text">منصة وطنية لتوثيق الأثر المجتمعي والاحتفاء بالكفاءات والقدوات. نؤمن بأن "الأثر يبقى"، فصممنا هذا السجل الذهبي ليكون شهادة فخر لكل من ترك بصمة إيجابية في المجتمع الجزائري.</p>
+            <p class="about-text">نرصد ونكرم الممكنين، المربين، المحسنين، المبتكرين، والمثقفين الذين ساهموا في بناء الوعي ونشر الخير. "وسامي ديزاد" هو جسر تقدير يربط المبادرات الشبابية بصناع التغيير في كل شبر من الوطن.</p>
+            <div class="vision-box"><i class="fas fa-hand-sparkles"></i> <strong>رؤيتنا:</strong> جزائر يسودها الاعتراف بالعطاء، وتُروى فيها حكايات الأثر الجميل.</div>
+        </div>
+    </div>
+
+    <div id="medalsTab" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-gem"></i> خزانة الأوسمة</h3>
+            <div id="medalsList" class="medals-scroll"></div>
+            <div id="medalDetail" class="medal-detail" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="honoreesTab" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-trophy"></i> سجل المكرمين</h3>
+            <input type="text" id="wilayaSearch" class="wilaya-search" placeholder="🔍 ابحث باسم الولاية... (مثال: الجزائر، وهران، قسنطينة)">
+            <div class="map-wrapper"><div id="algeriaMap" style="height:100%; width:100%;"></div></div>
+            <div id="honoreesList" class="honorees-grid"></div>
+        </div>
+    </div>
+
+    <div id="nominateTab" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-pen-fancy"></i> ترشيح شخصية لوسام وطني</h3>
+            <form id="nominationForm">
+                <div class="form-group"><label>الاسم الكامل للمرشح *</label><input type="text" id="nomineeName" required></div>
+                <div class="form-group"><label>الولاية</label><input type="text" id="nomineeWilaya"></div>
+                <div class="form-group"><label>الوسام المطلوب *</label><select id="nomineeMedal" required></select></div>
+                <div class="form-group"><label>سبب الاستحقاق (الأثر المجتمعي) *</label><textarea rows="3" id="nomineeReason" required></textarea></div>
+                <div class="form-group"><label>صورة المرشح (رفع صورة)</label><input type="file" id="nomineeImageFile" accept="image/*"></div>
+                <div id="imagePreview" class="file-preview" style="display:none;"><img id="previewImg" class="preview-img"><span id="previewName"></span></div>
+                <div class="form-group"><label>مقدم الترشيح (اختياري)</label><input type="text" id="nominatorName"></div>
+                <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> إرسال الترشيح</button>
+            </form>
+            <div style="margin-top: 1.5rem; border-top: 0.5px solid #eef2f8; padding-top: 1rem;">
+                <h4><i class="fas fa-phone-alt"></i> تواصل معنا</h4>
+                <div class="contact-icons">
+                    <a href="mailto:nazahaa36.inf@gmail.com" class="contact-icon"><i class="fas fa-envelope"></i></a>
+                    <a href="#" class="contact-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="contact-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="contact-icon"><i class="fab fa-twitter"></i></a>
+                </div>
+                <p style="text-align: center; margin-top: 1rem;">بريد الترشيحات: nazahaa36.inf@gmail.com</p>
+            </div>
+        </div>
+    </div>
+    <footer><i class="fas fa-hand-sparkles"></i> وسامي ديزاد · توثيق الأثر والاحتفاء بالقدوات</footer>
+</div>
+
+<div class="bottom-tab-bar">
+    <button class="tab-btn active" data-tab="aboutTab"><i class="fas fa-info-circle"></i><span>من نحن</span></button>
+    <button class="tab-btn" data-tab="medalsTab"><i class="fas fa-medal"></i><span>الأوسمة</span></button>
+    <button class="tab-btn" data-tab="honoreesTab"><i class="fas fa-users"></i><span>المكرمون</span></button>
+    <button class="tab-btn" data-tab="nominateTab"><i class="fas fa-pen-alt"></i><span>ترشيح</span></button>
+</div>
+
+<div id="profileModal" class="modal"><div class="modal-content"><span class="close-modal">&times;</span><div id="modalContent"></div></div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // الأوسمة
+    const medals = [
+        { name: "المُمكِّن", icon: "fas fa-handshake", color: "#2E7D32", def: "وسام التمكين: يُمنح لصنّاع القرار والجهات الداعمة الذين يذللون العقبات ويفتحون آفاق التمكين للشباب والمبادرات." },
+        { name: "المُلهم", icon: "fas fa-lightbulb", color: "#F57C00", def: "وسام الإلهام: للشخصيات المؤثرة التي تغير القناعات وتنشر الفكر الإيجابي وتشعل شرارة الأمل." },
+        { name: "المُربي", icon: "fas fa-chalkboard-user", color: "#1976D2", def: "وسام التربية: للأساتذة والمعلمين الذين كرسوا حياتهم لخدمة الطفولة وتنشئة الأجيال." },
+        { name: "المُحسن", icon: "fas fa-hand-holding-heart", color: "#C2185B", def: "وسام الإحسان: لرواد العمل الخيري والميداني الذين يساعدون الفئات الهشة ويتركون أثراً إنسانياً." },
+        { name: "المُبتكر", icon: "fas fa-microchip", color: "#8E24AA", def: "وسام الابتكار: لأصحاب المبادرات العلمية والتقنية التي تقدم حلولاً ذكية لتحديات المجتمع." },
+        { name: "المثقف", icon: "fas fa-landmark", color: "#1E3A5F", def: "وسام الثقافة: لحماة الهوية الوطنية ومنشطي السياحة والمبدعين في الفنون والتراث." },
+        { name: "المواطن الفعّال", icon: "fas fa-hand-peace", color: "#00ACC1", def: "وسام المواطنة: للمتطوعين وقادة المجتمع المدني الذين يعززون التضامن والعمل الجماعي." },
+        { name: "الصانع المبدع", icon: "fas fa-drafting-compass", color: "#FF6D00", def: "وسام الإبداع الحرفي: للحرفيين والفنانين الذين يبدعون في صناعة الجمال ويحافظون على التراث." },
+        { name: "الرائد البيئي", icon: "fas fa-tree", color: "#43A047", def: "وسام الريادة البيئية: للناشطين في حماية البيئة والتشجير والتنمية المستدامة." }
+    ];
+
+    let honorees = [];
+    let map, markersLayer;
+
+    function getMedalColor(name) { let m = medals.find(m => m.name === name); return m ? m.color : "#D21034"; }
+    function getMedalIcon(name) { let m = medals.find(m => m.name === name); return m ? m.icon : "fas fa-medal"; }
+    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    // عرض الأوسمة
+    function buildMedals() {
+        const container = document.getElementById("medalsList");
+        container.innerHTML = "";
+        medals.forEach(m => {
+            const card = document.createElement("div");
+            card.className = "medal-card";
+            card.style.borderTopColor = m.color;
+            card.innerHTML = `<i class="${m.icon}" style="background:${m.color}10; color:${m.color};"></i><h4>${m.name}</h4>`;
+            card.onclick = () => {
+                const detailDiv = document.getElementById("medalDetail");
+                detailDiv.style.display = "block";
+                detailDiv.style.borderRightColor = m.color;
+                detailDiv.innerHTML = `<div style="display:flex; gap:12px; align-items:center;"><i class="${m.icon}" style="font-size:2rem; color:${m.color};"></i><h3>${m.name}</h3></div><p style="margin-top:0.8rem;">${m.def}</p><hr style="margin:0.8rem 0;"><p><i class="fas fa-heart"></i> هذا الوسام يُمنح لمن يضربون أروع الأمثلة في العطاء والإخلاص للوطن.</p>`;
+                detailDiv.scrollIntoView({ behavior: "smooth" });
+            };
+            container.appendChild(card);
+        });
+    }
+
+    // عرض المكرمين
+    function renderHonorees(list) {
+        const container = document.getElementById("honoreesList");
+        if (!list.length) { container.innerHTML = `<div class="friendly-msg" style="background:#fef9e6; border-radius:28px; padding:1.5rem; text-align:center;">✨ لا توجد بيانات مكرمين. يمكنك ترشيح شخصيات جديدة من تبويبة الترشيح ✨</div>`; return; }
+        container.innerHTML = list.map(h => {
+            const color = getMedalColor(h.medal);
+            const imgSrc = h.image || "https://placehold.co/400x300?text=صورة+الشخصية";
+            return `<div class="honoree-card" onclick="openProfile(${h.id})">
+                        <img class="honoree-img" src="${imgSrc}" onerror="this.src='https://placehold.co/400x300?text=صورة'">
+                        <div class="honoree-info">
+                            <div class="honoree-name">${escapeHtml(h.name)}</div>
+                            <div><span class="medal-tag" style="background:${color}15; color:${color};">${h.medal}</span></div>
+                            <div style="font-size:0.7rem;"><i class="fas fa-map-pin"></i> ${escapeHtml(h.wilaya || "الجزائر")}</div>
+                        </div>
+                    </div>`;
+        }).join('');
+    }
+
+    // فلترة حسب الولاية
+    function filterByWilaya(wilaya) {
+        const searchInput = document.getElementById("wilayaSearch");
+        searchInput.value = wilaya || "";
+        const filtered = honorees.filter(h => !wilaya || (h.wilaya && h.wilaya.toLowerCase().includes(wilaya.toLowerCase())));
+        renderHonorees(filtered);
+        updateMapMarkers(filtered);
+    }
+
+    // خريطة
+    function initMap() {
+        if(map) return;
+        map = L.map('algeriaMap').setView([28.5, 2.0], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CartoDB', subdomains: 'abcd' }).addTo(map);
+        markersLayer = L.layerGroup().addTo(map);
+    }
+    function updateMapMarkers(list) {
+        if(!markersLayer) return;
+        markersLayer.clearLayers();
+        list.forEach(h => {
+            if(!h.lat || !h.lng) return;
+            let color = getMedalColor(h.medal);
+            let iconHtml = `<div style="background:${color}; width:34px;height:34px;border-radius:30px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.9rem;"><i class="${getMedalIcon(h.medal)}"></i></div>`;
+            let icon = L.divIcon({ html: iconHtml, iconSize: [34,34] });
+            let marker = L.marker([h.lat, h.lng], { icon }).addTo(markersLayer);
+            marker.bindPopup(`<b>${escapeHtml(h.name)}</b><br>${h.medal}<br><button onclick="filterByWilaya('${escapeHtml(h.wilaya)}')" style="background:#006233; color:white; border:none; border-radius:20px; padding:4px 10px; margin-top:5px;">عرض مكرمي ${escapeHtml(h.wilaya)}</button>`);
+            marker.on('click', () => filterByWilaya(h.wilaya));
+        });
+    }
+
+    window.openProfile = function(id) {
+        let h = honorees.find(p => p.id === id);
+        if(!h) return;
+        let color = getMedalColor(h.medal);
+        let imgSrc = h.image || "https://placehold.co/400x300?text=صورة";
+        document.getElementById("modalContent").innerHTML = `
+            <div style="text-align:center;"><img src="${imgSrc}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid ${color};"><h2>${escapeHtml(h.name)}</h2><span style="background:${color}15;padding:4px 16px;border-radius:40px;">${h.medal}</span></div>
+            <p><i class="fas fa-map-pin"></i> <strong>الولاية:</strong> ${escapeHtml(h.wilaya)}</p>
+            <hr><h4>لماذا استحق الوسام؟</h4><p>${escapeHtml(h.why) || "عطاء مميز وأثر مجتمعي واضح."}</p>
+            <div style="background:#f8fafc; border-radius:24px; padding:0.8rem; margin-top:0.8rem;"><i class="fas fa-scroll"></i> <strong>المبادرة:</strong><br> ${escapeHtml(h.initiative) || "ساهم في مشاريع تنموية وطنية."}</div>
+        `;
+        document.getElementById("profileModal").style.display = "flex";
+    };
+
+    // تحميل البيانات من JSON (إن وجد)
+    async function loadData() {
+        try {
+            const res = await fetch('Wissamm.json');
+            if(res.ok) {
+                const data = await res.json();
+                let arr = Array.isArray(data) ? data : (data.honorees || []);
+                honorees = arr.map((h,i) => ({ id: h.id || i+1, name: h.name, wilaya: h.wilaya, medal: h.medal, lat: h.lat, lng: h.lng, why: h.why, initiative: h.initiative, image: h.image || h.image_url }));
+            } else throw new Error();
+        } catch(e) { honorees = []; }
+        // إذا كان هناك بيانات محلية مخزنة (من الترشيح) ندمجها
+        const local = localStorage.getItem("wissami_honorees");
+        if(local) {
+            const localData = JSON.parse(local);
+            honorees = [...honorees, ...localData];
+            honorees = honorees.filter((v,i,a)=>a.findIndex(t=>t.id===v.id)===i);
+        }
+        renderHonorees(honorees);
+        updateMapMarkers(honorees);
+        document.getElementById("wilayaSearch").addEventListener("input", (e) => filterByWilaya(e.target.value));
+    }
+
+    // نموذج الترشيح مع رفع الصورة
+    function setupNomination() {
+        const medalSelect = document.getElementById("nomineeMedal");
+        medals.forEach(m => medalSelect.innerHTML += `<option value="${m.name}">${m.name}</option>`);
+        const fileInput = document.getElementById("nomineeImageFile");
+        const previewDiv = document.getElementById("imagePreview");
+        const previewImg = document.getElementById("previewImg");
+        fileInput.addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    previewImg.src = ev.target.result;
+                    previewDiv.style.display = "flex";
+                    document.getElementById("previewName").innerText = file.name;
+                };
+                reader.readAsDataURL(file);
+            } else previewDiv.style.display = "none";
+        });
+        document.getElementById("nominationForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            let name = document.getElementById("nomineeName").value.trim();
+            if(!name) return alert("أدخل اسم المرشح");
+            let wilaya = document.getElementById("nomineeWilaya").value;
+            let medal = document.getElementById("nomineeMedal").value;
+            let reason = document.getElementById("nomineeReason").value;
+            let nominator = document.getElementById("nominatorName").value;
+            let imageData = null;
+            if(fileInput.files.length) {
+                const reader = new FileReader();
+                reader.onload = function(ev) { imageData = ev.target.result; sendNomination(name, wilaya, medal, reason, nominator, imageData); };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else sendNomination(name, wilaya, medal, reason, nominator, null);
+            function sendNomination(n, w, m, r, nom, img) {
+                // إضافة المكرم الجديد إلى القائمة المحلية
+                const newId = Date.now();
+                const newHonoree = { id: newId, name: n, wilaya: w, medal: m, why: r, initiative: "تم الترشيح عبر المنصة", image: img || null, lat: 36.7538, lng: 3.0588 };
+                honorees.push(newHonoree);
+                // حفظ في localStorage
+                const local = localStorage.getItem("wissami_honorees") || "[]";
+                const arr = JSON.parse(local);
+                arr.push(newHonoree);
+                localStorage.setItem("wissami_honorees", JSON.stringify(arr));
+                renderHonorees(honorees);
+                updateMapMarkers(honorees);
+                // إرسال البريد
+                let body = `ترشيح لوسام وطني:\nالمرشح: ${n}\nالولاية: ${w}\nالوسام: ${m}\nسبب الاستحقاق: ${r}\nمقدم الترشيح: ${nom || "غير مذكور"}\n--\nتم إضافة المكرم إلى السجل المحلي. الصورة مرفقة في التطبيق.`;
+                window.location.href = `mailto:nazahaa36.inf@gmail.com?subject=ترشيح%20لوسام%20${encodeURIComponent(m)}&body=${encodeURIComponent(body)}`;
+                alert("تم إضافة المكرم إلى السجل وفتح بريدك لإرسال الترشيح. شكراً!");
+                document.getElementById("nominationForm").reset();
+                previewDiv.style.display = "none";
+                fileInput.value = "";
+            }
+        });
+    }
+
+    // التبويبات
+    function initTabs() {
+        const btns = document.querySelectorAll(".tab-btn");
+        const contents = document.querySelectorAll(".tab-content");
+        btns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                let tabId = btn.getAttribute("data-tab");
+                contents.forEach(c => c.classList.remove("active"));
+                btns.forEach(b => b.classList.remove("active"));
+                document.getElementById(tabId).classList.add("active");
+                btn.classList.add("active");
+                if(tabId === "honoreesTab" && map) setTimeout(() => map.invalidateSize(), 150);
+            });
+        });
+    }
+
+    document.querySelector(".close-modal")?.addEventListener("click", () => document.getElementById("profileModal").style.display = "none");
+    window.onclick = (e) => { if(e.target === document.getElementById("profileModal")) document.getElementById("profileModal").style.display = "none"; };
+
+    buildMedals();
+    initMap();
+    loadData();
+    setupNomination();
+    initTabs();
+    document.getElementById("wissamiLogo").src = "wissami.png";
+    document.getElementById("forumLogo").src = "logo.png";
+    document.getElementById("aboutLogo").src = "wissami.png";
+</script>
+</body>
+</html>
