@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>nazaha.dz</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2334c759'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white'%3Eن%3C/text%3E%3C/svg%3E">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Noto+Kufi+Arabic:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', 'Noto Kufi Arabic', sans-serif; }
+        :root {
+            --primary-green: #34c759;
+            --accent-red: #ff3b30;
+            --ios-bg: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #1c1c1e;
+            --bottom-nav-bg: rgba(255, 255, 255, 0.92);
+        }
+        body.dark {
+            --ios-bg: #000000;
+            --glass-bg: rgba(28, 28, 30, 0.9);
+            --text-main: #ffffff;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --bottom-nav-bg: rgba(28, 28, 30, 0.95);
+        }
+        body { background-color: var(--ios-bg); color: var(--text-main); transition: 0.4s; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* loading screen */
+        .loading-screen {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: var(--ios-bg); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.5s; text-align: center; padding:20px;
+        }
+        .loading-screen.hide { opacity: 0; visibility: hidden; }
+        .spinner { width: 60px; height: 60px; border:5px solid rgba(52,199,89,0.2); border-top:5px solid var(--primary-green); border-radius:50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .inspirational-quote { margin-top:30px; font-size:18px; font-weight:600; color:var(--primary-green); max-width:80%; line-height:1.6; }
+        .quote-author { margin-top:10px; font-size:14px; opacity:0.7; }
+
+        /* header */
+        header {
+            position: fixed; top:0; width:100%; padding:8px 12px; display: flex; justify-content: space-between; align-items: center;
+            z-index:1000; backdrop-filter: blur(20px); background: var(--glass-bg); border-bottom:1px solid var(--glass-border);
+        }
+        .youth-logo { width:40px; height:40px; background:var(--primary-green); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px white,0 0 0 4px var(--primary-green); overflow:hidden; }
+        .youth-logo img { width:100%; height:100%; object-fit:cover; }
+        .header-title { font-weight:800; font-size:12px; color:var(--primary-green); line-height:1.4; text-align:center; max-width:160px; }
+        .header-title .line1 { display:block; }
+        .header-title .line2 { display:block; font-size:11px; opacity:0.9; }
+        .header-actions { display:flex; gap:14px; align-items:center; }
+
+        /* bottom nav */
+        .bottom-nav {
+            position: fixed; bottom:0; left:0; right:0; background: var(--bottom-nav-bg); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; padding: 8px 12px 20px; border-top:1px solid var(--glass-border); z-index:1000;
+        }
+        .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:0.6; transition:0.2s; font-size:10px; font-weight:600; }
+        .nav-item i { font-size:20px; }
+        .nav-item.active { opacity:1; color:var(--primary-green); }
+
+        /* tabs */
+        .tab-content { display: none; padding: 80px 16px 25px; animation: slideUp 0.4s ease; max-width: 850px; margin: auto; }
+        .tab-content.active { display: block; }
+        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        /* cards */
+        .animated-card {
+            background: linear-gradient(135deg, #2b8c4e, #1e6a3b);
+            border-radius: 48px; padding: 35px 25px; text-align: center; max-width:650px; width:100%; margin:0 auto;
+            box-shadow:0 30px 40px rgba(0,0,0,0.2); transition: transform 0.3s ease;
+        }
+        .animated-card:hover { transform: translateY(-6px); }
+        .icon-container { font-size:56px; color:white; margin-bottom:16px; filter:drop-shadow(0 0 8px rgba(0,0,0,0.3)); animation: gentlePulse 2s infinite ease-in-out; }
+        @keyframes gentlePulse { 0% { transform:scale(1); opacity:0.95; } 50% { transform:scale(1.05); opacity:1; text-shadow:0 0 12px white; } 100% { transform:scale(1); opacity:0.95; } }
+        .dynamic-text { font-size:28px; font-weight:800; color:white; min-height:90px; display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; text-shadow:0 2px 5px rgba(0,0,0,0.3); }
+        .hero-title { font-size:22px; font-weight:900; color:var(--primary-green); margin-bottom:18px; text-align:center; }
+        .ios-card { background:var(--glass-bg); border-radius:28px; padding:24px; margin-bottom:20px; border:1px solid var(--glass-border); box-shadow:0 10px 25px rgba(0,0,0,0.05); }
+        .btn-submit { background:var(--primary-green); color:white; padding:12px; border-radius:20px; border:none; font-weight:bold; width:100%; cursor:pointer; transition:all 0.3s; font-size:15px; }
+        .btn-submit:hover { transform:scale(1.02); box-shadow:0 8px 20px rgba(52,199,89,0.4); }
+        .form-input { width:100%; padding:12px 16px; margin-bottom:14px; border-radius:20px; border:1px solid var(--glass-border); background:var(--glass-bg); font-size:14px; transition:0.3s; }
+        .form-input:focus { outline:none; border-color:var(--primary-green); box-shadow:0 0 0 3px rgba(52,199,89,0.2); }
+        .toast { position:fixed; top:20px; right:20px; left:20px; max-width:400px; padding:12px 16px; border-radius:18px; box-shadow:0 12px 25px rgba(0,0,0,0.2); display:none; align-items:center; gap:12px; z-index:9999; backdrop-filter:blur(20px); font-weight:600; }
+        .toast.success { background:rgba(52,199,89,0.95); color:white; }
+        .toast.error { background:rgba(255,59,48,0.95); color:white; }
+        .toast.info { background:rgba(0,122,255,0.95); color:white; }
+
+        /* initiatives cards */
+        .initiatives-container { display:flex; flex-direction:column; gap:16px; }
+        .initiative-card { background:var(--glass-bg); border-radius:24px; border:1px solid var(--glass-border); overflow:hidden; cursor:pointer; transition:transform 0.2s; }
+        .initiative-card:hover { transform:translateY(-3px); }
+        .initiative-img { width:100%; height:150px; object-fit:cover; background:#2b8c4e; }
+        .initiative-info { padding:14px; }
+        .initiative-title { font-size:17px; font-weight:800; margin-bottom:6px; }
+        .initiative-date, .initiative-category { font-size:12px; opacity:0.7; display:inline-block; margin-left:10px; }
+
+        /* footer icons - صغيرة جداً */
+        .global-footer {
+            margin-top: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 8px 16px 80px;
+            text-align: center;
+        }
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            margin-bottom: 6px;
+        }
+        .footer-icon {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 7px;
+            transition: 0.2s;
+        }
+        .footer-icon i {
+            font-size: 12px;
+            color: var(--primary-green);
+        }
+        .copyright { font-size: 8px; opacity: 0.6; }
+
+        /* modals */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px);
+            z-index:10001; display:none; align-items:center; justify-content:center; padding:20px;
+        }
+        .modal-container {
+            background: var(--glass-bg); border-radius:32px; max-width:650px; width:100%; max-height:85vh; overflow-y:auto;
+            padding:24px; position:relative; border:1px solid var(--glass-border);
+        }
+        .modal-close { position:absolute; top:12px; left:12px; background:var(--accent-red); border:none; width:32px; height:32px; border-radius:50%; color:white; cursor:pointer; }
+        .consent-field { background:rgba(52,199,89,0.05); border-radius:20px; padding:12px; margin-top:10px; }
+        .map-container iframe { width:100%; height:300px; border-radius:20px; border:none; }
+        .board-members { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-top:20px; }
+        .member-card { text-align:center; width:220px; background:rgba(52,199,89,0.08); border-radius:28px; padding:18px; }
+        .circle-icon { width:40px; height:40px; background:rgba(52,199,89,0.15); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
+        .type-buttons { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="inspirational-quote" id="inspirationalQuote">"نزاهة .. لأن الفكر أول خطوة للتغيير"</div>
+    <div class="quote-author">- المنتدى الشبابي للفكر والمشاركة المدنية</div>
+</div>
+
+<header>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <div class="youth-logo"><img id="dynamic-logo" src="logo.png" alt="شعار نزاهة" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%2334c759%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2750%27 text-anchor=%27middle%27 fill=%27white%27%3Eن%3C/text%3E%3C/svg%3E'"></div>
+        <div class="header-title"><span class="line1">المنتدى الشبابي للفكر</span><span class="line2">والمشاركة المدنية</span></div>
+    </div>
+    <div class="header-actions"><div onclick="toggleTheme()" style="cursor:pointer;"><i class="fas fa-moon" id="theme-icon"></i></div></div>
+</header>
+
+<div class="bottom-nav">
+    <div class="nav-item active" data-tab="home"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+    <div class="nav-item" data-tab="about"><i class="fas fa-users"></i><span>من نحن</span></div>
+    <div class="nav-item" data-tab="initiatives"><i class="fas fa-bullhorn"></i><span>مبادراتنا</span></div>
+    <div class="nav-item" data-tab="register"><i class="fas fa-user-plus"></i><span>تسجيل</span></div>
+</div>
+
+<!-- الرئيسية -->
+<div id="home" class="tab-content active">
+    <div class="hero-section">
+        <div class="animated-card">
+            <div class="icon-container" id="animatedIcon"><i class="fas fa-brain"></i></div>
+            <div class="dynamic-text"><span class="typed-text" id="typedText"></span><span class="cursor"></span></div>
+            <div style="margin-top:25px;"><button onclick="openRegistrationModalDirectly()" class="btn-submit" style="width:auto; padding:10px 24px; background:white; color:#1e6a3b;">سجّل الآن وكن صانع التغيير</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- من نحن (نص كامل) -->
+<div id="about" class="tab-content">
+    <div class="ios-card"><h2 class="hero-title">منتدى نزاهة .. مشروع وطني شبابي بامتياز</h2><p class="section-desc" style="font-size:15px; font-weight:500;">نزاهة ليس مجرد منتدى عابر، إنه حركة فكرية شبابية منظمة تسعى لزرع الوعي النقدي والمشاركة المدنية الحقيقية في نسيج المجتمع الجزائري. نحن نؤمن بأن الشباب اليوم هو القوة المحركة للتغيير، وأن الاستثمار في العقول هو الضمان الأوحد لمستقبل مزدهر. يجمع المنتدى تحت لوائه شباباً طموحاً من مختلف التخصصات، يركّز على تمكين الفئة العمرية من 14 إلى 30 سنة، ويهدف لأن يكون حاضنة حقيقية للكفاءات التي ستقود المشهد الوطني غداً.</p></div>
+    <div class="ios-card"><h2 class="hero-title">الرؤية: جيل واعٍ يقود التحول</h2><p class="section-desc">نتطلع لأن نكون النموذج الرائد في تأهيل الشباب فكرياً ومدنياً، بحيث يصبح كل شاب جزائري سفيراً للنزاهة والمواطنة الفاعلة. نريد أن نرى مؤسسات الدولة تتبنى نموذج "نزاهة" كأفضل ممارسة في التربية على المواطنة، وأن تصبح مبادراتنا منهاجاً معتمداً في دور الشباب والمراكز الثقافية. رؤيتنا هي جزائر يقودها شباب متسلح بالعلم، منفتح على العالم، متمسك بهويته، قادر على مواجهة التحديات بروح نقدية بناءة.</p></div>
+    <div class="ios-card"><h2 class="hero-title">الرسالة: فكر يحرر، مشاركة تبني</h2><p class="section-desc">نعمل على تأطير الشباب عبر برامج توعوية عميقة، ندوات فكرية، مخيمات تكوينية، ومشاريع ميدانية تعزز قيم الشفافية والحوار. نؤمن بأن التغيير الحقيقي يبدأ من داخل العقل، لذا نركز على تنمية مهارات التحليل، التفكير النقدي، والوعي بالقضايا الوطنية. نمد جسور التعاون مع وزارة الشباب والرياضة، مديريات الشباب، والمجتمع المدني لنخلق بيئة داعمة للمبادرات الشبابية. رسالتنا هي تحويل الطاقة الشبابية إلى طاقة إيجابية فاعلة في المجتمع.</p></div>
+    <div class="ios-card"><h2 class="hero-title">أهدافنا الاستراتيجية (لماذا ستدعمنا الوزارة؟)</h2><ul class="section-desc" style="list-style:none;"><li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>معالجة ضعف الوعي الفكري:</strong> من خلال برامج فكرية منهجية تعزز ثقافة النقد البناء ومكافحة التطرف الفكري.</li><li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>تأهيل قادة المستقبل:</strong> إعداد كوادر شبابية قيادية قادرة على تسيير العمل الجمعوي والعمومي وفق معايير النزاهة.</li><li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>تعزيز المشاركة المدنية:</strong> تحويل الشباب من متفرجين إلى فاعلين في التنمية المحلية عبر مشاريع ملموسة.</li><li style="margin-bottom:14px;"><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>التكامل مع مؤسسات الدولة:</strong> تقديم نموذج عملي يمكن تعميمه على مستوى ولايات الجمهورية بالشراكة مع قطاع الشباب.</li><li><i class="fas fa-check-circle" style="color:var(--primary-green); margin-left:12px;"></i> <strong>خلق فضاء آمن للحوار:</strong> بعيداً عن أي انتماء حزبي أو جهوي، ضمن إطار وطني خالص.</li></ul><div style="margin-top:25px; background:rgba(52,199,89,0.1); border-radius:20px; padding:16px; text-align:center;"><i class="fas fa-chart-line" style="color: var(--primary-green); font-size:24px;"></i><p style="margin-top:10px; font-weight:600;">نحن نصنع المستقبل اليوم.. انضم إلى طليعة الشباب المؤثر في الجزائر الجديدة.</p></div></div>
+    <div class="ios-card"><h2 class="hero-title">موقعنا على الخريطة</h2><div class="map-container"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12906.613500475354!2d8.0342!3d36.7676!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12f2b2f2b2f2b2f%3A0x2b2f2b2f2b2f2b2f!2z2YXYs9in2YHZg9iq!5e0!3m2!1sar!2sdz!4v1712345678901!5m2!1sar!2sdz" allowfullscreen="" loading="lazy"></iframe></div><p style="margin-top:12px;"><i class="fas fa-building"></i> العنوان: دار الشباب أحمد بتشين – الطارف + المركب الرياضي الجواري – القالة</p></div>
+    <div class="ios-card"><h2 class="hero-title">أعضاء مجلس الإدارة</h2><div class="board-members"><div class="member-card"><div class="circle-icon" style="width:70px; height:70px; margin:0 auto 12px; font-size:32px;"><i class="fas fa-user-tie"></i></div><h3>نزيه عبدالله بومهني</h3><p style="color: var(--primary-green);">المؤسس ورئيس المنتدى</p><div><a href="https://www.facebook.com/nazihboumahni" target="_blank"><i class="fab fa-facebook" style="color:var(--primary-green); font-size:18px; margin:0 5px;"></i></a><a href="https://www.instagram.com/nazihboumahni" target="_blank"><i class="fab fa-instagram" style="color:var(--primary-green); font-size:18px;"></i></a></div></div><div class="member-card"><div class="circle-icon" style="width:70px; height:70px; margin:0 auto 12px; font-size:32px;"><i class="fas fa-user-secret"></i></div><h3>صلاح الدين بن قسمية</h3><p style="color: var(--primary-green);">أمين السر</p></div></div></div>
+</div>
+
+<!-- مبادراتنا -->
+<div id="initiatives" class="tab-content">
+    <div class="ios-card"><h2 class="hero-title">مبادراتنا وأنشطتنا</h2><div id="initiativesList" class="initiatives-container"></div></div>
+</div>
+
+<!-- تبويب التسجيل (يحتوي على نفس آلية النافذة المنبثقة) -->
+<div id="register" class="tab-content">
+    <div class="ios-card">
+        <div style="text-align:center;"><div class="youth-logo" style="width:70px; height:70px; margin:0 auto 10px;"><img src="logo.png" style="width:100%;height:100%;border-radius:12px;"></div></div>
+        <h2 class="hero-title">انضم إلى حركة النزاهة الآن</h2>
+        <button onclick="openRegistrationModalDirectly()" class="btn-submit">ابدأ التسجيل</button>
+    </div>
+</div>
+
+<!-- مودال التسجيل الرئيسي (يظهر فيه خيارات الانخراط/التوظيف/المشاركة) -->
+<div id="registrationModal" class="modal-overlay">
+    <div class="modal-container">
+        <button class="modal-close" onclick="closeRegistrationModal()"><i class="fas fa-times"></i></button>
+        <div style="text-align:center;"><div class="youth-logo" style="width:50px; height:50px; margin:0 auto 10px;"><img src="logo.png" style="width:100%;height:100%;border-radius:12px;"></div></div>
+        <h3 style="text-align:center; color:var(--primary-green);">اختر نوع التسجيل</h3>
+        <div class="type-buttons">
+            <button onclick="showTermsForType('انخراط')" class="btn-submit">طلب عضوية (انخراط)</button>
+            <button onclick="showTermsForType('توظيف')" class="btn-submit">التطوع والانضمام للفرق</button>
+            <button onclick="showTermsForType('مشاركة')" class="btn-submit" style="grid-column:span 2;">المشاركة في الأنشطة والمسابقات</button>
+        </div>
+        <button onclick="closeRegistrationModal()" class="btn-submit" style="background:#ff3b30; margin-top:10px;">إلغاء</button>
+    </div>
+</div>
+
+<!-- مودال عرض الشروط (يظهر بعد اختيار نوع التسجيل) -->
+<div id="termsModal" class="modal-overlay">
+    <div class="modal-container">
+        <button class="modal-close" onclick="closeTermsModal()"><i class="fas fa-times"></i></button>
+        <div id="termsContent" class="terms-content"></div>
+        <div class="agree-check" style="margin:15px 0;"><label><input type="checkbox" id="termsAgreeCheckbox"> أوافق على جميع الشروط والأحكام والنظام الداخلي للمنتدى.</label></div>
+        <button class="btn-modal" onclick="acceptTermsAndShowForm()" style="background:var(--primary-green); color:white; padding:10px; border-radius:30px; width:100%; border:none;">أوافق وأكمل</button>
+    </div>
+</div>
+
+<!-- مودال نموذج التسجيل (يظهر بعد الموافقة على الشروط) -->
+<div id="formModal" class="modal-overlay">
+    <div class="modal-container">
+        <button class="modal-close" onclick="closeFormModal()"><i class="fas fa-times"></i></button>
+        <div style="text-align:center;"><div class="youth-logo" style="width:50px; height:50px; margin:0 auto 10px;"><img src="logo.png" style="width:100%;height:100%;border-radius:12px;"></div></div>
+        <h3 style="text-align:center; color:var(--primary-green);" id="formModalTitle">استمارة التسجيل</h3>
+        <form id="regFormModal" onsubmit="handleDynamicForm(event)">
+            <div id="dynamic-fields-modal"></div>
+            <button type="submit" class="btn-submit" id="submit-btn-modal">إرسال طلب التسجيل</button>
+        </form>
+    </div>
+</div>
+
+<!-- مودال عرض تفاصيل المبادرة -->
+<div id="initiativeModal" class="modal-overlay">
+    <div class="modal-container">
+        <button class="modal-close" onclick="closeInitiativeModal()"><i class="fas fa-times"></i></button>
+        <div id="initiativeDetailContent" class="initiative-detail"></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"><i id="toast-icon"></i><span id="toast-message"></span></div>
+
+<script>
+    emailjs.init("POCtDAFV9CECAu9ow");
+    let currentType = '';
+    let initiativesData = [];
+    
+    // شاشة تحميل بعبارات ملهمة
+    const quotes = ["نزاهة .. لأن الفكر أول خطوة للتغيير","جيل واعٍ .. جزائر الغد","شارك في بناء الجمهورية الجديدة","كن قائداً للنزاهة في مجتمعك","منتدى شبابي رائد يُحدث الفارق","العلم نور، والنزاهة طريق","المستقبل ينتظر مبادراتك","معاً نحو جزائر جديدة"];
+    let quoteIndex = 0;
+    const quoteEl = document.getElementById('inspirationalQuote');
+    if(quoteEl) setInterval(()=>{ quoteIndex=(quoteIndex+1)%quotes.length; quoteEl.textContent=`"${quotes[quoteIndex]}"`; },1500);
+    
+    function showToast(type,msg){ let t=document.getElementById('toast'),ic=document.getElementById('toast-icon'); t.className=`toast ${type}`; ic.className=type==='success'?'fas fa-check-circle':(type==='error'?'fas fa-exclamation-triangle':'fas fa-info-circle'); document.getElementById('toast-message').textContent=msg; t.style.display='flex'; setTimeout(()=>t.style.display='none',4000); }
+    function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    function validateArabicName(name){ return /^[\u0600-\u06FF\s]{4,}$/.test(name.trim()); }
+    function toggleTheme(){ document.body.classList.toggle('dark'); document.getElementById('theme-icon').className=document.body.classList.contains('dark')?'fas fa-sun':'fas fa-moon'; }
+    
+    // جلب المبادرات
+    const INITIATIVES_URL = "https://raw.githubusercontent.com/nazahaa36/com/main/initiatives.json";
+    async function fetchInitiatives() {
+        try{
+            const res = await fetch(INITIATIVES_URL);
+            if(!res.ok) throw new Error();
+            initiativesData = await res.json();
+        } catch(e){
+            initiativesData = [
+                { id:1, title:"مبادرة شباب من أجل النزاهة", date:"2025-03-15", category:"توعوية", content:"مبادرة توعوية لمكافحة الفساد وتعزيز قيم الشفافية في المجتمع الجزائري. تتضمن ورشات عمل وحملات تحسيسية في المؤسسات التربوية والجامعات.", image:"", link:"https://example.com/initiative1" },
+                { id:2, title:"منتدى الحوار الوطني", date:"2025-04-20", category:"فكري", content:"ندوة حول المشاركة المدنية ودور الشباب في بناء الجمهورية الجديدة. يشارك فيها أكاديميون وصناع قرار.", image:"", link:"https://example.com/initiative2" }
+            ];
+        }
+        renderInitiatives();
+    }
+    function renderInitiatives(){
+        const container = document.getElementById('initiativesList');
+        if(!container) return;
+        container.innerHTML = '';
+        initiativesData.forEach(init => {
+            const card = document.createElement('div');
+            card.className = 'initiative-card';
+            card.innerHTML = `<img class="initiative-img" src="${init.image||''}" onerror="this.src='https://via.placeholder.com/400x200/34c759/ffffff?text=NAZAHA'"><div class="initiative-info"><div class="initiative-title">${escapeHtml(init.title)}</div><div><span class="initiative-date"><i class="fas fa-calendar-alt"></i> ${init.date}</span><span class="initiative-category"><i class="fas fa-tag"></i> ${init.category}</span></div><p style="margin-top:8px;">${escapeHtml(init.content.substring(0,100))}...</p></div>`;
+            card.addEventListener('click', () => openInitiativeModal(init));
+            container.appendChild(card);
+        });
+    }
+    function openInitiativeModal(init){
+        const modal = document.getElementById('initiativeModal');
+        const content = document.getElementById('initiativeDetailContent');
+        content.innerHTML = `<h3>${escapeHtml(init.title)}</h3><p><strong>التاريخ:</strong> ${init.date}</p><p><strong>التصنيف:</strong> ${init.category}</p>${init.image ? `<img src="${init.image}" style="width:100%; border-radius:16px; margin:10px 0;" onerror="this.style.display='none'">` : ''}<p>${escapeHtml(init.content)}</p>${init.link ? `<a href="${init.link}" target="_blank" style="display:inline-block; margin-top:15px; background:var(--primary-green); color:white; padding:8px 16px; border-radius:30px; text-decoration:none;">رابط خارجي <i class="fas fa-external-link-alt"></i></a>` : ''}`;
+        modal.style.display = 'flex';
+    }
+    function closeInitiativeModal(){ document.getElementById('initiativeModal').style.display = 'none'; }
+    
+    // الكتابة المتحركة
+    const phrases = [{text:"نزاهة .. لأن الفكر أول خطوة للتغيير",icon:"fas fa-brain"},{text:"جيل واعٍ .. جزائر الغد",icon:"fas fa-chart-line"},{text:"شارك في بناء الجمهورية الجديدة",icon:"fas fa-hand-peace"},{text:"كن قائداً للنزاهة في مجتمعك",icon:"fas fa-users"},{text:"منتدى شبابي رائد يُحدث الفارق",icon:"fas fa-rocket"}];
+    let pIdx=0, cIdx=0, del=false;
+    const typedSpan = document.getElementById('typedText');
+    const iconSpan = document.getElementById('animatedIcon').querySelector('i');
+    function typeEffect(){
+        const cur = phrases[pIdx].text;
+        if(del) typedSpan.textContent = cur.substring(0, cIdx-1), cIdx--;
+        else typedSpan.textContent = cur.substring(0, cIdx+1), cIdx++;
+        if(!del && cIdx===cur.length){ del=true; setTimeout(typeEffect,1800); return; }
+        if(del && cIdx===0){ del=false; pIdx=(pIdx+1)%phrases.length; iconSpan.className=phrases[pIdx].icon; setTimeout(typeEffect,200); return; }
+        setTimeout(typeEffect, del?55:80);
+    }
+    setTimeout(typeEffect,300);
+    
+    // ========== آلية التسجيل الجديدة ==========
+    function openRegistrationModalDirectly() {
+        document.getElementById('registrationModal').style.display = 'flex';
+    }
+    function closeRegistrationModal() {
+        document.getElementById('registrationModal').style.display = 'none';
+        document.getElementById('termsModal').style.display = 'none';
+        document.getElementById('formModal').style.display = 'none';
+        currentType = '';
+    }
+    
+    function showTermsForType(type) {
+        currentType = type;
+        let content = '';
+        if(type === 'انخراط'){
+            content = `<h3>شروط الانخراط (عضوية كاملة)</h3>
+            <ul><li>السن: 14 إلى 30 سنة.</li><li>الجنسية جزائرية أو مقيم إقامة قانونية.</li><li>الالتزام بقيم المنتدى والنظام الداخلي.</li><li>دفع الاشتراك السنوي الرمزي (100-1000 دج) بعد القبول.</li><li>المشاركة في الأنشطة الإجبارية بنسبة لا تقل عن 60%.</li><li>تقديم تعهد بالاحترام التام للقوانين.</li><li>يحق للمنتدى إنهاء العضوية في حالة الإخلال.</li></ul>
+            <p><strong>ملاحظة:</strong> العضوية تمنح حق الترشح والتصويت في الجمعيات العمومية.</p>
+            <p>للاطلاع على النظام الداخلي الكامل: <a href="https://drive.google.com/file/d/1funjxkShUEfVJOQW90pTWyqtarnuMGQh/view?usp=drivesdk" target="_blank">اضغط هنا</a></p>`;
+        } else if(type === 'توظيف'){
+            content = `<h3>شروط التطوع والانضمام للخلايا (توظيف)</h3>
+            <ul><li>العمر من 16 فما فوق (بدون حد أقصى).</li><li>توفر وقت وجدية (4 ساعات أسبوعياً كحد أدنى).</li><li>اجتياز مقابلة شخصية بسيطة.</li><li>الالتزام بمهام الخلية المختارة.</li><li>تقديم سيرة ذاتية مبسطة.</li><li>الحصول على شهادة تطوع معتمدة بعد 3 أشهر.</li></ul>
+            <p>للاطلاع على النظام الداخلي الكامل: <a href="https://drive.google.com/file/d/1funjxkShUEfVJOQW90pTWyqtarnuMGQh/view?usp=drivesdk" target="_blank">اضغط هنا</a></p>`;
+        } else {
+            content = `<h3>شروط المشاركة في الأنشطة والمسابقات</h3>
+            <ul><li>التسجيل المسبق في النشاط المطلوب.</li><li>الالتزام بمواعيد الفعاليات.</li><li>روح الفريق والإيجابية.</li><li>إحضار أي مستلزمات يطلبها النشاط.</li><li>لا يسمح بالانسحاب بعد التسجيل دون عذر مقبول.</li></ul>
+            <p>للاطلاع على النظام الداخلي الكامل: <a href="https://drive.google.com/file/d/1funjxkShUEfVJOQW90pTWyqtarnuMGQh/view?usp=drivesdk" target="_blank">اضغط هنا</a></p>`;
+        }
+        document.getElementById('termsContent').innerHTML = content;
+        document.getElementById('termsModal').style.display = 'flex';
+        document.getElementById('registrationModal').style.display = 'none';
+        document.getElementById('termsAgreeCheckbox').checked = false;
+    }
+    
+    function closeTermsModal() {
+        document.getElementById('termsModal').style.display = 'none';
+        document.getElementById('registrationModal').style.display = 'flex';
+    }
+    
+    function acceptTermsAndShowForm() {
+        if(!document.getElementById('termsAgreeCheckbox').checked) {
+            showToast('error', 'يجب الموافقة على الشروط أولاً');
+            return;
+        }
+        document.getElementById('termsModal').style.display = 'none';
+        renderDynamicFormModal();
+        document.getElementById('formModal').style.display = 'flex';
+    }
+    
+    function renderDynamicFormModal() {
+        let container = document.getElementById('dynamic-fields-modal');
+        if(!container) return;
+        let commonFields = `
+            <div><input type="text" id="full-name" placeholder="الاسم الكامل (ثلاثي)" class="form-input" required onblur="validateFullNameModal()"><div id="name-error" style="color:red; font-size:12px; display:none;">الاسم يجب أن يكون عربياً و4 أحرف على الأقل</div></div>
+            <div><input type="date" id="birth-date" class="form-input" required onchange="checkAgeForGuardianModal()"></div>
+            <div><input type="text" id="address-hay" placeholder="الحي / الشارع" class="form-input" required></div>
+            <div><input type="text" id="address-wilaya" placeholder="الولاية" class="form-input" required></div>
+            <div><input type="text" id="address-baladia" placeholder="البلدية" class="form-input" required></div>
+            <div><input type="tel" id="phone" placeholder="رقم الهاتف (مرتبط بالواتساب)" class="form-input" required pattern="^(05|06|07)[0-9]{8}$|^213[0-9]{9}$"><small>يجب ربط الرقم بالواتساب</small></div>
+            <div><input type="email" id="email" placeholder="البريد الإلكتروني" class="form-input" required></div>
+        `;
+        let specificFields = '';
+        let motivationField = `<textarea id="motivation" rows="3" placeholder="الدافع وراء ${currentType === 'انخراط' ? 'الانخراط' : (currentType === 'توظيف' ? 'التوظيف' : 'المشاركة')}" class="form-input" required></textarea>`;
+        
+        if(currentType === 'انخراط'){
+            specificFields = `<select id="education-level" class="form-input" required><option value="">المستوى الدراسي</option><option>ابتدائي</option><option>متوسط</option><option>ثانوي</option><option>جامعي (ليسانس)</option><option>ماستر</option><option>دكتوراه</option></select><select id="youth-institution" class="form-input" required><option value="">الانخراط في المؤسسات الشبانية</option><option>منخرط في دار الشباب</option><option>منخرط في المركب الرياضي الجواري</option><option>ليس منخرط</option></select><select id="interest-field" class="form-input" required><option value="">المجال المهتم به</option><option>فكري</option><option>مدني</option><option>اجتماعي</option><option>بيئي</option><option>إبداعي</option><option>تكنولوجي</option><option>ديني</option><option>علمي</option></select><input id="specialization" placeholder="التخصص الدقيق (اختياري)" class="form-input">`;
+        } else if(currentType === 'توظيف'){
+            specificFields = `<select id="education-level" class="form-input" required><option value="">المستوى الدراسي</option><option>ابتدائي</option><option>متوسط</option><option>ثانوي</option><option>جامعي</option><option>ماستر</option><option>دكتوراه</option></select><textarea id="experience" rows="3" placeholder="الخبرات أو المهارات" class="form-input" required></textarea><select id="cell" class="form-input" required><option value="">اختر الخلية</option><option>أمانة السر</option><option>خلية التنظيم</option><option>خلية الشؤون القانونية</option><option>خلية الإعلام والترويج</option><option>مستشارو مجلس الإدارة</option><option>ممثلو المكاتب</option></select>`;
+        } else if(currentType === 'مشاركة'){
+            specificFields = `<div><label><input type="radio" name="participationType" value="event" onchange="toggleParticipationFieldsModal()" required> مشاركة في فعالية</label><label><input type="radio" name="participationType" value="competition" onchange="toggleParticipationFieldsModal()" required> مشاركة في مسابقة</label></div><input type="text" id="activity-name" placeholder="اسم المسابقة أو الفعالية" class="form-input" required><input type="url" id="announcement-link" placeholder="رابط الإعلان" class="form-input" required><div id="event-fields" style="display:none;"><input type="url" id="fb-link" placeholder="رابط فيسبوك (اختياري)" class="form-input"><input type="url" id="instagram-link" placeholder="رابط إنستغرام (اختياري)" class="form-input"><input type="url" id="youtube-link" placeholder="رابط يوتيوب (اختياري)" class="form-input"></div><div id="competition-fields" style="display:none;"><input type="file" id="work-file" accept=".pdf,.docx,image/*,video/*" class="form-input"></div>`;
+        }
+        
+        container.innerHTML = commonFields + specificFields + motivationField + `<div id="guardian-field-container"></div><label><input type="checkbox" id="legal-approval" required> أوافق على جميع الشروط والنظام الداخلي للمنتدى</label>`;
+        
+        window.validateFullNameModal = function(){ let n=document.getElementById('full-name'), e=document.getElementById('name-error'); if(n && !validateArabicName(n.value)){ e.style.display='block'; n.style.borderColor='#ff3b30'; return false; } else { if(e) e.style.display='none'; if(n) n.style.borderColor=''; return true; } };
+        window.toggleParticipationFieldsModal = function(){ let sel=document.querySelector('input[name="participationType"]:checked'); let ev=document.getElementById('event-fields'), comp=document.getElementById('competition-fields'); if(sel && sel.value==='event'){ ev.style.display='block'; comp.style.display='none'; } else if(sel && sel.value==='competition'){ ev.style.display='none'; comp.style.display='block'; } };
+        window.checkAgeForGuardianModal = function(){
+            let birth = document.getElementById('birth-date').value;
+            if(!birth) return;
+            let age = calculateAge(birth);
+            let guardianContainer = document.getElementById('guardian-field-container');
+            if((currentType === 'انخراط' || currentType === 'توظيف') && age >=14 && age <=17){
+                guardianContainer.innerHTML = `<div class="consent-field"><h4>موافقة الولي</h4><input type="text" id="guardian-name" placeholder="اسم الولي (إجباري)" class="form-input" required><input type="text" id="guardian-id" placeholder="رقم بطاقة الولي (اختياري)" class="form-input"><label><input type="checkbox" id="guardian-consent" required> أقر بأن ولي أمري موافق على تسجيلي</label></div>`;
+            } else { guardianContainer.innerHTML = ''; }
+        };
+    }
+    
+    function calculateAge(birth){ let today=new Date(), bd=new Date(birth); let age=today.getFullYear()-bd.getFullYear(); if(today.getMonth()<bd.getMonth() || (today.getMonth()===bd.getMonth() && today.getDate()<bd.getDate())) age--; return age; }
+    
+    function fallbackToMailClient(params){ let subject=`طلب تسجيل جديد - ${currentType}`; let body=Object.entries(params).map(([k,v])=>`${k}: ${v}`).join('\n'); window.location.href=`mailto:nazahaa36.inf@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; showToast('info','تم فتح بريدك لإرسال الطلب يدوياً'); }
+    
+    async function handleDynamicForm(e){
+        e.preventDefault();
+        if(!validateArabicName(document.getElementById('full-name').value)){ showToast('error','الاسم يجب أن يكون عربياً و4 أحرف'); return; }
+        let name=document.getElementById('full-name').value.trim(), birth=document.getElementById('birth-date').value, phone=document.getElementById('phone').value.trim(), email=document.getElementById('email').value.trim(), motivation=document.getElementById('motivation').value.trim();
+        if(!motivation){ showToast('error','يرجى كتابة الدافع'); return; }
+        if(!document.getElementById('legal-approval')?.checked){ showToast('error','يجب الموافقة على الشروط'); return; }
+        let age=calculateAge(birth);
+        if(age<14){ showToast('error','عمرك أقل من 14 سنة'); return; }
+        if(age>30){ showToast('error','عمرك يتجاوز 30 سنة'); return; }
+        let wilaya=document.getElementById('address-wilaya').value.trim(), baladia=document.getElementById('address-baladia').value.trim();
+        let params={ نوع_الطلب:currentType, الاسم_الكامل:name, تاريخ_الميلاد:birth, العمر:age, الحي:document.getElementById('address-hay').value, البلدية:baladia, الولاية:wilaya, الهاتف:phone, البريد:email, الدافع:motivation };
+        let guardianName=document.getElementById('guardian-name')?.value, guardianId=document.getElementById('guardian-id')?.value, guardianConsent=document.getElementById('guardian-consent')?.checked;
+        if(guardianName) params.اسم_الولي=guardianName;
+        if(guardianId) params.رقم_بطاقة_الولي=guardianId;
+        if(guardianConsent!==undefined) params.موافقة_الولي=guardianConsent?'نعم':'لا';
+        if(currentType==='انخراط'){ params.المستوى_الدراسي=document.getElementById('education-level').value; params.المؤسسة_الشبانية=document.getElementById('youth-institution').value; params.المجال=document.getElementById('interest-field').value; params.تخصص=document.getElementById('specialization').value; }
+        else if(currentType==='توظيف'){ params.المستوى_الدراسي=document.getElementById('education-level').value; params.الخبرة=document.getElementById('experience').value; params.الخلية=document.getElementById('cell').value; }
+        else if(currentType==='مشاركة'){ let partType=document.querySelector('input[name="participationType"]:checked')?.value; params.نوع_المشاركة=partType; params.اسم_النشاط=document.getElementById('activity-name').value; params.رابط_الإعلان=document.getElementById('announcement-link').value; if(partType==='event'){ params.رابط_فيسبوك=document.getElementById('fb-link')?.value; params.رابط_انستغرام=document.getElementById('instagram-link')?.value; params.رابط_يوتيوب=document.getElementById('youtube-link')?.value; } else if(partType==='competition'){ params.ملف_العمل='تم اختيار ملف (يرسل يدوياً)'; } }
+        let btn=document.getElementById('submit-btn-modal'); let orig=btn.innerHTML; btn.innerHTML='جاري الإرسال...'; btn.disabled=true;
+        try{ await emailjs.send('service_kbbvwbh','template_m1zojd7',params); showToast('success','تم إرسال طلبك بنجاح!'); document.getElementById('regFormModal').reset(); closeFormModal(); currentType=''; } catch(err){ console.error(err); showToast('error','فشل الإرسال، سيتم فتح بريدك'); fallbackToMailClient(params); } finally{ btn.innerHTML=orig; btn.disabled=false; }
+    }
+    
+    function closeFormModal() {
+        document.getElementById('formModal').style.display = 'none';
+        document.getElementById('registrationModal').style.display = 'flex';
+    }
+    
+    // إخفاء شاشة التحميل
+    window.addEventListener('load', async()=>{ await fetchInitiatives(); setTimeout(()=>{ let loader=document.getElementById('loadingScreen'); if(loader) loader.classList.add('hide'); },2500); });
+    
+    // التنقل بين التبويبات
+    document.querySelectorAll('.nav-item').forEach(i=>{ i.addEventListener('click',()=>{ let tab=i.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(tab).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); i.classList.add('active'); }); });
+    
+    // إغلاق المودالات عند الضغط خارجها
+    window.onclick = function(event){ document.querySelectorAll('.modal-overlay').forEach(modal=>{ if(event.target===modal) modal.style.display='none'; }); };
+</script>
+
+<!-- التذييل الثابت -->
+<footer class="global-footer">
+    <div class="footer-icons">
+        <a href="https://facebook.com/nazaha.36" target="_blank" class="footer-icon"><i class="fab fa-facebook-f"></i><span>فيسبوك</span></a>
+        <a href="https://instagram.com/nazaha.36" target="_blank" class="footer-icon"><i class="fab fa-instagram"></i><span>انستغرام</span></a>
+        <a href="https://youtube.com/@nazaha.dz" target="_blank" class="footer-icon"><i class="fab fa-youtube"></i><span>يوتيوب</span></a>
+        <a href="mailto:nazahaa36.inf@gmail.com" class="footer-icon"><i class="fas fa-envelope"></i><span>إيميل</span></a>
+        <a href="https://www.mediafire.com/file/4h3begn36tdw7u0/NAZAHA6.0.apk/file" target="_blank" class="footer-icon"><i class="fab fa-android"></i><span>التطبيق</span></a>
+        <a href="https://drive.google.com/file/d/1funjxkShUEfVJOQW90pTWyqtarnuMGQh/view?usp=drivesdk" target="_blank" class="footer-icon"><i class="fas fa-file-alt"></i><span>النظام الداخلي</span></a>
+    </div>
+    <div class="copyright">جميع الحقوق محفوظة &copy; 2026 المنتدى الشبابي للفكر والمشاركة المدنية - nazaha.dz</div>
+</footer>
+
+</body>
+</html>
