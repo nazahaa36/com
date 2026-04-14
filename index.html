@@ -36,17 +36,8 @@
         }
         body { background-color: var(--ios-bg); color: var(--text-main); transition: 0.4s; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* loading screen */
-        .loading-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: var(--ios-bg); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.5s; text-align: center; padding:20px;
-        }
-        .loading-screen.hide { opacity: 0; visibility: hidden; }
-        .spinner { width: 60px; height: 60px; border:5px solid rgba(52,199,89,0.2); border-top:5px solid var(--primary-green); border-radius:50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .inspirational-quote { margin-top:30px; font-size:18px; font-weight:600; color:var(--primary-green); max-width:80%; line-height:1.6; }
-        .quote-author { margin-top:10px; font-size:14px; opacity:0.7; }
-
+        /* loading screen removed */
+        
         /* header */
         header {
             position: fixed; top:0; width:100%; padding:8px 12px; display: flex; justify-content: space-between; align-items: center;
@@ -156,12 +147,6 @@
 </head>
 <body>
 
-<div class="loading-screen" id="loadingScreen">
-    <div class="spinner"></div>
-    <div class="inspirational-quote" id="inspirationalQuote">"نزاهة .. لأن الفكر أول خطوة للتغيير"</div>
-    <div class="quote-author">- المنتدى الشبابي للفكر والمشاركة المدنية</div>
-</div>
-
 <header>
     <div style="display:flex; align-items:center; gap:8px;">
         <div class="youth-logo"><img id="dynamic-logo" src="logo.png" alt="شعار نزاهة" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%2334c759%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2750%27 text-anchor=%27middle%27 fill=%27white%27%3Eن%3C/text%3E%3C/svg%3E'"></div>
@@ -265,11 +250,9 @@
     let currentType = '';
     let initiativesData = [];
     
-    // شاشة تحميل بعبارات ملهمة
-    const quotes = ["نزاهة .. لأن الفكر أول خطوة للتغيير","جيل واعٍ .. جزائر الغد","شارك في بناء الجمهورية الجديدة","كن قائداً للنزاهة في مجتمعك","منتدى شبابي رائد يُحدث الفارق","العلم نور، والنزاهة طريق","المستقبل ينتظر مبادراتك","معاً نحو جزائر جديدة"];
-    let quoteIndex = 0;
-    const quoteEl = document.getElementById('inspirationalQuote');
-    if(quoteEl) setInterval(()=>{ quoteIndex=(quoteIndex+1)%quotes.length; quoteEl.textContent=`"${quotes[quoteIndex]}"`; },1500);
+    // شاشة تحميل بعبارات ملهمة - تم إزالتها
+    // const quotes ... تم حذفها
+    // const quoteEl ... تم حذفها
     
     function showToast(type,msg){ let t=document.getElementById('toast'),ic=document.getElementById('toast-icon'); t.className=`toast ${type}`; ic.className=type==='success'?'fas fa-check-circle':(type==='error'?'fas fa-exclamation-triangle':'fas fa-info-circle'); document.getElementById('toast-message').textContent=msg; t.style.display='flex'; setTimeout(()=>t.style.display='none',4000); }
     function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
@@ -444,8 +427,11 @@
         document.getElementById('registrationModal').style.display = 'flex';
     }
     
-    // إخفاء شاشة التحميل
-    window.addEventListener('load', async()=>{ await fetchInitiatives(); setTimeout(()=>{ let loader=document.getElementById('loadingScreen'); if(loader) loader.classList.add('hide'); },2500); });
+    // إخفاء شاشة التحميل - تم إزالة الكود الخاص بها
+    window.addEventListener('load', async()=>{ 
+        await fetchInitiatives(); 
+        // تم حذف setTimeout الخاص بإخفاء شاشة التحميل
+    });
     
     // التنقل بين التبويبات
     document.querySelectorAll('.nav-item').forEach(i=>{ i.addEventListener('click',()=>{ let tab=i.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(tab).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); i.classList.add('active'); }); });
