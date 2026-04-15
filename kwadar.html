@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>NSpace | إدارة الأعضاء - خلية التنظيم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', system-ui, sans-serif;
+        }
+        :root {
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --glass: rgba(255,255,255,0.96);
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e6a3b, #0f3b22);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .login-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 48px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 30px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .dashboard {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 32px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .user-info {
+            font-weight: 700;
+            background: #f0f0f0;
+            padding: 6px 16px;
+            border-radius: 40px;
+        }
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+        .btn-icon {
+            background: #f0f0f0;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .btn-icon.danger {
+            background: #fee;
+            color: var(--danger);
+        }
+        .btn-icon.success {
+            background: #e8f8f0;
+            color: var(--primary);
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            border: 1px solid #ddd;
+        }
+        .scanner-box {
+            background: #1e1e2a;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .member-card {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        @media (max-width: 768px) {
+            th, td { font-size: 12px; padding: 8px; }
+            .tab-btn { padding: 8px 16px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <div class="login-logo"><i class="fas fa-users-gear"></i></div>
+        <h2 style="margin-bottom: 20px;">خلية التنظيم</h2>
+        <input type="text" id="loginUsername" class="form-input" placeholder="اسم المستخدم" autocomplete="off">
+        <input type="password" id="loginPassword" class="form-input" placeholder="كلمة السر">
+        <button class="btn-primary" onclick="performLogin()">دخول</button>
+        <p style="margin-top: 15px; font-size: 12px; color: #666;">للإداريين فقط</p>
+    </div>
+</div>
+
+<div id="dashboard" class="dashboard">
+    <div class="header">
+        <div class="user-info" id="userNameDisplay"></div>
+        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="members">📋 الأعضاء</button>
+        <button class="tab-btn" data-tab="activities">📅 النشاطات</button>
+        <button class="tab-btn" data-tab="attendance">✅ تسجيل الحضور</button>
+        <button class="tab-btn" data-tab="reports">📊 تقارير الحضور</button>
+    </div>
+
+    <!-- تبويب الأعضاء (استعلام) -->
+    <div id="membersTab" class="tab-content active">
+        <div class="search-box">
+            <input type="text" id="memberSearch" placeholder="بحث بالاسم أو رقم العضوية أو الباركود..." oninput="filterMembers()">
+            <button class="btn-icon" onclick="openScannerForSearch()"><i class="fas fa-camera"></i> مسح باركود</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="membersTable">
+                <thead>
+                    <tr><th>الباركود/رقم العضوية</th><th>الاسم الكامل</th><th>تاريخ الميلاد</th><th>تاريخ التسجيل</th><th>تاريخ الانتهاء</th><th>الخلية/المنصب</th><th>الحالة</th></tr>
+                </thead>
+                <tbody id="membersTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- تبويب النشاطات (إنشاء + عرض) -->
+    <div id="activitiesTab" class="tab-content">
+        <div style="background: #f0f2f5; border-radius: 24px; padding: 20px; margin-bottom: 20px;">
+            <h3><i class="fas fa-plus-circle"></i> إنشاء نشاط جديد</h3>
+            <input type="text" id="activityName" class="form-input" placeholder="اسم النشاط" style="margin-top: 10px;">
+            <input type="date" id="activityDate" class="form-input">
+            <input type="text" id="activityLocation" class="form-input" placeholder="المكان">
+            <textarea id="activityDetails" class="form-input" rows="3" placeholder="تفاصيل النشاط (أهداف، ملاحظات)"></textarea>
+            <button class="btn-primary" onclick="createActivity()">إنشاء النشاط</button>
+        </div>
+        <h3><i class="fas fa-history"></i> النشاطات السابقة</h3>
+        <div id="activitiesList"></div>
+    </div>
+
+    <!-- تبويب تسجيل الحضور -->
+    <div id="attendanceTab" class="tab-content">
+        <div class="search-box">
+            <select id="attendanceActivitySelect" class="form-input" onchange="loadAttendanceScanner()"></select>
+        </div>
+        <div id="scannerSection" style="display: none;">
+            <div class="scanner-box">
+                <div id="qr-reader" style="width: 100%; max-width: 500px; margin: 0 auto;"></div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button class="btn-icon" onclick="stopScanner()"><i class="fas fa-stop"></i> إيقاف المسح</button>
+                </div>
+            </div>
+            <div id="scannedMembersList"></div>
+            <button class="btn-primary" onclick="saveAttendance()" style="margin-top: 15px;">💾 حفظ الحضور (تسجيل الباقي غياب)</button>
+        </div>
+        <div id="noActivityMsg" style="text-align: center; padding: 40px; color: #888;">يرجى إنشاء نشاط أولاً</div>
+    </div>
+
+    <!-- تبويب التقارير -->
+    <div id="reportsTab" class="tab-content">
+        <select id="reportActivitySelect" class="form-input" onchange="showReport()"></select>
+        <div id="reportStats"></div>
+        <div id="attendanceDetailsTable"></div>
+    </div>
+</div>
+
+<script>
+    // ---------- قاعدة البيانات المحلية (IndexedDB) ----------
+    const DB_NAME = "NazahaDB";
+    const DB_VERSION = 2;
+    let db = null;
+    let currentUser = null;
+    let html5QrCode = null;
+    let currentScanActivityId = null;
+    let tempAttendanceList = []; // مؤقت لحضور النشاط الحالي (قبل الحفظ)
+
+    // فتح قاعدة البيانات
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                db = request.result;
+                resolve(db);
+            };
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('activities')) {
+                    const store = db.createObjectStore('activities', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('date', 'date');
+                }
+                if (!db.objectStoreNames.contains('attendance')) {
+                    const store = db.createObjectStore('attendance', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('activityId', 'activityId');
+                    store.createIndex('memberId', 'memberId');
+                }
+                if (!db.objectStoreNames.contains('members')) {
+                    db.createObjectStore('members', { keyPath: 'barcode' });
+                }
+            };
+        });
+    }
+
+    // جلب الأعضاء من ملف JSON (مرة واحدة عند التحميل)
+    let membersList = []; // يخزن الأعضاء فقط (الذين ليسوا إداريين)
+    let adminUsers = []; // يخزن المستخدمين الإداريين للدخول
+
+    async function fetchMembersAndAdmins() {
+        try {
+            const res = await fetch("https://raw.githubusercontent.com/nazahaa36/com/main/member.json");
+            const data = await res.json();
+            // data مصفوفة تحتوي على جميع الأشخاص (أعضاء + موظفين إداريين)
+            // الأعضاء: هم الذين ليس لديهم منصب إداري (cell !== "موظف" أو حسب تعريفك)
+            // بناءً على طلبك: عرض الأعضاء فقط (غير الموظفين الإداريين)
+            membersList = data.filter(p => {
+                // إذا كان cell = "موظف" أو المنصب من ضمن الإدارة نعتبره إداري وليس عضو عادي
+                const isAdmin = (p.cell && p.cell === "موظف") || 
+                                (p.position && (p.position.includes("خلية التنظيم") || p.position.includes("شؤون المنخرطين") || 
+                                p.position.includes("أمانة السر") || p.position.includes("مجلس الإدارة")));
+                return !isAdmin;
+            });
+            // المستخدمون الإداريون المسموح لهم بالدخول
+            adminUsers = data.filter(p => {
+                const position = p.position || "";
+                const cell = p.cell || "";
+                return (p.fullName === "رحاب بدرة") ||
+                       (cell === "موظف" && (position.includes("خلية التنظيم") || position.includes("شؤون المنخرطين") || 
+                        position.includes("أمانة السر") || position.includes("مجلس الإدارة")));
+            });
+            // تخزين الأعضاء في IndexedDB
+            const tx = db.transaction('members', 'readwrite');
+            const store = tx.objectStore('members');
+            membersList.forEach(m => store.put({ barcode: m.id, ...m }));
+            await tx.complete;
+            return true;
+        } catch(e) { console.error(e); return false; }
+    }
+
+    // عرض الأعضاء في الجدول
+    function renderMembersTable(filter = "") {
+        const tbody = document.getElementById('membersTableBody');
+        let filtered = membersList.filter(m => 
+            m.fullName.includes(filter) || m.id.includes(filter)
+        );
+        tbody.innerHTML = filtered.map(m => `
+            <tr>
+                <td>${m.id}</td>
+                <td>${m.fullName}</td>
+                <td>${m.birthDate || '-'}</td>
+                <td>${m.hiringDate || '-'}</td>
+                <td>${m.expiryDate || '-'}</td>
+                <td>${m.cell || m.position || 'عضو'}</td>
+                <td><span class="badge">نشط</span></td>
+            </tr>
+        `).join('');
+    }
+
+    function filterMembers() {
+        const val = document.getElementById('memberSearch').value;
+        renderMembersTable(val);
+    }
+
+    // مسح باركود للبحث
+    function openScannerForSearch() {
+        const scannerDiv = document.createElement('div');
+        scannerDiv.id = 'tempScanner';
+        scannerDiv.style.position = 'fixed'; scannerDiv.style.top='0'; scannerDiv.style.left='0';
+        scannerDiv.style.width='100%'; scannerDiv.style.height='100%'; scannerDiv.style.background='rgba(0,0,0,0.9)';
+        scannerDiv.style.zIndex='3000'; scannerDiv.style.padding='20px';
+        scannerDiv.innerHTML = `<div style="background:white; border-radius:24px; padding:20px;"><div id="searchScanner"></div><button onclick="document.body.removeChild(this.parentElement.parentElement)" style="margin-top:10px;">إغلاق</button></div>`;
+        document.body.appendChild(scannerDiv);
+        const scanner = new Html5Qrcode("searchScanner");
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+            scanner.stop();
+            document.body.removeChild(scannerDiv);
+            document.getElementById('memberSearch').value = decodedText;
+            filterMembers();
+            // فتح ملف العضو تلقائياً (عرض التفاصيل)
+            const member = membersList.find(m => m.id === decodedText);
+            if(member) alert(`تم العثور على العضو:\nالاسم: ${member.fullName}\nرقم العضوية: ${member.id}`);
+            else alert("لم يتم العثور على عضو بهذا الرقم");
+        }, (err) => {});
+    }
+
+    // ---------- إدارة النشاطات ----------
+    async function loadActivities() {
+        const tx = db.transaction('activities', 'readonly');
+        const store = tx.objectStore('activities');
+        const activities = await new Promise((resolve) => {
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result);
+        });
+        const container = document.getElementById('activitiesList');
+        container.innerHTML = activities.map(act => `
+            <div class="member-card">
+                <div><strong>${act.name}</strong><br>${act.date} | ${act.location}</div>
+                <div>${act.details ? act.details.substring(0,50) : ''}</div>
+            </div>
+        `).join('') || '<p>لا توجد نشاطات</p>';
+        // تحديث القوائم المنسدلة
+        const selectAttendance = document.getElementById('attendanceActivitySelect');
+        const selectReport = document.getElementById('reportActivitySelect');
+        const options = activities.map(act => `<option value="${act.id}">${act.name} - ${act.date}</option>`);
+        selectAttendance.innerHTML = '<option value="">اختر نشاطاً</option>' + options;
+        selectReport.innerHTML = '<option value="">اختر نشاطاً</option>' + options;
+    }
+
+    async function createActivity() {
+        const name = document.getElementById('activityName').value.trim();
+        const date = document.getElementById('activityDate').value;
+        const location = document.getElementById('activityLocation').value.trim();
+        const details = document.getElementById('activityDetails').value.trim();
+        if(!name || !date) { alert("يرجى إدخال اسم النشاط والتاريخ"); return; }
+        const tx = db.transaction('activities', 'readwrite');
+        const store = tx.objectStore('activities');
+        await store.add({ name, date, location, details, createdAt: new Date().toISOString() });
+        await tx.complete;
+        alert("تم إنشاء النشاط بنجاح");
+        document.getElementById('activityName').value = '';
+        document.getElementById('activityDate').value = '';
+        document.getElementById('activityLocation').value = '';
+        document.getElementById('activityDetails').value = '';
+        loadActivities();
+    }
+
+    // ---------- تسجيل الحضور ----------
+    async function loadAttendanceScanner() {
+        const actId = parseInt(document.getElementById('attendanceActivitySelect').value);
+        if(!actId) { document.getElementById('scannerSection').style.display = 'none'; document.getElementById('noActivityMsg').style.display = 'block'; return; }
+        document.getElementById('noActivityMsg').style.display = 'none';
+        document.getElementById('scannerSection').style.display = 'block';
+        currentScanActivityId = actId;
+        tempAttendanceList = [];
+        // تحميل الحضور السابق إن وجد
+        const tx = db.transaction('attendance', 'readonly');
+        const index = tx.objectStore('attendance').index('activityId');
+        const existing = await new Promise(resolve => {
+            const req = index.getAll(actId);
+            req.onsuccess = () => resolve(req.result);
+        });
+        if(existing.length > 0) {
+            tempAttendanceList = existing.map(a => a.memberId);
+            alert(`تم تحميل ${tempAttendanceList.length} مسجل حضور مسبقاً`);
+        }
+        updateScannedList();
+        startScanner();
+    }
+
+    function startScanner() {
+        if(html5QrCode) html5QrCode.stop().catch(e=>{});
+        html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+            // decodedText هو رقم العضوية (barcode)
+            if(!tempAttendanceList.includes(decodedText)) {
+                tempAttendanceList.push(decodedText);
+                updateScannedList();
+                // إشارة صوتية قصيرة
+                const beep = new Audio('data:audio/wav;base64,U3RlYWx0aCBzb3VuZA==');
+                beep.play().catch(e=>{});
+            } else {
+                alert("تم تسجيل هذا العضو مسبقاً");
+            }
+        }, (err) => {});
+    }
+
+    function stopScanner() {
+        if(html5QrCode) html5QrCode.stop().catch(e=>{});
+    }
+
+    function updateScannedList() {
+        const container = document.getElementById('scannedMembersList');
+        const scannedMembers = membersList.filter(m => tempAttendanceList.includes(m.id));
+        container.innerHTML = `<h4>تم تسجيل حضور (${scannedMembers.length})</h4>` + 
+            scannedMembers.map(m => `<div class="member-card"><span>${m.fullName} (${m.id})</span><i class="fas fa-check-circle" style="color:green"></i></div>`).join('');
+    }
+
+    async function saveAttendance() {
+        if(!currentScanActivityId) return;
+        // جلب جميع الأعضاء
+        const allMemberIds = membersList.map(m => m.id);
+        const present = tempAttendanceList;
+        const absent = allMemberIds.filter(id => !present.includes(id));
+        const tx = db.transaction('attendance', 'readwrite');
+        const store = tx.objectStore('attendance');
+        // حذف القديم لهذا النشاط
+        const index = store.index('activityId');
+        const existing = await new Promise(resolve => {
+            const req = index.getAll(currentScanActivityId);
+            req.onsuccess = () => resolve(req.result);
+        });
+        for(let rec of existing) await store.delete(rec.id);
+        // تسجيل الحضور
+        for(let memberId of present) {
+            await store.add({ activityId: currentScanActivityId, memberId, status: 'حاضر', timestamp: new Date().toISOString() });
+        }
+        for(let memberId of absent) {
+            await store.add({ activityId: currentScanActivityId, memberId, status: 'غائب', timestamp: new Date().toISOString() });
+        }
+        await tx.complete;
+        alert(`تم حفظ الحضور: ${present.length} حاضر، ${absent.length} غائب`);
+        stopScanner();
+        document.getElementById('scannerSection').style.display = 'none';
+        document.getElementById('attendanceActivitySelect').value = '';
+        loadActivities(); // تحديث القوائم
+    }
+
+    // ---------- التقارير ----------
+    async function showReport() {
+        const actId = parseInt(document.getElementById('reportActivitySelect').value);
+        if(!actId) return;
+        const tx = db.transaction(['attendance', 'activities'], 'readonly');
+        const attStore = tx.objectStore('attendance');
+        const index = attStore.index('activityId');
+        const attendance = await new Promise(resolve => {
+            const req = index.getAll(actId);
+            req.onsuccess = () => resolve(req.result);
+        });
+        const activity = await new Promise(resolve => {
+            const req = tx.objectStore('activities').get(actId);
+            req.onsuccess = () => resolve(req.result);
+        });
+        const presentCount = attendance.filter(a => a.status === 'حاضر').length;
+        const absentCount = attendance.filter(a => a.status === 'غائب').length;
+        document.getElementById('reportStats').innerHTML = `
+            <div class="stat-card" style="display:flex; gap:20px; justify-content:center; margin-bottom:20px;">
+                <div><strong>النشاط:</strong> ${activity.name}</div>
+                <div><strong>التاريخ:</strong> ${activity.date}</div>
+                <div><strong>المكان:</strong> ${activity.location}</div>
+                <div><strong>✅ حاضر:</strong> ${presentCount}</div>
+                <div><strong>❌ غائب:</strong> ${absentCount}</div>
+            </div>
+        `;
+        // تفاصيل الحضور
+        const detailsHtml = attendance.map(att => {
+            const member = membersList.find(m => m.id === att.memberId);
+            return `<div class="member-card"><span>${member ? member.fullName : att.memberId}</span><span class="badge ${att.status === 'حاضر' ? 'success' : 'danger'}">${att.status}</span></div>`;
+        }).join('');
+        document.getElementById('attendanceDetailsTable').innerHTML = `<h4>تفاصيل الحضور والغياب</h4>${detailsHtml || '<p>لا توجد بيانات</p>'}`;
+    }
+
+    // ---------- المصادقة ----------
+    async function performLogin() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        if(!username || !password) { alert("أدخل اسم المستخدم وكلمة السر"); return; }
+        // التحقق من adminUsers (تم جلبهم من JSON)
+        const admin = adminUsers.find(a => a.fullName === username && a.password === password);
+        if(admin) {
+            currentUser = admin;
+            document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user-shield"></i> ${currentUser.fullName} | ${currentUser.position || 'خلية التنظيم'}`;
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            // تحميل الأعضاء في الخلفية
+            await fetchMembersAndAdmins();
+            renderMembersTable();
+            loadActivities();
+        } else {
+            alert("بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول");
+        }
+    }
+
+    function logout() {
+        if(html5QrCode) html5QrCode.stop().catch(e=>{});
+        currentUser = null;
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+    }
+
+    // تبديل التبويبات
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tabId = btn.dataset.tab;
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.getElementById(`${tabId}Tab`).classList.add('active');
+            if(tabId === 'attendance') loadAttendanceScanner();
+            if(tabId === 'reports') showReport();
+        });
+    });
+
+    // تهيئة
+    window.onload = async () => {
+        await openDB();
+        // محاولة جلب الملف الأولي
+        try {
+            const res = await fetch("https://raw.githubusercontent.com/nazahaa36/com/main/member.json");
+            const data = await res.json();
+            adminUsers = data.filter(p => {
+                const pos = p.position || "";
+                const cell = p.cell || "";
+                return (p.fullName === "رحاب بدرة") ||
+                       (cell === "موظف" && (pos.includes("خلية التنظيم") || pos.includes("شؤون المنخرطين") || 
+                        pos.includes("أمانة السر") || pos.includes("مجلس الإدارة")));
+            });
+            membersList = data.filter(p => {
+                const isAdmin = (p.cell === "موظف") || 
+                                (p.position && (p.position.includes("خلية التنظيم") || p.position.includes("شؤون المنخرطين") || 
+                                p.position.includes("أمانة السر") || p.position.includes("مجلس الإدارة")));
+                return !isAdmin;
+            });
+            // تخزين الأعضاء في IndexedDB
+            const tx = db.transaction('members', 'readwrite');
+            const store = tx.objectStore('members');
+            membersList.forEach(m => store.put({ barcode: m.id, ...m }));
+            await tx.complete;
+        } catch(e) { console.warn("فشل جلب البيانات، سيتم استخدام البيانات المحلية إن وجدت"); }
+    };
+</script>
+</body>
+</html>
