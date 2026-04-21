@@ -98,18 +98,18 @@
     "adminMessage": "نقدر جهودك في الإعلام، معك نصل إلى الأفضل."
   },
   {
-    "id": "",
-    "password": "",
-    "fullName": "",
-    "cadreType": "",
-    "hiringDate": "",
-    "position": "",
-    "cell": "",
-    "evaluation": "",
-    "expiryDate": "",
-    "birthDate": "",
-    "address": "",
-    "adminMessage": ""
+    "id": "1008050",
+    "password": "nadiir",
+    "fullName": "محمد نذير بوزيان",
+    "cadreType": "عضو",
+    "hiringDate": "21-04-2026",
+    "position": "غير متوفر",
+    "cell": "غير متوفر",
+    "evaluation": "غير متوفر",
+    "expiryDate": "21-04-2027",
+    "birthDate": "28-09-2010",
+    "address": "حي الوزن الثقيل",
+    "adminMessage": "إنضمامك يشرفنا"
   },
   {
     "id": "",
