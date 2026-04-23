@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم - المنتدى الشبابي للفكر والمشاركة المدنية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2c5282;
+            --secondary: #c05621;
+            --accent: #d69e2e;
+            --success: #38a169;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --info: #3182ce;
+            --bg: #f7fafc;
+            --sidebar-bg: #1a202c;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Login Screen */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .login-box h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .login-box p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Layout */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-right: 3px solid transparent;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border-right-color: var(--accent);
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            margin-right: auto;
+            background: var(--danger);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: var(--sidebar-bg);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-info span {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-right: 280px;
+            padding: 2rem;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .notification-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue { background: #ebf8ff; color: var(--info); }
+        .stat-icon.green { background: #f0fff4; color: var(--success); }
+        .stat-icon.orange { background: #fffaf0; color: var(--warning); }
+        .stat-icon.red { background: #fff5f5; color: var(--danger); }
+
+        .stat-details h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .stat-details p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 0.3rem;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        /* Content Sections */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header h3 i {
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: right;
+            padding: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: #f7fafc;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-cell img, .user-cell .avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .user-cell div h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .user-cell div span {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .status-active {
+            background: #f0fff4;
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: #fffaf0;
+            color: var(--warning);
+        }
+
+        .status-suspended {
+            background: #fff5f5;
+            color: var(--danger);
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view { background: #ebf8ff; color: var(--info); }
+        .btn-edit { background: #fffaf0; color: var(--warning); }
+        .btn-delete { background: #fff5f5; color: var(--danger); }
+        .btn-approve { background: #f0fff4; color: var(--success); }
+
+        .btn-sm:hover {
+            transform: scale(1.1);
+            filter: brightness(0.95);
+        }
+
+        /* Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            background: var(--bg);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: #edf2f7;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.join { background: #f0fff4; color: var(--success); }
+        .activity-icon.post { background: #ebf8ff; color: var(--info); }
+        .activity-icon.report { background: #fff5f5; color: var(--danger); }
+        .activity-icon.staff { background: #fffaf0; color: var(--warning); }
+
+        .activity-content h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-content p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+        }
+
+        /* Staff Roles */
+        .role-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .role-admin {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .role-moderator {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .role-editor {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        .role-support {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        /* Charts Placeholder */
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            color: var(--text-light);
+        }
+
+        /* Section Display */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast-msg {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+            min-width: 300px;
+        }
+
+        .toast-msg.success { background: var(--success); }
+        .toast-msg.error { background: var(--danger); }
+        .toast-msg.warning { background: var(--warning); }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(-100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: block;
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-action-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quick-action-btn i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: var(--primary);
+        }
+
+        .quick-action-btn span {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 0.875rem 3rem 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .filter-select {
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div class="login-overlay" id="loginScreen">
+        <div class="login-box">
+            <i class="fas fa-users-cog login-logo"></i>
+            <h2>لوحة تحكم المنتدى</h2>
+            <p>المنتدى الشبابي للفكر والمشاركة المدنية</p>
+            
+            <div class="input-group">
+                <label>اسم المستخدم</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم" value="admin">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPass" placeholder="أدخل كلمة المرور" value="admin123">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i>
+                تسجيل الدخول
+            </button>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-comments sidebar-logo"></i>
+                <h3>المنتدى الشبابي</h3>
+                <p>للفكر والمشاركة المدنية</p>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>لوحة المعلومات</span>
+                </div>
+                <div class="nav-item" onclick="showSection('members')">
+                    <i class="fas fa-users"></i>
+                    <span>الأعضاء</span>
+                    <span class="nav-badge" id="pendingMembersBadge">3</span>
+                </div>
+                <div class="nav-item" onclick="showSection('staff')">
+                    <i class="fas fa-user-shield"></i>
+                    <span>الموظفين</span>
+                </div>
+                <div class="nav-item" onclick="showSection('topics')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>المواضيع</span>
+                    <span class="nav-badge">12</span>
+                </div>
+                <div class="nav-item" onclick="showSection('reports')">
+                    <i class="fas fa-flag"></i>
+                    <span>البلاغات</span>
+                    <span class="nav-badge" style="background: var(--warning);">5</span>
+                </div>
+                <div class="nav-item" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar">م</div>
+                    <div class="user-info">
+                        <h4>مدير النظام</h4>
+                        <span>مسؤول عام</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <button class="mobile-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">لوحة المعلومات</h1>
+                    <p id="pageSubtitle">نظرة عامة على أداء المنتدى</p>
+                </div>
+                <div class="top-actions">
+                    <button class="notification-btn" onclick="showToast('لديك 5 إشعارات جديدة', 'warning')">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button class="btn btn-primary" onclick="openModal('addMemberModal')">
+                        <i class="fas fa-plus"></i>
+                        عضو جديد
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div class="section active" id="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>1,248</h3>
+                            <p>إجمالي الأعضاء</p>
+                            <span class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 12% هذا الشهر
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>3,642</h3>
+                            <p>المواضيع المنشورة</p>
+                            <span class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 8% هذا الشهر
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>8,921</h3>
+                            <p>التعليقات</p>
+                            <span class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 15% هذا الشهر
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>156</h3>
+                            <p>الأعضاء النشطين اليوم</p>
+                            <span class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i> 3% عن الأمس
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="quick-action-btn" onclick="showSection('members')">
+                        <i class="fas fa-user-plus"></i>
+                        <span>إدارة الأعضاء</span>
+                    </div>
+                    <div class="quick-action-btn" onclick="showSection('topics')">
+                        <i class="fas fa-edit"></i>
+                        <span>مراجعة المواضيع</span>
+                    </div>
+                    <div class="quick-action-btn" onclick="showSection('reports')">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>معالجة البلاغات</span>
+                    </div>
+                    <div class="quick-action-btn" onclick="showSection('staff')">
+                        <i class="fas fa-user-cog"></i>
+                        <span>صلاحيات الموظفين</span>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar"></i> إحصائيات النشاط</h3>
+                            <select class="filter-select">
+                                <option>آخر 7 أيام</option>
+                                <option>آخر 30 يوم</option>
+                                <option>هذا العام</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-area" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p>رسم بياني للنشاط اليومي</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> آخر النشاطات</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon join">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>عضو جديد</h4>
+                                        <p>انضمام <strong>أحمد السالم</strong> للمنتدى</p>
+                                        <span class="activity-time">منذ 5 دقائق</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon post">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>موضوع جديد</h4>
+                                        <p><strong>نورة العلي</strong> نشرت "أهمية المشاركة المدنية"</p>
+                                        <span class="activity-time">منذ 15 دقيقة</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon report">
+                                        <i class="fas fa-flag"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>بلاغ جديد</h4>
+                                        <p>بلاغ عن محتوى مخالف في موضوع #452</p>
+                                        <span class="activity-time">منذ 30 دقيقة</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon staff">
+                                        <i class="fas fa-user-shield"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>تعديل صلاحيات</h4>
+                                        <p>تم ترقية <strong>خالد المنيف</strong> إلى مشرف</p>
+                                        <span class="activity-time">منذ ساعة</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members Section -->
+            <div class="section" id="members">
+                <div class="search-bar">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="البحث في الأعضاء...">
+                    </div>
+                    <select class="filter-select">
+                        <option>جميع الحالات</option>
+                        <option>نشط</option>
+                        <option>معلق</option>
+                        <option>موقوف</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>جميع الفئات</option>
+                        <option>أعضاء عاديين</option>
+                        <option>مساهمون مميزون</option>
+                        <option>جديدون</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> قائمة الأعضاء</h3>
+                        <span style="color: var(--text-light);">إجمالي: 1,248 عضو</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>العضو</th>
+                                        <th>البريد الإلكتروني</th>
+                                        <th>تاريخ الانضمام</th>
+                                        <th>الحالة</th>
+                                        <th>المشاركات</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="membersTable">
+                                    <!-- Members loaded by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Section -->
+            <div class="section" id="staff">
+                <div class="search-bar">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="البحث في الموظفين...">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('addStaffModal')">
+                        <i class="fas fa-plus"></i>
+                        إضافة موظف
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-shield"></i> فريق الإدارة</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>الموظف</th>
+                                        <th>المنصب</th>
+                                        <th>الصلاحيات</th>
+                                        <th>آخر نشاط</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTable">
+                                    <!-- Staff loaded by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topics Section -->
+            <div class="section" id="topics">
+                <div class="search-bar">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="البحث في المواضيع...">
+                    </div>
+                    <select class="filter-select">
+                        <option>جميع الأقسام</option>
+                        <option>الفكر والفلسفة</option>
+                        <option>المشاركة المدنية</option>
+                        <option>التنمية المستدامة</option>
+                        <option>الشباب والقيادة</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>جميع الحالات</option>
+                        <option>منشور</option>
+                        <option>بانتظار المراجعة</option>
+                        <option>محذوف</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-alt"></i> إدارة المواضيع</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>العنوان</th>
+                                        <th>القسم</th>
+                                        <th>الكاتب</th>
+                                        <th>تاريخ النشر</th>
+                                        <th>المشاهدات</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topicsTable">
+                                    <!-- Topics loaded by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div class="section" id="reports">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-flag"></i> البلاغات والشكاوى</h3>
+                        <span class="status-badge status-pending">5 بلاغات معلقة</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>رقم البلاغ</th>
+                                        <th>النوع</th>
+                                        <th>البلاغ عن</th>
+                                        <th>المبلغ</th>
+                                        <th>التاريخ</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#452</td>
+                                        <td>محتوى مخالف</td>
+                                        <td>موضوع: "نقد الحكومة"</td>
+                                        <td>محمد العبدالله</td>
+                                        <td>2026-04-23</td>
+                                        <td><span class="status-badge status-pending">قيد المراجعة</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn-sm btn-view" title="عرض"><i class="fas fa-eye"></i></button>
+                                                <button class="btn-sm btn-approve" title="حل البلاغ"><i class="fas fa-check"></i></button>
+                                                <button class="btn-sm btn-delete" title="رفض"><i class="fas fa-times"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#451</td>
+                                        <td>تحرش</td>
+                                        <td>تعليق: #1289</td>
+                                        <td>فاطمة الزهراء</td>
+                                        <td>2026-04-22</td>
+                                        <td><span class="status-badge status-pending">قيد المراجعة</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn-sm btn-view" title="عرض"><i class="fas fa-eye"></i></button>
+                                                <button class="btn-sm btn-approve" title="حل البلاغ"><i class="fas fa-check"></i></button>
+                                                <button class="btn-sm btn-delete" title="رفض"><i class="fas fa-times"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="section" id="settings">
+                <div class="content-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-cog"></i> إعدادات عامة</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>اسم المنتدى</label>
+                                <input type="text" value="المنتدى الشبابي للفكر والمشاركة المدنية">
+                            </div>
+                            <div class="form-group">
+                                <label>البريد الإلكتروني للتواصل</label>
+                                <input type="email" value="admin@youth-forum.org">
+                            </div>
+                            <div class="form-group">
+                                <label>وصف المنتدى</label>
+                                <textarea rows="4">منصة شبابية للحوار البناء والمشاركة المدنية...</textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="showToast('تم حفظ الإعدادات بنجاح', 'success')">
+                                <i class="fas fa-save"></i>
+                                حفظ التغييرات
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-shield-alt"></i> إعدادات الأمان</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>تفعيل التحقق بخطوتين</label>
+                                <select class="filter-select" style="width: 100%;">
+                                    <option>مفعل للجميع</option>
+                                    <option>مفعل للإدارة فقط</option>
+                                    <option>معطل</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>سياسة كلمات المرور</label>
+                                <select class="filter-select" style="width: 100%;">
+                                    <option>قوية (8 أحرف على الأقل)</option>
+                                    <option>متوسطة</option>
+                                    <option>ضعيفة</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>مدة الجلسة (دقائق)</label>
+                                <input type="number" value="30">
+                            </div>
+                            <button class="btn btn-primary" onclick="showToast('تم تحديث إعدادات الأمان', 'success')">
+                                <i class="fas fa-save"></i>
+                                حفظ التغييرات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal" id="addMemberModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>إضافة عضو جديد</h3>
+                <button class="modal-close" onclick="closeModal('addMemberModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" placeholder="أدخل الاسم الكامل">
+                </div>
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" placeholder="أدخل اسم المستخدم">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label>الدور</label>
+                    <select class="filter-select" style="width: 100%;">
+                        <option>عضو عادي</option>
+                        <option>مساهم مميز</option>
+                        <option>مشرف</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addMemberModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="addMember()">
+                    <i class="fas fa-plus"></i>
+                    إضافة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Staff Modal -->
+    <div class="modal" id="addStaffModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>إضافة موظف جديد</h3>
+                <button class="modal-close" onclick="closeModal('addStaffModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" placeholder="أدخل الاسم الكامل">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label>المنصب</label>
+                    <select class="filter-select" style="width: 100%;">
+                        <option>مسؤول عام</option>
+                        <option>مشرف</option>
+                        <option>محرر</option>
+                        <option>دعم فني</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الصلاحيات</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                            <input type="checkbox" checked> إدارة الأعضاء
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                            <input type="checkbox" checked> إدارة المواضيع
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                            <input type="checkbox"> إدارة البلاغات
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                            <input type="checkbox"> إعدادات النظام
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addStaffModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="addStaff()">
+                    <i class="fas fa-plus"></i>
+                    إضافة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Data
+        const membersData = [
+            { id: 1, name: "أحمد السالم", email: "ahmed@email.com", joinDate: "2026-04-23", status: "active", posts: 45, avatar: null },
+            { id: 2, name: "نورة العلي", email: "noura@email.com", joinDate: "2026-04-20", status: "active", posts: 128, avatar: null },
+            { id: 3, name: "خالد المنيف", email: "khaled@email.com", joinDate: "2026-04-18", status: "active", posts: 67, avatar: null },
+            { id: 4, name: "فاطمة الزهراء", email: "fatima@email.com", joinDate: "2026-04-15", status: "pending", posts: 0, avatar: null },
+            { id: 5, name: "محمد العبدالله", email: "mohammed@email.com", joinDate: "2026-04-10", status: "suspended", posts: 12, avatar: null },
+            { id: 6, name: "ليلى الحسيني", email: "laila@email.com", joinDate: "2026-04-05", status: "active", posts: 89, avatar: null },
+        ];
+
+        const staffData = [
+            { id: 1, name: "مدير النظام", email: "admin@forum.org", role: "admin", roleName: "مسؤول عام", lastActive: "الآن", status: "active", permissions: "الكل" },
+            { id: 2, name: "خالد المنيف", email: "khaled@forum.org", role: "moderator", roleName: "مشرف", lastActive: "منذ 5 دقائق", status: "active", permissions: "أعضاء، مواضيع" },
+            { id: 3, name: "سارة العتيبي", email: "sara@forum.org", role: "editor", roleName: "محرر", lastActive: "منذ ساعة", status: "active", permissions: "مواضيع" },
+            { id: 4, name: "عمر التميمي", email: "omar@forum.org", role: "support", roleName: "دعم فني", lastActive: "منذ يومين", status: "inactive", permissions: "بلاغات" },
+        ];
+
+        const topicsData = [
+            { id: 1, title: "أهمية المشاركة المدنية في المجتمع", category: "المشاركة المدنية", author: "نورة العلي", date: "2026-04-23", views: 1245, status: "published" },
+            { id: 2, title: "الشباب وصناعة القرار", category: "الشباب والقيادة", author: "أحمد السالم", date: "2026-04-22", views: 892, status: "published" },
+            { id: 3, title: "التنمية المستدامة وأهداف 2030", category: "التنمية المستدامة", author: "خالد المنيف", date: "2026-04-21", views: 567, status: "pending" },
+            { id: 4, title: "نقد الفكر السياسي الحديث", category: "الفكر والفلسفة", author: "محمد العبدالله", date: "2026-04-20", views: 2100, status: "published" },
+            { id: 5, title: "دور المرأة في التنمية", category: "المشاركة المدنية", author: "فاطمة الزهراء", date: "2026-04-19", views: 0, status: "pending" },
+        ];
+
+        // Login
+        function login() {
+            const user = document.getElementById('loginUser').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            if (user && pass) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.add('active');
+                showToast('تم تسجيل الدخول بنجاح', 'success');
+            } else {
+                showToast('يرجى إدخال اسم المستخدم وكلمة المرور', 'error');
+            }
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update title
+            const titles = {
+                dashboard: ['لوحة المعلومات', 'نظرة عامة على أداء المنتدى'],
+                members: ['إدارة الأعضاء', 'التحكم في حسابات الأعضاء'],
+                staff: ['إدارة الموظفين', 'التحكم في فريق العمل'],
+                topics: ['إدارة المواضيع', 'مراجعة وإدارة المحتوى'],
+                reports: ['البلاغات', 'معالجة الشكاوى والبلاغات'],
+                settings: ['الإعدادات', 'تخصيص إعدادات المنتدى']
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionId][0];
+            document.getElementById('pageSubtitle').textContent = titles[sectionId][1];
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Render Tables
+        function renderMembers() {
+            const tbody = document.getElementById('membersTable');
+            tbody.innerHTML = membersData.map(member => `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar-placeholder">${member.name.charAt(0)}</div>
+                            <div>
+                                <h4>${member.name}</h4>
+                                <span>@${member.email.split('@')[0]}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${member.email}</td>
+                    <td>${member.joinDate}</td>
+                    <td>
+                        <span class="status-badge status-${member.status}">
+                            ${member.status === 'active' ? 'نشط' : member.status === 'pending' ? 'معلق' : 'موقوف'}
+                        </span>
+                    </td>
+                    <td>${member.posts}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-sm btn-view" title="عرض" onclick="showToast('عرض بيانات العضو', 'info')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-sm btn-edit" title="تعديل" onclick="showToast('تعديل بيانات العضو', 'warning')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-sm ${member.status === 'suspended' ? 'btn-approve' : 'btn-delete'}" 
+                                    title="${member.status === 'suspended' ? 'تفعيل' : 'تعليق'}" 
+                                    onclick="toggleMemberStatus(${member.id})">
+                                <i class="fas ${member.status === 'suspended' ? 'fa-check' : 'fa-ban'}"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderStaff() {
+            const tbody = document.getElementById('staffTable');
+            tbody.innerHTML = staffData.map(staff => `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar-placeholder">${staff.name.charAt(0)}</div>
+                            <div>
+                                <h4>${staff.name}</h4>
+                                <span>${staff.email}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="role-badge role-${staff.role}">${staff.roleName}</span></td>
+                    <td>${staff.permissions}</td>
+                    <td>${staff.lastActive}</td>
+                    <td>
+                        <span class="status-badge status-${staff.status}">
+                            ${staff.status === 'active' ? 'نشط' : 'غير نشط'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-sm btn-edit" title="تعديل الصلاحيات" onclick="showToast('تعديل صلاحيات الموظف', 'warning')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-sm btn-delete" title="إزالة" onclick="showToast('تم إزالة الموظف', 'error')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTopics() {
+            const tbody = document.getElementById('topicsTable');
+            tbody.innerHTML = topicsData.map(topic => `
+                <tr>
+                    <td><strong>${topic.title}</strong></td>
+                    <td>${topic.category}</td>
+                    <td>${topic.author}</td>
+                    <td>${topic.date}</td>
+                    <td>${topic.views.toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge status-${topic.status === 'published' ? 'active' : 'pending'}">
+                            ${topic.status === 'published' ? 'منشور' : 'بانتظار المراجعة'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-sm btn-view" title="عرض"><i class="fas fa-eye"></i></button>
+                            <button class="btn-sm btn-edit" title="تعديل"><i class="fas fa-edit"></i></button>
+                            <button class="btn-sm btn-delete" title="حذف" onclick="showToast('تم حذف الموضوع', 'error')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Actions
+        function toggleMemberStatus(id) {
+            const member = membersData.find(m => m.id === id);
+            if (member.status === 'suspended') {
+                member.status = 'active';
+                showToast(`تم تفعيل العضو ${member.name}`, 'success');
+            } else {
+                member.status = 'suspended';
+                showToast(`تم تعليق العضو ${member.name}`, 'warning');
+            }
+            renderMembers();
+        }
+
+        function addMember() {
+            closeModal('addMemberModal');
+            showToast('تم إضافة العضو بنجاح', 'success');
+        }
+
+        function addStaff() {
+            closeModal('addStaffModal');
+            showToast('تم إضافة الموظف بنجاح', 'success');
+        }
+
+        // Modal
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            toast.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMembers();
+            renderStaff();
+            renderTopics();
+        });
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
