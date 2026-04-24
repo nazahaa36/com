@@ -1,0 +1,2729 @@
+
+html_content = '''<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام نزاهة - إدارة المنتدى الشبابي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #1a5f2a;
+            --primary-dark: #0d3d16;
+            --primary-light: #2d8a3e;
+            --secondary: #c9a84c;
+            --accent: #e8b923;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #16a34a;
+            --info: #2563eb;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
+
+        /* Loading */
+        .loading-screen {
+            position: fixed; inset: 0; background: var(--primary); z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-logo {
+            width: 100px; height: 100px; background: white; border-radius: 28px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: var(--primary); margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255,255,255,0); }
+        }
+        .loading-bar {
+            width: 200px; height: 4px; background: rgba(255,255,255,0.2);
+            border-radius: 2px; overflow: hidden;
+        }
+        .loading-bar-fill {
+            height: 100%; width: 0%; background: white;
+            border-radius: 2px; transition: width 0.3s;
+            animation: loadProgress 2s ease forwards;
+        }
+        @keyframes loadProgress { to { width: 100%; } }
+
+        /* Login */
+        .login-overlay {
+            position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .login-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .login-card {
+            background: white; padding: 3rem; border-radius: var(--radius-xl);
+            width: 100%; max-width: 420px; box-shadow: var(--shadow-xl);
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        .login-logo-area { margin-bottom: 2rem; }
+        .login-logo-icon {
+            width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 24px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem; font-size: 2.5rem; color: white;
+        }
+        .login-card h2 { color: var(--gray-900); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .login-card p { color: var(--gray-500); margin-bottom: 2rem; }
+
+        .input-group { margin-bottom: 1.25rem; text-align: right; }
+        .input-group label {
+            display: block; margin-bottom: 0.5rem; font-weight: 700;
+            color: var(--gray-700); font-size: 0.9rem;
+        }
+        .input-wrapper { position: relative; }
+        .input-wrapper i {
+            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+            color: var(--gray-400); font-size: 1.1rem;
+        }
+        .input-wrapper input, .input-wrapper select {
+            width: 100%; padding: 0.875rem 3rem 0.875rem 1rem;
+            border: 2px solid var(--gray-200); border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif; font-size: 1rem;
+            transition: var(--transition); background: var(--gray-50);
+        }
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            outline: none; border-color: var(--primary);
+            background: white; box-shadow: 0 0 0 4px rgba(26, 95, 42, 0.1);
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.875rem 1.75rem; border: none; border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: var(--transition);
+        }
+        .btn-block { width: 100%; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; box-shadow: 0 4px 12px rgba(26, 95, 42, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26, 95, 42, 0.4);
+        }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+        .btn-secondary:hover { background: var(--gray-200); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; border-radius: var(--radius); }
+        .btn-icon-btn {
+            width: 36px; height: 36px; border-radius: var(--radius);
+            border: none; cursor: pointer; display: inline-flex;
+            align-items: center; justify-content: center; transition: var(--transition);
+        }
+
+        /* App Layout */
+        .app { display: none; min-height: 100vh; }
+        .app.active { display: grid; grid-template-columns: 280px 1fr; }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--gray-900); color: white; position: fixed;
+            height: 100vh; width: 280px; overflow-y: auto; z-index: 100;
+            transition: var(--transition);
+        }
+        .sidebar-header {
+            padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .sidebar-brand {
+            width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem; font-size: 1.75rem; color: white;
+        }
+        .sidebar-header h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.25rem; }
+        .sidebar-header p { font-size: 0.8rem; color: var(--gray-400); }
+
+        .nav-menu { padding: 1rem 0; }
+        .nav-item {
+            padding: 0.875rem 1.5rem; display: flex; align-items: center; gap: 0.875rem;
+            cursor: pointer; transition: var(--transition); border-right: 3px solid transparent;
+            color: var(--gray-400); text-decoration: none; position: relative;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active {
+            background: rgba(255,255,255,0.05); color: white;
+            border-right-color: var(--secondary);
+        }
+        .nav-item i { width: 24px; text-align: center; font-size: 1.1rem; }
+        .nav-badge {
+            margin-right: auto; background: var(--danger); color: white;
+            padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+        }
+
+        .sidebar-user {
+            padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);
+            position: sticky; bottom: 0; background: var(--gray-900);
+        }
+        .user-mini {
+            display: flex; align-items: center; gap: 0.875rem;
+        }
+        .user-mini-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; color: var(--gray-900);
+        }
+        .user-mini-info h4 { font-size: 0.9rem; font-weight: 700; }
+        .user-mini-info span {
+            font-size: 0.75rem; color: var(--gray-400);
+            display: flex; align-items: center; gap: 0.25rem;
+        }
+        .user-mini-info span::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--success);
+        }
+        .user-mini-info span.offline::before { background: var(--gray-500); }
+
+        /* Main Content */
+        .main {
+            margin-right: 280px; padding: 2rem; min-height: 100vh;
+        }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .page-info h1 {
+            font-size: 1.75rem; font-weight: 800; color: var(--gray-900);
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .page-info p { color: var(--gray-500); font-size: 0.95rem; margin-top: 0.25rem; }
+        .topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+        .icon-btn {
+            width: 44px; height: 44px; border-radius: var(--radius);
+            border: 1px solid var(--gray-200); background: white;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: var(--gray-600); transition: var(--transition);
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .icon-btn .dot {
+            position: absolute; top: 8px; left: 8px;
+            width: 10px; height: 10px; background: var(--danger);
+            border-radius: 50%; border: 2px solid white;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem; margin-bottom: 2rem;
+        }
+        .stat-box {
+            background: white; padding: 1.5rem; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+            display: flex; align-items: center; gap: 1rem; transition: var(--transition);
+        }
+        .stat-box:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-icon {
+            width: 56px; height: 56px; border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; flex-shrink: 0;
+        }
+        .stat-icon.green { background: #dcfce7; color: var(--success); }
+        .stat-icon.blue { background: #dbeafe; color: var(--info); }
+        .stat-icon.gold { background: #fef3c7; color: var(--warning); }
+        .stat-icon.red { background: #fee2e2; color: var(--danger); }
+        .stat-text h3 { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); }
+        .stat-text p { color: var(--gray-500); font-size: 0.875rem; }
+        .stat-trend {
+            font-size: 0.8rem; font-weight: 700; margin-top: 0.25rem;
+            display: flex; align-items: center; gap: 0.25rem;
+        }
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        /* Cards */
+        .card {
+            background: white; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+            overflow: hidden; margin-bottom: 1.5rem;
+        }
+        .card-header {
+            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-100);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+        }
+        .card-header h3 {
+            font-size: 1.15rem; font-weight: 700; color: var(--gray-900);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .card-header h3 i { color: var(--primary); }
+        .card-body { padding: 1.5rem; }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: right; padding: 0.875rem 1rem;
+            font-weight: 700; color: var(--gray-500); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--gray-200); background: var(--gray-50);
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+        tr:hover td { background: var(--gray-50); }
+        tr:last-child td { border-bottom: none; }
+
+        .td-user {
+            display: flex; align-items: center; gap: 0.875rem;
+        }
+        .td-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+        }
+        .td-user-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--gray-900); }
+        .td-user-info span { font-size: 0.8rem; color: var(--gray-500); }
+
+        .badge {
+            padding: 0.35rem 0.875rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700; display: inline-flex;
+            align-items: center; gap: 0.4rem;
+        }
+        .badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        .badge-green { background: #dcfce7; color: var(--success); }
+        .badge-yellow { background: #fef3c7; color: var(--warning); }
+        .badge-red { background: #fee2e2; color: var(--danger); }
+        .badge-blue { background: #dbeafe; color: var(--info); }
+        .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+
+        .role-admin { background: #fee2e2; color: #991b1b; }
+        .role-moderator { background: #fef3c7; color: #92400e; }
+        .role-editor { background: #dbeafe; color: #1e40af; }
+        .role-viewer { background: #f3e8ff; color: #6b21a8; }
+
+        .actions { display: flex; gap: 0.5rem; }
+        .action-btn {
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+            border: none; cursor: pointer; display: inline-flex;
+            align-items: center; justify-content: center;
+            font-size: 0.875rem; transition: var(--transition);
+        }
+        .action-view { background: #eff6ff; color: var(--info); }
+        .action-edit { background: #fffbeb; color: var(--warning); }
+        .action-delete { background: #fef2f2; color: var(--danger); }
+        .action-print { background: #f0fdf4; color: var(--success); }
+        .action-btn:hover { transform: scale(1.1); }
+
+        /* Search & Filters */
+        .toolbar {
+            display: flex; gap: 1rem; margin-bottom: 1.5rem;
+            flex-wrap: wrap; align-items: center;
+        }
+        .search-box {
+            flex: 1; min-width: 250px; position: relative;
+        }
+        .search-box input {
+            width: 100%; padding: 0.75rem 3rem 0.75rem 1rem;
+            border: 2px solid var(--gray-200); border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            transition: var(--transition); background: white;
+        }
+        .search-box input:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 95, 42, 0.1);
+        }
+        .search-box i {
+            position: absolute; right: 1rem; top: 50%;
+            transform: translateY(-50%); color: var(--gray-400);
+        }
+        .filter-select {
+            padding: 0.75rem 1rem; border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg); font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem; background: white; cursor: pointer; min-width: 160px;
+        }
+
+        /* ID Card Styles */
+        .id-card {
+            width: 340px; background: white; border-radius: var(--radius-xl);
+            overflow: hidden; box-shadow: var(--shadow-xl); margin: 0 auto;
+            border: 1px solid var(--gray-200);
+        }
+        .id-card-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 1.5rem; text-align: center; color: white; position: relative;
+        }
+        .id-card-header::after {
+            content: ''; position: absolute; bottom: -20px; left: 0; right: 0;
+            height: 40px; background: white; border-radius: 50% 50% 0 0;
+        }
+        .id-card-logo {
+            width: 70px; height: 70px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem; font-size: 2rem; color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .id-card-header h3 { font-size: 1.25rem; font-weight: 800; }
+        .id-card-header p { font-size: 0.85rem; opacity: 0.9; }
+        .id-card-body {
+            padding: 2rem 1.5rem 1.5rem; text-align: center;
+        }
+        .id-card-photo {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gray-200), var(--gray-300));
+            margin: -50px auto 1rem; border: 4px solid white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: var(--gray-500); position: relative; z-index: 1;
+        }
+        .id-card-name { font-size: 1.25rem; font-weight: 800; color: var(--gray-900); margin-bottom: 0.25rem; }
+        .id-card-role { color: var(--primary); font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem; }
+        .id-card-details {
+            text-align: right; background: var(--gray-50);
+            border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem;
+        }
+        .id-card-row {
+            display: flex; justify-content: space-between; padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-200); font-size: 0.9rem;
+        }
+        .id-card-row:last-child { border-bottom: none; }
+        .id-card-row span:first-child { color: var(--gray-500); }
+        .id-card-row span:last-child { font-weight: 700; color: var(--gray-800); }
+        .id-card-qr {
+            width: 120px; height: 120px; margin: 0 auto;
+        }
+        .id-card-footer {
+            background: var(--gray-50); padding: 1rem;
+            text-align: center; font-size: 0.8rem; color: var(--gray-500);
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Certificate */
+        .certificate {
+            width: 800px; background: white;
+            border: 12px solid var(--primary); padding: 3rem;
+            position: relative; margin: 0 auto;
+            box-shadow: var(--shadow-xl);
+        }
+        .certificate::before, .certificate::after {
+            content: ''; position: absolute; width: 60px; height: 60px;
+            border: 3px solid var(--secondary);
+        }
+        .certificate::before { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .certificate::after { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+        .cert-header { text-align: center; margin-bottom: 2rem; }
+        .cert-logo {
+            width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: white; margin-bottom: 1rem;
+        }
+        .cert-header h2 { font-size: 2rem; font-weight: 900; color: var(--primary); }
+        .cert-header h3 { font-size: 1.25rem; color: var(--gray-600); margin-top: 0.5rem; }
+        .cert-body { text-align: center; padding: 2rem 0; }
+        .cert-body p { font-size: 1.1rem; line-height: 2; color: var(--gray-700); margin-bottom: 1rem; }
+        .cert-body .cert-name {
+            font-size: 2.5rem; font-weight: 900; color: var(--primary);
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .cert-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--gray-200);
+        }
+        .cert-sig { text-align: center; }
+        .cert-sig-line {
+            width: 150px; height: 1px; background: var(--gray-800); margin-bottom: 0.5rem;
+        }
+        .cert-sig p { font-size: 0.9rem; color: var(--gray-600); }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 1000; align-items: center; justify-content: center;
+            padding: 2rem; overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: white; border-radius: var(--radius-xl);
+            max-width: 700px; width: 100%; max-height: 90vh;
+            overflow-y: auto; box-shadow: var(--shadow-xl);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-head {
+            padding: 1.5rem; border-bottom: 1px solid var(--gray-100);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-head h3 { font-size: 1.25rem; font-weight: 800; }
+        .modal-close {
+            background: none; border: none; font-size: 1.5rem;
+            cursor: pointer; color: var(--gray-400); transition: var(--transition);
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { background: var(--gray-100); color: var(--danger); transform: rotate(90deg); }
+        .modal-body { padding: 1.5rem; }
+        .modal-foot {
+            padding: 1.25rem 1.5rem; border-top: 1px solid var(--gray-100);
+            display: flex; justify-content: flex-end; gap: 0.75rem;
+        }
+
+        .form-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+        }
+        .form-group { margin-bottom: 1rem; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label {
+            display: block; margin-bottom: 0.5rem; font-weight: 700;
+            font-size: 0.875rem; color: var(--gray-700);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200); border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 95, 42, 0.1);
+        }
+
+        /* QR Scanner */
+        .scanner-container {
+            background: var(--gray-900); border-radius: var(--radius-lg);
+            padding: 1.5rem; text-align: center;
+        }
+        .scanner-box {
+            width: 100%; max-width: 400px; margin: 0 auto;
+            border-radius: var(--radius); overflow: hidden;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed; top: 2rem; left: 2rem; z-index: 9999;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .toast {
+            padding: 1rem 1.5rem; border-radius: var(--radius);
+            box-shadow: var(--shadow-xl); display: flex;
+            align-items: center; gap: 0.75rem; font-weight: 600;
+            animation: toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            min-width: 300px;
+        }
+        @keyframes toastIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast.success { background: var(--success); color: white; }
+        .toast.error { background: var(--danger); color: white; }
+        .toast.warning { background: var(--warning); color: white; }
+        .toast.info { background: var(--info); color: white; }
+
+        /* Print */
+        @media print {
+            .sidebar, .topbar, .actions, .no-print { display: none !important; }
+            .main { margin: 0; padding: 0; }
+            .card { box-shadow: none; border: none; }
+            .id-card, .certificate { box-shadow: none; page-break-inside: avoid; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app.active { grid-template-columns: 1fr; }
+            .sidebar { transform: translateX(100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-right: 0; }
+            .form-grid { grid-template-columns: 1fr; }
+            .certificate { width: 100%; padding: 1.5rem; }
+        }
+
+        .mobile-toggle {
+            display: none; background: none; border: none;
+            font-size: 1.5rem; cursor: pointer; color: var(--gray-700);
+        }
+        @media (max-width: 1024px) {
+            .mobile-toggle { display: block; }
+        }
+
+        /* Section */
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Empty State */
+        .empty {
+            text-align: center; padding: 4rem 2rem;
+        }
+        .empty i { font-size: 4rem; color: var(--gray-300); margin-bottom: 1rem; }
+        .empty h3 { font-size: 1.25rem; color: var(--gray-700); margin-bottom: 0.5rem; }
+        .empty p { color: var(--gray-500); }
+
+        /* Activity Card */
+        .activity-card {
+            background: var(--gray-50); border-radius: var(--radius);
+            padding: 1.25rem; margin-bottom: 1rem;
+            border: 1px solid var(--gray-200);
+            cursor: pointer; transition: var(--transition);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .activity-card:hover {
+            background: white; border-color: var(--primary);
+            transform: translateX(-4px); box-shadow: var(--shadow-md);
+        }
+        .activity-info h4 { font-weight: 700; color: var(--gray-900); margin-bottom: 0.25rem; }
+        .activity-info p { font-size: 0.875rem; color: var(--gray-500); }
+        .activity-status {
+            padding: 0.5rem 1rem; border-radius: 20px;
+            font-size: 0.875rem; font-weight: 700;
+        }
+        .activity-status.upcoming { background: #dbeafe; color: var(--info); }
+        .activity-status.active { background: #dcfce7; color: var(--success); }
+        .activity-status.past { background: var(--gray-100); color: var(--gray-500); }
+
+        /* Permission Matrix */
+        .perm-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem; margin-top: 1rem;
+        }
+        .perm-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem; border-radius: var(--radius);
+            background: var(--gray-50); border: 1px solid var(--gray-200);
+            cursor: pointer; transition: var(--transition);
+        }
+        .perm-item:hover { background: var(--gray-100); }
+        .perm-item input[type="checkbox"] {
+            width: 20px; height: 20px; accent-color: var(--primary);
+        }
+        .perm-item label { font-weight: 600; cursor: pointer; flex: 1; }
+
+        /* Document Preview */
+        .doc-preview {
+            background: var(--gray-50); border-radius: var(--radius);
+            padding: 2rem; border: 2px dashed var(--gray-300);
+            text-align: center; margin-bottom: 1.5rem;
+        }
+        .doc-preview i { font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem; }
+        .doc-preview p { color: var(--gray-500); }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200); padding-bottom: 0.5rem;
+        }
+        .tab {
+            padding: 0.75rem 1.5rem; border: none; background: none;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            font-weight: 700; color: var(--gray-500); cursor: pointer;
+            border-radius: var(--radius) var(--radius) 0 0;
+            transition: var(--transition); position: relative;
+        }
+        .tab:hover { color: var(--primary); }
+        .tab.active {
+            color: var(--primary); background: rgba(26, 95, 42, 0.05);
+        }
+        .tab.active::after {
+            content: ''; position: absolute; bottom: -0.5rem; left: 0; right: 0;
+            height: 3px; background: var(--primary); border-radius: 3px 3px 0 0;
+        }
+
+        /* Initiative Card */
+        .initiative-card {
+            background: white; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+            overflow: hidden; margin-bottom: 1.5rem; transition: var(--transition);
+        }
+        .initiative-card:hover {
+            transform: translateY(-4px); box-shadow: var(--shadow-lg);
+        }
+        .initiative-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 1.5rem; color: white;
+        }
+        .initiative-header h4 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .initiative-header .init-meta {
+            display: flex; gap: 1rem; font-size: 0.85rem; opacity: 0.9;
+        }
+        .initiative-body { padding: 1.5rem; }
+        .initiative-body p { color: var(--gray-600); line-height: 1.8; margin-bottom: 1rem; }
+        .initiative-footer {
+            padding: 1rem 1.5rem; border-top: 1px solid var(--gray-100);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* Attendance Log */
+        .attendance-log {
+            display: flex; flex-direction: column; gap: 0.75rem;
+        }
+        .attendance-item {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1rem; background: var(--gray-50);
+            border-radius: var(--radius); border: 1px solid var(--gray-200);
+        }
+        .attendance-item .att-time {
+            font-size: 0.85rem; color: var(--gray-500);
+            white-space: nowrap;
+        }
+        .attendance-item .att-name {
+            font-weight: 700; color: var(--gray-900); flex: 1;
+        }
+        .attendance-item .att-status {
+            padding: 0.25rem 0.75rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700;
+        }
+        .att-status.present { background: #dcfce7; color: var(--success); }
+        .att-status.late { background: #fef3c7; color: var(--warning); }
+
+        /* Member Detail Modal */
+        .member-detail-grid {
+            display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;
+        }
+        .member-detail-avatar {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: white; margin: 0 auto 1rem;
+        }
+        .member-detail-sidebar {
+            text-align: center; padding: 1.5rem;
+            background: var(--gray-50); border-radius: var(--radius-lg);
+        }
+        .detail-row {
+            display: flex; justify-content: space-between;
+            padding: 0.75rem 0; border-bottom: 1px solid var(--gray-200);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row span:first-child { color: var(--gray-500); }
+        .detail-row span:last-child { font-weight: 700; color: var(--gray-900); }
+
+        /* Quick Search Results */
+        .quick-search-results {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border-radius: var(--radius);
+            box-shadow: var(--shadow-xl); z-index: 100;
+            max-height: 300px; overflow-y: auto;
+            border: 1px solid var(--gray-200); margin-top: 0.5rem;
+            display: none;
+        }
+        .quick-search-results.active { display: block; }
+        .quick-search-item {
+            padding: 0.75rem 1rem; cursor: pointer;
+            display: flex; align-items: center; gap: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .quick-search-item:hover { background: var(--gray-50); }
+        .quick-search-item:last-child { border-bottom: none; }
+
+        /* Data Status Badge */
+        .data-status {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 1rem; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 700;
+        }
+        .data-status.online { background: #dcfce7; color: var(--success); }
+        .data-status.offline { background: #fee2e2; color: var(--danger); }
+        .data-status.syncing { background: #dbeafe; color: var(--info); }
+    </style>
+</head>
+<body>
+
+    <!-- Loading -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo"><i class="fas fa-shield-alt"></i></div>
+        <h2 style="color: white; margin-bottom: 1rem;">نظام نزاهة</h2>
+        <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+    </div>
+
+    <!-- Login -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <div class="login-logo-area">
+                <div class="login-logo-icon"><i class="fas fa-shield-alt"></i></div>
+                <h2>نظام نزاهة</h2>
+                <p>المنتدى الشبابي للفكر والمشاركة المدنية</p>
+            </div>
+            
+            <div class="input-group">
+                <label>البريد الإلكتروني</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="loginEmail" placeholder="admin@nazaha.dz" value="admin@nazaha.dz">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="••••••••" value="admin123">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i>
+                تسجيل الدخول
+            </button>
+            
+            <p style="margin-top: 1.5rem; font-size: 0.875rem; color: var(--gray-400);">
+                <i class="fas fa-info-circle"></i>
+                للتجربة: admin@nazaha.dz / admin123
+            </p>
+        </div>
+    </div>
+
+    <!-- App -->
+    <div class="app" id="app">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand"><i class="fas fa-shield-alt"></i></div>
+                <h3>نظام نزاهة</h3>
+                <p>إدارة المنتدى الشبابي</p>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="navigate('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>لوحة المعلومات</span>
+                </div>
+                <div class="nav-item" onclick="navigate('members')">
+                    <i class="fas fa-users"></i>
+                    <span>الأعضاء</span>
+                    <span class="nav-badge" id="membersBadge">0</span>
+                </div>
+                <div class="nav-item" onclick="navigate('staff')">
+                    <i class="fas fa-user-shield"></i>
+                    <span>الموظفين</span>
+                    <span class="nav-badge" id="staffBadge">0</span>
+                </div>
+                <div class="nav-item" onclick="navigate('initiatives')">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>المبادرات</span>
+                    <span class="nav-badge" id="initiativesBadge">0</span>
+                </div>
+                <div class="nav-item" onclick="navigate('activities')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>النشاطات</span>
+                    <span class="nav-badge" id="activitiesBadge">0</span>
+                </div>
+                <div class="nav-item" onclick="navigate('documents')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>المستندات</span>
+                    <span class="nav-badge" id="docsBadge">0</span>
+                </div>
+                <div class="nav-item" onclick="navigate('attendance')">
+                    <i class="fas fa-qrcode"></i>
+                    <span>تسجيل الحضور</span>
+                </div>
+                <div class="nav-item" onclick="navigate('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-user">
+                <div class="user-mini">
+                    <div class="user-mini-avatar" id="userAvatar">م</div>
+                    <div class="user-mini-info">
+                        <h4 id="userName">مدير النظام</h4>
+                        <span id="userRole">مسؤول عام</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="page-info">
+                    <button class="mobile-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle"><i class="fas fa-chart-line"></i> لوحة المعلومات</h1>
+                    <p id="pageSubtitle">نظرة عامة على المنتدى</p>
+                </div>
+                <div class="topbar-actions no-print">
+                    <div class="data-status online" id="dataStatus">
+                        <i class="fas fa-wifi"></i> متصل بالبيانات
+                    </div>
+                    <button class="icon-btn" onclick="syncAllData()" title="تحديث البيانات">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="icon-btn" onclick="showToast('لديك 3 إشعارات جديدة', 'warning')">
+                        <i class="fas fa-bell"></i>
+                        <span class="dot"></span>
+                    </button>
+                    <button class="icon-btn" onclick="logout()" title="تسجيل الخروج">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="section active" id="dashboardSection">
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-icon green"><i class="fas fa-users"></i></div>
+                        <div class="stat-text">
+                            <h3 id="statMembers">0</h3>
+                            <p>إجمالي الأعضاء</p>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> مباشر من GitHub</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon blue"><i class="fas fa-user-shield"></i></div>
+                        <div class="stat-text">
+                            <h3 id="statStaff">0</h3>
+                            <p>الموظفين</p>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> فريق العمل</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon gold"><i class="fas fa-lightbulb"></i></div>
+                        <div class="stat-text">
+                            <h3 id="statInitiatives">0</h3>
+                            <p>المبادرات</p>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> مبادرات وطنية</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon red"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-text">
+                            <h3 id="statActivities">0</h3>
+                            <p>النشاطات</p>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> قادمة وسابقة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-area"></i> إحصائيات النشاط</h3>
+                            <select class="filter-select" id="chartPeriod" onchange="updateDashboardChart()">
+                                <option value="30">آخر 30 يوم</option>
+                                <option value="year">هذا العام</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="dashboardChart" height="120"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> آخر النشاطات</h3>
+                        </div>
+                        <div class="card-body" id="recentActivity">
+                            <div class="empty">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <h3>جاري التحميل...</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMBERS -->
+            <div class="section" id="membersSection">
+                <div class="toolbar">
+                    <div class="search-box" style="position: relative;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="memberSearch" placeholder="بحث بالاسم، الرقم، أو البريد..." oninput="filterMembers()">
+                        <div class="quick-search-results" id="memberQuickResults"></div>
+                    </div>
+                    <select class="filter-select" id="memberFilter" onchange="filterMembers()">
+                        <option value="all">جميع الحالات</option>
+                        <option value="active">نشط</option>
+                        <option value="pending">معلق</option>
+                        <option value="suspended">موقوف</option>
+                    </select>
+                    <select class="filter-select" id="memberTypeFilter" onchange="filterMembers()">
+                        <option value="all">جميع الأنواع</option>
+                        <option value="موظف">موظف</option>
+                        <option value="عضو">عضو</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openModal('addMemberModal')">
+                        <i class="fas fa-plus"></i>
+                        عضو جديد
+                    </button>
+                    <button class="btn btn-secondary" onclick="syncMembersFromGitHub()">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        تحديث من GitHub
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> قائمة الأعضاء</h3>
+                        <span style="color: var(--gray-500); font-size: 0.9rem;" id="membersCount">0 عضو</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>العضو</th>
+                                        <th>رقم العضوية</th>
+                                        <th>النوع</th>
+                                        <th>المنصب</th>
+                                        <th>الخلية</th>
+                                        <th>تاريخ الانضمام</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="membersTableBody">
+                                    <tr><td colspan="8" style="text-align:center"><i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAFF -->
+            <div class="section" id="staffSection">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="staffSearch" placeholder="بحث في الموظفين..." oninput="filterStaff()">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('addStaffModal')">
+                        <i class="fas fa-plus"></i>
+                        موظف جديد
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-shield"></i> فريق العمل</h3>
+                        <span style="color: var(--gray-500); font-size: 0.9rem;" id="staffCount">0 موظف</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>الموظف</th>
+                                        <th>رقم الموظف</th>
+                                        <th>المنصب</th>
+                                        <th>الخلية</th>
+                                        <th>التقييم</th>
+                                        <th>تاريخ الانضمام</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTableBody">
+                                    <tr><td colspan="7" style="text-align:center"><i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INITIATIVES -->
+            <div class="section" id="initiativesSection">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="initiativeSearch" placeholder="بحث في المبادرات..." oninput="filterInitiatives()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="syncInitiativesFromGitHub()">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        تحديث المبادرات
+                    </button>
+                </div>
+
+                <div id="initiativesList">
+                    <div class="empty">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <h3>جاري تحميل المبادرات...</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVITIES -->
+            <div class="section" id="activitiesSection">
+                <div class="toolbar">
+                    <button class="btn btn-primary" onclick="openModal('addActivityModal')">
+                        <i class="fas fa-plus"></i>
+                        نشاط جديد
+                    </button>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchActivityTab('upcoming', this)">قادم</button>
+                    <button class="tab" onclick="switchActivityTab('past', this)">سابق</button>
+                    <button class="tab" onclick="switchActivityTab('all', this)">الكل</button>
+                </div>
+
+                <div id="activitiesList">
+                    <div class="empty">
+                        <i class="fas fa-calendar"></i>
+                        <h3>لا توجد نشاطات</h3>
+                        <p>يمكنك إضافة نشاط جديد من الزر أعلاه</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENTS -->
+            <div class="section" id="documentsSection">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchDocTab('cards', this)">بطاقات العضوية</button>
+                    <button class="tab" onclick="switchDocTab('certificates', this)">الشهادات</button>
+                    <button class="tab" onclick="switchDocTab('letters', this)">خطابات رسمية</button>
+                </div>
+
+                <!-- ID Cards -->
+                <div id="cardsPanel" class="doc-panel active">
+                    <div class="toolbar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="cardSearch" placeholder="بحث عن عضو..." oninput="filterCards()">
+                        </div>
+                        <button class="btn btn-secondary" onclick="printAllCards()">
+                            <i class="fas fa-print"></i> طباعة الكل
+                        </button>
+                    </div>
+                    <div id="cardsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem;">
+                        <!-- Cards loaded by JS -->
+                    </div>
+                </div>
+
+                <!-- Certificates -->
+                <div id="certificatesPanel" class="doc-panel" style="display: none;">
+                    <div class="toolbar">
+                        <button class="btn btn-primary" onclick="openModal('createCertModal')">
+                            <i class="fas fa-plus"></i>
+                            إنشاء شهادة
+                        </button>
+                    </div>
+                    <div id="certsList">
+                        <div class="empty">
+                            <i class="fas fa-certificate"></i>
+                            <h3>لا توجد شهادات</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Letters -->
+                <div id="lettersPanel" class="doc-panel" style="display: none;">
+                    <div class="toolbar">
+                        <button class="btn btn-primary" onclick="openModal('createLetterModal')">
+                            <i class="fas fa-plus"></i>
+                            خطاب جديد
+                        </button>
+                    </div>
+                    <div id="lettersList">
+                        <div class="empty">
+                            <i class="fas fa-envelope"></i>
+                            <h3>لا توجد خطابات</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ATTENDANCE -->
+            <div class="section" id="attendanceSection">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-qrcode"></i> ماسح QR للحضور</h3>
+                            <button class="btn btn-sm btn-secondary" onclick="startScanner()">
+                                <i class="fas fa-play"></i> تشغيل الكاميرا
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="scanner-container">
+                                <div id="attendanceScanner" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+                                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+                                    <button class="btn btn-secondary" onclick="toggleFlash()">
+                                        <i class="fas fa-lightbulb"></i> فلاش
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="stopScanner()">
+                                        <i class="fas fa-stop"></i> إيقاف
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius);">
+                                <h4 style="margin-bottom: 0.75rem;"><i class="fas fa-keyboard"></i> تسجيل يدوي بالرقم</h4>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="text" id="manualAttendanceId" placeholder="أدخل رقم العضوية..." 
+                                           style="flex:1; padding: 0.75rem; border: 2px solid var(--gray-200); border-radius: var(--radius); font-family: 'Tajawal';"
+                                           onkeypress="if(event.key==='Enter')manualAttendance()">
+                                    <button class="btn btn-primary" onclick="manualAttendance()">
+                                        <i class="fas fa-check"></i> تسجيل
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clipboard-list"></i> سجل الحضور اليوم</h3>
+                            <span class="badge badge-green" id="todayAttCount">0 حاضر</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="attendance-log" id="todayAttendance">
+                                <div class="empty" style="padding: 2rem;">
+                                    <i class="fas fa-user-clock"></i>
+                                    <h3>لا يوجد حضور مسجل</h3>
+                                    <p>استخدم الماسح أو الإدخال اليدوي</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="section" id="settingsSection">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-building"></i> بيانات المنتدى</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>اسم المنتدى</label>
+                                <input type="text" id="forumName" value="المنتدى الشبابي للفكر والمشاركة المدنية - نزاهة">
+                            </div>
+                            <div class="form-group">
+                                <label>الشعار</label>
+                                <input type="text" id="forumSlogan" value="شباب نزاهة.. طاقة إيجابية تبني جزائر الغد">
+                            </div>
+                            <div class="form-group">
+                                <label>رابط قاعدة بيانات الأعضاء (JSON)</label>
+                                <input type="text" id="membersJsonUrl" value="https://raw.githubusercontent.com/nazahaa36/com/main/member.json">
+                            </div>
+                            <div class="form-group">
+                                <label>رابط قاعدة بيانات المبادرات (JSON)</label>
+                                <input type="text" id="initiativesJsonUrl" value="https://raw.githubusercontent.com/nazahaa36/com/main/initiatives.json">
+                            </div>
+                            <button class="btn btn-primary" onclick="saveSettings()">
+                                <i class="fas fa-save"></i> حفظ الإعدادات
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-database"></i> حالة البيانات</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="detail-row">
+                                <span>آخر تحديث للأعضاء</span>
+                                <span id="lastMembersSync">لم يتم التحديث</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>آخر تحديث للمبادرات</span>
+                                <span id="lastInitiativesSync">لم يتم التحديث</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>عدد الأعضاء المحملين</span>
+                                <span id="loadedMembersCount">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>عدد المبادرات المحملة</span>
+                                <span id="loadedInitiativesCount">0</span>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <button class="btn btn-secondary btn-block" onclick="syncAllData()">
+                                    <i class="fas fa-sync-alt"></i> تحديث كل البيانات
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Member Detail Modal -->
+    <div class="modal-overlay" id="memberDetailModal">
+        <div class="modal-box" style="max-width: 800px;">
+            <div class="modal-head">
+                <h3><i class="fas fa-user"></i> تفاصيل العضو</h3>
+                <button class="modal-close" onclick="closeModal('memberDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="member-detail-grid" id="memberDetailContent">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('memberDetailModal')">إغلاق</button>
+                <button class="btn btn-primary" onclick="printMemberCardFromDetail()">
+                    <i class="fas fa-id-card"></i> طباعة البطاقة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal-overlay" id="addMemberModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3><i class="fas fa-user-plus"></i> إضافة عضو جديد</h3>
+                <button class="modal-close" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="newMemberName" placeholder="الاسم الرباعي">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم العضوية</label>
+                        <input type="text" id="newMemberId" placeholder="رقم العضوية">
+                    </div>
+                    <div class="form-group">
+                        <label>النوع</label>
+                        <select id="newMemberType">
+                            <option value="عضو">عضو</option>
+                            <option value="موظف">موظف</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المنصب</label>
+                        <input type="text" id="newMemberPosition" placeholder="المنصب">
+                    </div>
+                    <div class="form-group">
+                        <label>الخلية</label>
+                        <input type="text" id="newMemberCell" placeholder="الخلية / اللجنة">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الميلاد</label>
+                        <input type="date" id="newMemberBirth">
+                    </div>
+                    <div class="form-group full">
+                        <label>العنوان</label>
+                        <input type="text" id="newMemberAddress" placeholder="العنوان الكامل">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('addMemberModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="addNewMember()">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Staff Modal -->
+    <div class="modal-overlay" id="addStaffModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3><i class="fas fa-user-shield"></i> إضافة موظف جديد</h3>
+                <button class="modal-close" onclick="closeModal('addStaffModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="newStaffName" placeholder="الاسم الرباعي">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الموظف</label>
+                        <input type="text" id="newStaffId" placeholder="رقم الموظف">
+                    </div>
+                    <div class="form-group">
+                        <label>المنصب</label>
+                        <input type="text" id="newStaffPosition" placeholder="المنصب الوظيفي">
+                    </div>
+                    <div class="form-group">
+                        <label>الخلية</label>
+                        <input type="text" id="newStaffCell" placeholder="الخلية / اللجنة">
+                    </div>
+                    <div class="form-group">
+                        <label>التقييم</label>
+                        <select id="newStaffEval">
+                            <option value="ممتاز">ممتاز</option>
+                            <option value="جيد">جيد</option>
+                            <option value="غير متوفر">غير متوفر</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الانضمام</label>
+                        <input type="date" id="newStaffHireDate">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('addStaffModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="addNewStaff()">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Activity Modal -->
+    <div class="modal-overlay" id="addActivityModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3><i class="fas fa-calendar-plus"></i> إضافة نشاط جديد</h3>
+                <button class="modal-close" onclick="closeModal('addActivityModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>عنوان النشاط</label>
+                        <input type="text" id="newActivityTitle" placeholder="عنوان النشاط">
+                    </div>
+                    <div class="form-group">
+                        <label>التاريخ</label>
+                        <input type="date" id="newActivityDate">
+                    </div>
+                    <div class="form-group">
+                        <label>الوقت</label>
+                        <input type="time" id="newActivityTime">
+                    </div>
+                    <div class="form-group">
+                        <label>المكان</label>
+                        <input type="text" id="newActivityLocation" placeholder="مكان الانعقاد">
+                    </div>
+                    <div class="form-group">
+                        <label>النوع</label>
+                        <select id="newActivityType">
+                            <option value="workshop">ورشة عمل</option>
+                            <option value="meeting">اجتماع</option>
+                            <option value="event">فعالية</option>
+                            <option value="training">تدريب</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>الوصف</label>
+                        <textarea id="newActivityDesc" rows="3" placeholder="وصف النشاط..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('addActivityModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="addNewActivity()">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Certificate Modal -->
+    <div class="modal-overlay" id="createCertModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3><i class="fas fa-certificate"></i> إنشاء شهادة تقدير</h3>
+                <button class="modal-close" onclick="closeModal('createCertModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>العضو</label>
+                        <select id="certMemberSelect">
+                            <option value="">اختر العضو...</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>عنوان الشهادة</label>
+                        <input type="text" id="certTitle" value="شهادة تقدير وتكريم">
+                    </div>
+                    <div class="form-group full">
+                        <label>السبب / الإنجاز</label>
+                        <textarea id="certReason" rows="3" placeholder="سبب منح الشهادة..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الإصدار</label>
+                        <input type="date" id="certDate">
+                    </div>
+                    <div class="form-group">
+                        <label>الموقع</label>
+                        <input type="text" id="certPlace" value="الطارف، الجزائر">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('createCertModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="generateCertificate()">
+                    <i class="fas fa-file-pdf"></i> إنشاء وتحميل PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Letter Modal -->
+    <div class="modal-overlay" id="createLetterModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3><i class="fas fa-envelope"></i> خطاب رسمي جديد</h3>
+                <button class="modal-close" onclick="closeModal('createLetterModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>المرسل إليه</label>
+                        <input type="text" id="letterTo" placeholder="اسم الجهة أو الشخص">
+                    </div>
+                    <div class="form-group full">
+                        <label>الموضوع</label>
+                        <input type="text" id="letterSubject" placeholder="موضوع الخطاب">
+                    </div>
+                    <div class="form-group full">
+                        <label>نص الخطاب</label>
+                        <textarea id="letterBody" rows="6" placeholder="نص الخطاب الرسمي..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('createLetterModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="generateLetter()">
+                    <i class="fas fa-file-pdf"></i> إنشاء PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate Preview Modal -->
+    <div class="modal-overlay" id="certPreviewModal">
+        <div class="modal-box" style="max-width: 900px;">
+            <div class="modal-head">
+                <h3><i class="fas fa-eye"></i> معاينة الشهادة</h3>
+                <button class="modal-close" onclick="closeModal('certPreviewModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="certPreviewBody">
+                <!-- Certificate preview -->
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="closeModal('certPreviewModal')">إغلاق</button>
+                <button class="btn btn-primary" onclick="printCertificate()">
+                    <i class="fas fa-print"></i> طباعة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATA SOURCES ====================
+        const DATA_URLS = {
+            members: 'https://raw.githubusercontent.com/nazahaa36/com/main/member.json',
+            initiatives: 'https://raw.githubusercontent.com/nazahaa36/com/main/initiatives.json'
+        };
+
+        // ==================== STATE ====================
+        let appData = {
+            members: [],
+            staff: [],
+            initiatives: [],
+            activities: [],
+            certificates: [],
+            letters: [],
+            attendance: [],
+            settings: {
+                forumName: 'المنتدى الشبابي للفكر والمشاركة المدنية - نزاهة',
+                forumSlogan: 'شباب نزاهة.. طاقة إيجابية تبني جزائر الغد'
+            }
+        };
+
+        let currentUser = null;
+        let dashboardChart = null;
+        let qrScanner = null;
+        let currentActivityTab = 'upcoming';
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }, 2000);
+        });
+
+        // ==================== AUTH ====================
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email === 'admin@nazaha.dz' && password === 'admin123') {
+                currentUser = { name: 'مدير النظام', role: 'مسؤول عام', email: email };
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('app').classList.add('active');
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userRole').textContent = currentUser.role;
+                document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+                
+                showToast('تم تسجيل الدخول بنجاح', 'success');
+                syncAllData();
+            } else {
+                showToast('بيانات الدخول غير صحيحة', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('app').classList.remove('active');
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            showToast('تم تسجيل الخروج', 'info');
+        }
+
+        // ==================== DATA SYNC ====================
+        async function syncAllData() {
+            const statusEl = document.getElementById('dataStatus');
+            statusEl.className = 'data-status syncing';
+            statusEl.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> جاري التحديث...';
+            
+            await Promise.all([
+                syncMembersFromGitHub(),
+                syncInitiativesFromGitHub()
+            ]);
+            
+            statusEl.className = 'data-status online';
+            statusEl.innerHTML = '<i class="fas fa-wifi"></i> متصل بالبيانات';
+            showToast('تم تحديث جميع البيانات', 'success');
+        }
+
+        async function syncMembersFromGitHub() {
+            try {
+                showToast('جاري تحميل بيانات الأعضاء...', 'info');
+                const response = await fetch(DATA_URLS.members + '?t=' + Date.now());
+                if (!response.ok) throw new Error('Failed to fetch');
+                
+                const data = await response.json();
+                // The data is an array directly or wrapped in an object
+                let members = Array.isArray(data) ? data : (data.members || []);
+                
+                // Clean empty entries
+                members = members.filter(m => m && m.id && m.fullName && m.fullName.trim() !== '');
+                
+                // Enrich data
+                members.forEach(m => {
+                    m.status = m.status || 'active';
+                    m.joinDate = m.hiringDate || m.joinDate || new Date().toISOString().split('T')[0];
+                    m.activitiesCount = m.activitiesCount || 0;
+                    m.avatar = m.fullName ? m.fullName.charAt(0) : '؟';
+                });
+                
+                appData.members = members;
+                appData.staff = members.filter(m => m.cadreType === 'موظف');
+                
+                document.getElementById('lastMembersSync').textContent = new Date().toLocaleString('ar-DZ');
+                document.getElementById('loadedMembersCount').textContent = members.length;
+                
+                renderMembers();
+                renderStaff();
+                renderCards();
+                updateDashboardStats();
+                updateCertMemberSelect();
+                
+                showToast(`تم تحميل ${members.length} عضو`, 'success');
+            } catch (error) {
+                console.error('Error fetching members:', error);
+                showToast('خطأ في تحميل بيانات الأعضاء', 'error');
+                // Load demo data if fetch fails
+                loadDemoMembers();
+            }
+        }
+
+        async function syncInitiativesFromGitHub() {
+            try {
+                showToast('جاري تحميل المبادرات...', 'info');
+                const response = await fetch(DATA_URLS.initiatives + '?t=' + Date.now());
+                if (!response.ok) throw new Error('Failed to fetch');
+                
+                const data = await response.json();
+                let initiatives = Array.isArray(data) ? data : (data.initiatives || []);
+                
+                appData.initiatives = initiatives;
+                
+                document.getElementById('lastInitiativesSync').textContent = new Date().toLocaleString('ar-DZ');
+                document.getElementById('loadedInitiativesCount').textContent = initiatives.length;
+                
+                renderInitiatives();
+                updateDashboardStats();
+                
+                showToast(`تم تحميل ${initiatives.length} مبادرة`, 'success');
+            } catch (error) {
+                console.error('Error fetching initiatives:', error);
+                showToast('خطأ في تحميل المبادرات', 'error');
+                loadDemoInitiatives();
+            }
+        }
+
+        function loadDemoMembers() {
+            appData.members = [
+                {"id": "1270738", "fullName": "نزيه عبدالله بومهني", "cadreType": "موظف", "hiringDate": "2026-01-02", "position": "رئيس المنتدى", "cell": "مجلس الإدارة", "evaluation": "ممتاز", "expiryDate": "2030-01-02", "birthDate": "2008-07-19", "address": "حي جفال التركي جنوب القالة", "status": "active"},
+                {"id": "5569315", "fullName": "صلاح الدين بن قسمية", "cadreType": "موظف", "hiringDate": "2026-02-14", "position": "أمين السر", "cell": "مجلس الإدارة", "evaluation": "جيد", "expiryDate": "2030-01-14", "birthDate": "2009-08-08", "address": "حي جفال التركي شرق القالة", "status": "active"},
+                {"id": "4835980", "fullName": "محمد عدنان بن حليمة", "cadreType": "موظف", "hiringDate": "2026-03-28", "position": "مستشار الرئيس", "cell": "مجلس الإدارة", "evaluation": "غير متوفر", "expiryDate": "2028-03-28", "birthDate": "2003-09-13", "address": "Villa e23 el marsa alger", "status": "active"},
+                {"id": "2622675", "fullName": "رحاب بدرة", "cadreType": "موظف", "hiringDate": "2026-04-02", "position": "رئيس خلية التنظيم و شؤون المنخرطين", "cell": "خلية التنظيم", "evaluation": "ممتاز", "expiryDate": "2028-04-02", "birthDate": "2009-11-03", "address": "حي بلقاسم، الطارف", "status": "active"},
+                {"id": "6764345", "fullName": "كوثر رميتة", "cadreType": "عضو", "hiringDate": "2026-02-27", "position": "المكلفة بسفارة المنتدى", "cell": "خلية التنظيم و شؤون المنخرطين", "evaluation": "غير متوفر", "expiryDate": "2028-04-04", "birthDate": "2009-09-12", "address": "حي بلقاسم، الطارف", "status": "active"},
+                {"id": "5843569", "fullName": "عبدالرحمن بين عياد", "cadreType": "عضو", "hiringDate": "2026-04-01", "position": "غير متوفر", "cell": "غير متوفر", "evaluation": "غير متوفر", "expiryDate": "2027-04-01", "birthDate": "2010-04-08", "address": "حي بلقاسم، الطارف", "status": "active"},
+                {"id": "8653008", "fullName": "جنات معيفي", "cadreType": "موظف", "hiringDate": "2026-04-02", "position": "رئيس خلية الإعلام والإتصال", "cell": "الإعلام والترويج", "evaluation": "جيد", "expiryDate": "2028-04-02", "birthDate": "2009-07-07", "address": "حي بلقاسم، الطارف", "status": "active"},
+                {"id": "1008050", "fullName": "محمد نذير بوزيان", "cadreType": "عضو", "hiringDate": "2026-04-21", "position": "غير متوفر", "cell": "غير متوفر", "evaluation": "غير متوفر", "expiryDate": "2027-04-21", "birthDate": "2010-09-28", "address": "حي الوزن الثقيل", "status": "active"}
+            ];
+            appData.staff = appData.members.filter(m => m.cadreType === 'موظف');
+            renderMembers();
+            renderStaff();
+            renderCards();
+            updateDashboardStats();
+            updateCertMemberSelect();
+        }
+
+        function loadDemoInitiatives() {
+            appData.initiatives = [
+                {"id": 1, "title": "وسامي ديزاد - منصة وطنية لتوثيق الأثر المجتمعي والاحتفاء بالكفاءات", "date": "2025-04-14", "category": "مبادرة وطنية", "content": "وسامي ديزاد هي منصة جزائرية رائدة تهدف إلى توثيق الأثر المجتمعي للأفراد والمؤسسات، والاحتفاء بالكفاءات الوطنية في مختلف المجالات. تمنح المنصة أوسمة رمزية تسع (9) هي: المُمكِّن، المُلهم، المُربي، المُحسن، المُبتكر، المثقف، المواطن الفعّال، الصانع المبدع، والرائد البيئي.", "link": "https://com-bice-pi.vercel.app/Wissami-dz.html", "status": "active"}
+            ];
+            renderInitiatives();
+            updateDashboardStats();
+        }
+
+        // ==================== RENDERING ====================
+        function updateDashboardStats() {
+            document.getElementById('statMembers').textContent = appData.members.length;
+            document.getElementById('statStaff').textContent = appData.staff.length;
+            document.getElementById('statInitiatives').textContent = appData.initiatives.length;
+            document.getElementById('statActivities').textContent = appData.activities.length;
+            
+            document.getElementById('membersBadge').textContent = appData.members.length;
+            document.getElementById('staffBadge').textContent = appData.staff.length;
+            document.getElementById('initiativesBadge').textContent = appData.initiatives.length;
+            document.getElementById('activitiesBadge').textContent = appData.activities.length;
+            document.getElementById('docsBadge').textContent = appData.certificates.length + appData.letters.length;
+            
+            renderRecentActivity();
+            updateDashboardChart();
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            const activities = [];
+            
+            // Add member joins
+            appData.members.slice(0, 5).forEach(m => {
+                activities.push({
+                    text: `انضمام ${m.fullName}`,
+                    date: m.hiringDate || m.joinDate,
+                    icon: 'fa-user-plus',
+                    color: 'var(--success)'
+                });
+            });
+            
+            // Add initiatives
+            appData.initiatives.slice(0, 3).forEach(i => {
+                activities.push({
+                    text: `مبادرة جديدة: ${i.title.substring(0, 30)}...`,
+                    date: i.date,
+                    icon: 'fa-lightbulb',
+                    color: 'var(--warning)'
+                });
+            });
+            
+            activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (activities.length === 0) {
+                container.innerHTML = `
+                    <div class="empty" style="padding: 2rem;">
+                        <i class="fas fa-inbox"></i>
+                        <h3>لا توجد نشاطات حديثة</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = activities.slice(0, 8).map(a => `
+                <div style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 0; border-bottom: 1px solid var(--gray-100);">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: ${a.color}20; color: ${a.color}; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas ${a.icon}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 0.9rem;">${a.text}</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-400);">${a.date}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMembers() {
+            const tbody = document.getElementById('membersTableBody');
+            const search = document.getElementById('memberSearch').value.toLowerCase();
+            const filter = document.getElementById('memberFilter').value;
+            const typeFilter = document.getElementById('memberTypeFilter').value;
+            
+            let filtered = appData.members.filter(m => {
+                const matchSearch = !search || 
+                    (m.fullName && m.fullName.toLowerCase().includes(search)) ||
+                    (m.id && m.id.includes(search)) ||
+                    (m.position && m.position.toLowerCase().includes(search));
+                const matchFilter = filter === 'all' || m.status === filter;
+                const matchType = typeFilter === 'all' || m.cadreType === typeFilter;
+                return matchSearch && matchFilter && matchType;
+            });
+            
+            document.getElementById('membersCount').textContent = `${filtered.length} عضو`;
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="empty" style="text-align:center; padding: 3rem;"><i class="fas fa-users" style="font-size: 3rem; color: var(--gray-300);"></i><h3>لا يوجد أعضاء</h3></td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(m => `
+                <tr>
+                    <td>
+                        <div class="td-user">
+                            <div class="td-avatar">${m.avatar || m.fullName.charAt(0)}</div>
+                            <div class="td-user-info">
+                                <h4>${m.fullName}</h4>
+                                <span>${m.address || 'لا يوجد عنوان'}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code style="background: var(--gray-100); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">${m.id}</code></td>
+                    <td><span class="badge ${m.cadreType === 'موظف' ? 'badge-blue' : 'badge-green'}">${m.cadreType}</span></td>
+                    <td>${m.position || '-'}</td>
+                    <td>${m.cell || '-'}</td>
+                    <td>${m.hiringDate || '-'}</td>
+                    <td><span class="badge badge-green">نشط</span></td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn action-view" onclick="viewMember('${m.id}')" title="عرض"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn action-print" onclick="printMemberCard('${m.id}')" title="بطاقة"><i class="fas fa-id-card"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderStaff() {
+            const tbody = document.getElementById('staffTableBody');
+            const search = document.getElementById('staffSearch').value.toLowerCase();
+            
+            let filtered = appData.staff.filter(m => {
+                return !search || 
+                    (m.fullName && m.fullName.toLowerCase().includes(search)) ||
+                    (m.position && m.position.toLowerCase().includes(search)) ||
+                    (m.cell && m.cell.toLowerCase().includes(search));
+            });
+            
+            document.getElementById('staffCount').textContent = `${filtered.length} موظف`;
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty" style="text-align:center; padding: 3rem;"><i class="fas fa-user-shield" style="font-size: 3rem; color: var(--gray-300);"></i><h3>لا يوجد موظفين</h3></td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(m => `
+                <tr>
+                    <td>
+                        <div class="td-user">
+                            <div class="td-avatar">${m.avatar || m.fullName.charAt(0)}</div>
+                            <div class="td-user-info">
+                                <h4>${m.fullName}</h4>
+                                <span>${m.address || 'لا يوجد عنوان'}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code style="background: var(--gray-100); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">${m.id}</code></td>
+                    <td>${m.position || '-'}</td>
+                    <td>${m.cell || '-'}</td>
+                    <td><span class="badge ${m.evaluation === 'ممتاز' ? 'badge-green' : (m.evaluation === 'جيد' ? 'badge-blue' : 'badge-gray')}">${m.evaluation || 'غير متوفر'}</span></td>
+                    <td>${m.hiringDate || '-'}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn action-view" onclick="viewMember('${m.id}')" title="عرض"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn action-print" onclick="printMemberCard('${m.id}')" title="بطاقة"><i class="fas fa-id-card"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderInitiatives() {
+            const container = document.getElementById('initiativesList');
+            const search = document.getElementById('initiativeSearch').value.toLowerCase();
+            
+            let filtered = appData.initiatives.filter(i => {
+                return !search || (i.title && i.title.toLowerCase().includes(search)) ||
+                    (i.category && i.category.toLowerCase().includes(search));
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>لا توجد مبادرات</h3>
+                        <p>المبادرات تُجلب تلقائياً من GitHub</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(i => `
+                <div class="initiative-card">
+                    <div class="initiative-header">
+                        <h4>${i.title}</h4>
+                        <div class="init-meta">
+                            <span><i class="fas fa-tag"></i> ${i.category || 'عام'}</span>
+                            <span><i class="fas fa-calendar"></i> ${i.date || 'غير محدد'}</span>
+                        </div>
+                    </div>
+                    <div class="initiative-body">
+                        <p>${i.content || i.description || 'لا يوجد وصف'}</p>
+                    </div>
+                    <div class="initiative-footer">
+                        <span class="badge badge-green">نشطة</span>
+                        ${i.link ? `<a href="${i.link}" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-external-link-alt"></i> زيارة الموقع</a>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderActivities() {
+            const container = document.getElementById('activitiesList');
+            const now = new Date();
+            
+            let filtered = appData.activities.filter(a => {
+                const aDate = new Date(a.date);
+                if (currentActivityTab === 'upcoming') return aDate >= now;
+                if (currentActivityTab === 'past') return aDate < now;
+                return true;
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty">
+                        <i class="fas fa-calendar"></i>
+                        <h3>لا توجد نشاطات ${currentActivityTab === 'upcoming' ? 'قادمة' : (currentActivityTab === 'past' ? 'سابقة' : '')}</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(a => {
+                const aDate = new Date(a.date);
+                const isPast = aDate < now;
+                return `
+                    <div class="activity-card">
+                        <div class="activity-info">
+                            <h4>${a.title}</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${a.location || 'غير محدد'} &bull; <i class="fas fa-clock"></i> ${a.date} ${a.time || ''}</p>
+                        </div>
+                        <span class="activity-status ${isPast ? 'past' : 'upcoming'}">${isPast ? 'منتهي' : 'قادم'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cardsList');
+            const search = document.getElementById('cardSearch').value.toLowerCase();
+            
+            let filtered = appData.members.filter(m => {
+                return !search || (m.fullName && m.fullName.toLowerCase().includes(search)) ||
+                    (m.id && m.id.includes(search));
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty" style="grid-column: 1 / -1;">
+                        <i class="fas fa-id-card"></i>
+                        <h3>لا يوجد أعضاء</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(m => `
+                <div class="id-card" id="card-${m.id}">
+                    <div class="id-card-header">
+                        <div class="id-card-logo"><i class="fas fa-shield-alt"></i></div>
+                        <h3>نظام نزاهة</h3>
+                        <p>المنتدى الشبابي للفكر والمشاركة المدنية</p>
+                    </div>
+                    <div class="id-card-body">
+                        <div class="id-card-photo">${m.avatar || m.fullName.charAt(0)}</div>
+                        <div class="id-card-name">${m.fullName}</div>
+                        <div class="id-card-role">${m.position || 'عضو'}</div>
+                        <div class="id-card-details">
+                            <div class="id-card-row"><span>رقم العضوية</span><span>${m.id}</span></div>
+                            <div class="id-card-row"><span>الخلية</span><span>${m.cell || '-'}</span></div>
+                            <div class="id-card-row"><span>تاريخ الانضمام</span><span>${m.hiringDate || '-'}</span></div>
+                            <div class="id-card-row"><span>صالح حتى</span><span>${m.expiryDate || '-'}</span></div>
+                        </div>
+                        <div class="id-card-qr" id="qr-${m.id}"></div>
+                    </div>
+                    <div class="id-card-footer">
+                        <p>صالحة للاستخدام الرسمي فقط</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Generate QR codes
+            setTimeout(() => {
+                filtered.forEach(m => {
+                    const qrContainer = document.getElementById(`qr-${m.id}`);
+                    if (qrContainer && typeof QRCode !== 'undefined') {
+                        qrContainer.innerHTML = '';
+                        new QRCode(qrContainer, {
+                            text: JSON.stringify({id: m.id, name: m.fullName, type: 'member'}),
+                            width: 100,
+                            height: 100,
+                            colorDark: '#1a5f2a',
+                            colorLight: '#ffffff'
+                        });
+                    }
+                });
+            }, 100);
+        }
+
+        // ==================== CHARTS ====================
+        function updateDashboardChart() {
+            const ctx = document.getElementById('dashboardChart');
+            if (!ctx) return;
+            
+            const period = document.getElementById('chartPeriod').value;
+            
+            if (dashboardChart) {
+                dashboardChart.destroy();
+            }
+            
+            const labels = period === '30' 
+                ? Array.from({length: 7}, (_, i) => `يوم ${i + 1}`)
+                : ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
+            
+            const data = period === '30'
+                ? [12, 19, 15, 25, 22, 30, 28]
+                : [45, 52, 48, 60, 55, 70];
+            
+            dashboardChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'النشاطات',
+                        data: data,
+                        borderColor: '#1a5f2a',
+                        backgroundColor: 'rgba(26, 95, 42, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#1a5f2a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================== NAVIGATION ====================
+        function navigate(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const sectionEl = document.getElementById(section + 'Section');
+            const navEl = document.querySelector(`.nav-item[onclick="navigate('${section}')"]`);
+            
+            if (sectionEl) sectionEl.classList.add('active');
+            if (navEl) navEl.classList.add('active');
+            
+            const titles = {
+                dashboard: { title: 'لوحة المعلومات', subtitle: 'نظرة عامة على المنتدى', icon: 'fa-chart-line' },
+                members: { title: 'الأعضاء', subtitle: 'إدارة ملفات الأعضاء', icon: 'fa-users' },
+                staff: { title: 'الموظفين', subtitle: 'فريق العمل الإداري', icon: 'fa-user-shield' },
+                initiatives: { title: 'المبادرات', subtitle: 'المبادرات والمشاريع الوطنية', icon: 'fa-lightbulb' },
+                activities: { title: 'النشاطات', subtitle: 'تنظيم وإدارة النشاطات', icon: 'fa-calendar-alt' },
+                documents: { title: 'المستندات', subtitle: 'بطاقات وشهادات وخطابات', icon: 'fa-file-alt' },
+                attendance: { title: 'تسجيل الحضور', subtitle: 'مسح QR وتسجيل الحضور', icon: 'fa-qrcode' },
+                settings: { title: 'الإعدادات', subtitle: 'إعدادات النظام والبيانات', icon: 'fa-cog' }
+            };
+            
+            const t = titles[section];
+            if (t) {
+                document.getElementById('pageTitle').innerHTML = `<i class="fas ${t.icon}"></i> ${t.title}`;
+                document.getElementById('pageSubtitle').textContent = t.subtitle;
+            }
+            
+            if (window.innerWidth <= 1024) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+            
+            if (section === 'activities') renderActivities();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ==================== MODALS ====================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ==================== MEMBER ACTIONS ====================
+        function viewMember(id) {
+            const member = appData.members.find(m => m.id === id);
+            if (!member) return;
+            
+            const content = document.getElementById('memberDetailContent');
+            content.innerHTML = `
+                <div class="member-detail-sidebar">
+                    <div class="member-detail-avatar">${member.avatar || member.fullName.charAt(0)}</div>
+                    <h3 style="margin-bottom: 0.5rem;">${member.fullName}</h3>
+                    <span class="badge ${member.cadreType === 'موظف' ? 'badge-blue' : 'badge-green'}" style="margin-bottom: 1rem;">${member.cadreType}</span>
+                    <div style="text-align: right; margin-top: 1rem;">
+                        <div class="detail-row"><span>الحالة</span><span class="badge badge-green">نشط</span></div>
+                        <div class="detail-row"><span>التقييم</span><span>${member.evaluation || 'غير متوفر'}</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1rem; color: var(--gray-900);"><i class="fas fa-info-circle" style="color: var(--primary);"></i> المعلومات الشخصية</h4>
+                    <div class="detail-row"><span>رقم العضوية</span><span><code style="background: var(--gray-100); padding: 0.25rem 0.5rem; border-radius: 4px;">${member.id}</code></span></div>
+                    <div class="detail-row"><span>المنصب</span><span>${member.position || 'غير متوفر'}</span></div>
+                    <div class="detail-row"><span>الخلية / اللجنة</span><span>${member.cell || 'غير متوفر'}</span></div>
+                    <div class="detail-row"><span>تاريخ الميلاد</span><span>${member.birthDate || 'غير متوفر'}</span></div>
+                    <div class="detail-row"><span>العنوان</span><span>${member.address || 'غير متوفر'}</span></div>
+                    <div class="detail-row"><span>تاريخ الانضمام</span><span>${member.hiringDate || 'غير متوفر'}</span></div>
+                    <div class="detail-row"><span>تاريخ الانتهاء</span><span>${member.expiryDate || 'غير متوفر'}</span></div>
+                    
+                    <h4 style="margin: 1.5rem 0 1rem; color: var(--gray-900);"><i class="fas fa-comment" style="color: var(--primary);"></i> رسالة الإدارة</h4>
+                    <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius); border-right: 3px solid var(--primary);">
+                        ${member.adminMessage || 'لا توجد رسالة'}
+                    </div>
+                </div>
+            `;
+            
+            openModal('memberDetailModal');
+        }
+
+        function printMemberCard(id) {
+            const member = appData.members.find(m => m.id === id);
+            if (!member) return;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html dir="rtl">
+                <head>
+                    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f3f4f6; margin: 0; }
+                        .id-card { width: 340px; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); border: 1px solid #e5e7eb; }
+                        .id-card-header { background: linear-gradient(135deg, #1a5f2a, #2d8a3e); padding: 1.5rem; text-align: center; color: white; position: relative; }
+                        .id-card-header::after { content: ''; position: absolute; bottom: -20px; left: 0; right: 0; height: 40px; background: white; border-radius: 50% 50% 0 0; }
+                        .id-card-logo { width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem; color: #1a5f2a; }
+                        .id-card-body { padding: 2rem 1.5rem 1.5rem; text-align: center; }
+                        .id-card-photo { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #e5e7eb, #d1d5db); margin: -50px auto 1rem; border: 4px solid white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #6b7280; position: relative; z-index: 1; }
+                        .id-card-name { font-size: 1.25rem; font-weight: 800; color: #111827; margin-bottom: 0.25rem; }
+                        .id-card-role { color: #1a5f2a; font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem; }
+                        .id-card-details { text-align: right; background: #f9fafb; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+                        .id-card-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+                        .id-card-row:last-child { border-bottom: none; }
+                        .id-card-row span:first-child { color: #6b7280; }
+                        .id-card-row span:last-child { font-weight: 700; color: #1f2937; }
+                        .id-card-footer { background: #f9fafb; padding: 1rem; text-align: center; font-size: 0.8rem; color: #6b7280; border-top: 1px solid #e5e7eb; }
+                    </style>
+                </head>
+                <body>
+                    <div class="id-card">
+                        <div class="id-card-header">
+                            <div class="id-card-logo"><i class="fas fa-shield-alt"></i></div>
+                            <h3>نظام نزاهة</h3>
+                            <p>المنتدى الشبابي للفكر والمشاركة المدنية</p>
+                        </div>
+                        <div class="id-card-body">
+                            <div class="id-card-photo">${member.fullName.charAt(0)}</div>
+                            <div class="id-card-name">${member.fullName}</div>
+                            <div class="id-card-role">${member.position || 'عضو'}</div>
+                            <div class="id-card-details">
+                                <div class="id-card-row"><span>رقم العضوية</span><span>${member.id}</span></div>
+                                <div class="id-card-row"><span>الخلية</span><span>${member.cell || '-'}</span></div>
+                                <div class="id-card-row"><span>تاريخ الانضمام</span><span>${member.hiringDate || '-'}</span></div>
+                                <div class="id-card-row"><span>صالح حتى</span><span>${member.expiryDate || '-'}</span></div>
+                            </div>
+                        </div>
+                        <div class="id-card-footer">
+                            <p>صالحة للاستخدام الرسمي فقط</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => printWindow.print(), 500);
+        }
+
+        function printMemberCardFromDetail() {
+            // Get current member from modal and print
+            const name = document.querySelector('#memberDetailContent h3')?.textContent;
+            if (name) {
+                const member = appData.members.find(m => m.fullName === name);
+                if (member) printMemberCard(member.id);
+            }
+        }
+
+        function printAllCards() {
+            const printWindow = window.open('', '_blank');
+            let cardsHtml = appData.members.map(m => `
+                <div class="id-card" style="page-break-inside: avoid; margin-bottom: 2rem;">
+                    <div class="id-card-header">
+                        <div class="id-card-logo"><i class="fas fa-shield-alt"></i></div>
+                        <h3>نظام نزاهة</h3>
+                        <p>المنتدى الشبابي للفكر والمشاركة المدنية</p>
+                    </div>
+                    <div class="id-card-body">
+                        <div class="id-card-photo">${m.fullName.charAt(0)}</div>
+                        <div class="id-card-name">${m.fullName}</div>
+                        <div class="id-card-role">${m.position || 'عضو'}</div>
+                        <div class="id-card-details">
+                            <div class="id-card-row"><span>رقم العضوية</span><span>${m.id}</span></div>
+                            <div class="id-card-row"><span>الخلية</span><span>${m.cell || '-'}</span></div>
+                            <div class="id-card-row"><span>تاريخ الانضمام</span><span>${m.hiringDate || '-'}</span></div>
+                            <div class="id-card-row"><span>صالح حتى</span><span>${m.expiryDate || '-'}</span></div>
+                        </div>
+                    </div>
+                    <div class="id-card-footer">
+                        <p>صالحة للاستخدام الرسمي فقط</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            printWindow.document.write(`
+                <html dir="rtl">
+                <head>
+                    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <style>
+                        body { font-family: 'Tajawal', sans-serif; padding: 2rem; background: #f3f4f6; }
+                        .id-card { width: 340px; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); border: 1px solid #e5e7eb; margin: 0 auto 2rem; }
+                        .id-card-header { background: linear-gradient(135deg, #1a5f2a, #2d8a3e); padding: 1.5rem; text-align: center; color: white; position: relative; }
+                        .id-card-header::after { content: ''; position: absolute; bottom: -20px; left: 0; right: 0; height: 40px; background: white; border-radius: 50% 50% 0 0; }
+                        .id-card-logo { width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem; color: #1a5f2a; }
+                        .id-card-body { padding: 2rem 1.5rem 1.5rem; text-align: center; }
+                        .id-card-photo { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #e5e7eb, #d1d5db); margin: -50px auto 1rem; border: 4px solid white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #6b7280; position: relative; z-index: 1; }
+                        .id-card-name { font-size: 1.25rem; font-weight: 800; color: #111827; margin-bottom: 0.25rem; }
+                        .id-card-role { color: #1a5f2a; font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem; }
+                        .id-card-details { text-align: right; background: #f9fafb; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+                        .id-card-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+                        .id-card-row:last-child { border-bottom: none; }
+                        .id-card-row span:first-child { color: #6b7280; }
+                        .id-card-row span:last-child { font-weight: 700; color: #1f2937; }
+                        .id-card-footer { background: #f9fafb; padding: 1rem; text-align: center; font-size: 0.8rem; color: #6b7280; border-top: 1px solid #e5e7eb; }
+                    </style>
+                </head>
+                <body>${cardsHtml}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => printWindow.print(), 500);
+        }
+
+        // ==================== FILTERING ====================
+        function filterMembers() {
+            renderMembers();
+            // Quick search dropdown
+            const search = document.getElementById('memberSearch').value.toLowerCase();
+            const resultsContainer = document.getElementById('memberQuickResults');
+            
+            if (search.length < 2) {
+                resultsContainer.classList.remove('active');
+                return;
+            }
+            
+            const matches = appData.members.filter(m => 
+                (m.fullName && m.fullName.toLowerCase().includes(search)) ||
+                (m.id && m.id.includes(search))
+            ).slice(0, 5);
+            
+            if (matches.length > 0) {
+                resultsContainer.innerHTML = matches.map(m => `
+                    <div class="quick-search-item" onclick="viewMember('${m.id}'); document.getElementById('memberQuickResults').classList.remove('active');">
+                        <div class="td-avatar" style="width: 32px; height: 32px; font-size: 0.8rem;">${m.fullName.charAt(0)}</div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.9rem;">${m.fullName}</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">${m.id} - ${m.position || 'عضو'}</div>
+                        </div>
+                    </div>
+                `).join('');
+                resultsContainer.classList.add('active');
+            } else {
+                resultsContainer.classList.remove('active');
+            }
+        }
+
+        function filterStaff() {
+            renderStaff();
+        }
+
+        function filterInitiatives() {
+            renderInitiatives();
+        }
+
+        function filterCards() {
+            renderCards();
+        }
+
+        // ==================== TABS ====================
+        function switchActivityTab(tab, btn) {
+            currentActivityTab = tab;
+            document.querySelectorAll('#activitiesSection .tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderActivities();
+        }
+
+        function switchDocTab(tab, btn) {
+            document.querySelectorAll('.doc-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('#documentsSection .tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tab + 'Panel').style.display = 'block';
+            btn.classList.add('active');
+        }
+
+        // ==================== ADD FUNCTIONS ====================
+        function addNewMember() {
+            const name = document.getElementById('newMemberName').value;
+            const id = document.getElementById('newMemberId').value;
+            const type = document.getElementById('newMemberType').value;
+            const position = document.getElementById('newMemberPosition').value;
+            const cell = document.getElementById('newMemberCell').value;
+            const birth = document.getElementById('newMemberBirth').value;
+            const address = document.getElementById('newMemberAddress').value;
+            
+            if (!name || !id) {
+                showToast('الرجاء إدخال الاسم والرقم', 'warning');
+                return;
+            }
+            
+            appData.members.push({
+                id, fullName: name, cadreType: type, position, cell,
+                birthDate: birth, address, hiringDate: new Date().toISOString().split('T')[0],
+                status: 'active', avatar: name.charAt(0)
+            });
+            
+            if (type === 'موظف') {
+                appData.staff = appData.members.filter(m => m.cadreType === 'موظف');
+            }
+            
+            closeModal('addMemberModal');
+            renderMembers();
+            renderStaff();
+            updateDashboardStats();
+            showToast('تم إضافة العضو بنجاح', 'success');
+            
+            // Clear form
+            document.getElementById('newMemberName').value = '';
+            document.getElementById('newMemberId').value = '';
+        }
+
+        function addNewStaff() {
+            const name = document.getElementById('newStaffName').value;
+            const id = document.getElementById('newStaffId').value;
+            const position = document.getElementById('newStaffPosition').value;
+            const cell = document.getElementById('newStaffCell').value;
+            const evaluation = document.getElementById('newStaffEval').value;
+            const hireDate = document.getElementById('newStaffHireDate').value;
+            
+            if (!name || !id) {
+                showToast('الرجاء إدخال الاسم والرقم', 'warning');
+                return;
+            }
+            
+            appData.members.push({
+                id, fullName: name, cadreType: 'موظف', position, cell,
+                evaluation, hiringDate: hireDate || new Date().toISOString().split('T')[0],
+                status: 'active', avatar: name.charAt(0)
+            });
+            
+            appData.staff = appData.members.filter(m => m.cadreType === 'موظف');
+            
+            closeModal('addStaffModal');
+            renderMembers();
+            renderStaff();
+            updateDashboardStats();
+            showToast('تم إضافة الموظف بنجاح', 'success');
+        }
+
+        function addNewActivity() {
+            const title = document.getElementById('newActivityTitle').value;
+            const date = document.getElementById('newActivityDate').value;
+            const time = document.getElementById('newActivityTime').value;
+            const location = document.getElementById('newActivityLocation').value;
+            const type = document.getElementById('newActivityType').value;
+            const desc = document.getElementById('newActivityDesc').value;
+            
+            if (!title || !date) {
+                showToast('الرجاء إدخال العنوان والتاريخ', 'warning');
+                return;
+            }
+            
+            appData.activities.push({
+                id: Date.now(), title, date, time, location, type, description: desc
+            });
+            
+            closeModal('addActivityModal');
+            renderActivities();
+            updateDashboardStats();
+            showToast('تم إضافة النشاط بنجاح', 'success');
+        }
+
+        // ==================== CERTIFICATES & LETTERS ====================
+        function updateCertMemberSelect() {
+            const select = document.getElementById('certMemberSelect');
+            select.innerHTML = '<option value="">اختر العضو...</option>' + 
+                appData.members.map(m => `<option value="${m.id}">${m.fullName}</option>`).join('');
+        }
+
+        function generateCertificate() {
+            const memberId = document.getElementById('certMemberSelect').value;
+            const title = document.getElementById('certTitle').value;
+            const reason = document.getElementById('certReason').value;
+            const date = document.getElementById('certDate').value || new Date().toISOString().split('T')[0];
+            const place = document.getElementById('certPlace').value;
+            
+            if (!memberId) {
+                showToast('الرجاء اختيار العضو', 'warning');
+                return;
+            }
+            
+            const member = appData.members.find(m => m.id === memberId);
+            
+            const certData = {
+                id: Date.now(),
+                memberId, memberName: member.fullName,
+                title, reason, date, place
+            };
+            appData.certificates.push(certData);
+            
+            // Preview
+            const previewBody = document.getElementById('certPreviewBody');
+            previewBody.innerHTML = `
+                <div class="certificate" id="certPrintArea">
+                    <div class="cert-header">
+                        <div class="cert-logo"><i class="fas fa-shield-alt"></i></div>
+                        <h2>شهادة تقدير وتكريم</h2>
+                        <h3>المنتدى الشبابي للفكر والمشاركة المدنية - نزاهة</h3>
+                    </div>
+                    <div class="cert-body">
+                        <p>تتقدم إدارة المنتدى بخالص الشكر والتقدير إلى</p>
+                        <div class="cert-name">${member.fullName}</div>
+                        <p>على ${reason || 'جهوده المتميزة ومساهماته الفاعلة في أنشطة المنتدى'}</p>
+                        <p>وذلك تقديراً لما بذله من جهد وعطاء ساهم في تحقيق أهداف المنتدى ورسالته النبيلة</p>
+                    </div>
+                    <div class="cert-footer">
+                        <div class="cert-sig">
+                            <div class="cert-sig-line"></div>
+                            <p>رئيس المنتدى</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="font-size: 0.9rem; color: var(--gray-600);">${place}</p>
+                            <p style="font-size: 0.9rem; color: var(--gray-600);">${date}</p>
+                        </div>
+                        <div class="cert-sig">
+                            <div class="cert-sig-line"></div>
+                            <p>أمين السر</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            closeModal('createCertModal');
+            openModal('certPreviewModal');
+            updateDashboardStats();
+        }
+
+        function printCertificate() {
+            const printContent = document.getElementById('certPrintArea').outerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html dir="rtl">
+                <head>
+                    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <style>
+                        body { font-family: 'Tajawal', sans-serif; padding: 2rem; background: #f3f4f6; }
+                        .certificate { width: 800px; background: white; border: 12px solid #1a5f2a; padding: 3rem; position: relative; margin: 0 auto; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+                        .certificate::before, .certificate::after { content: ''; position: absolute; width: 60px; height: 60px; border: 3px solid #c9a84c; }
+                        .certificate::before { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+                        .certificate::after { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+                        .cert-header { text-align: center; margin-bottom: 2rem; }
+                        .cert-logo { width: 100px; height: 100px; background: linear-gradient(135deg, #1a5f2a, #c9a84c); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; color: white; margin-bottom: 1rem; }
+                        .cert-header h2 { font-size: 2rem; font-weight: 900; color: #1a5f2a; }
+                        .cert-header h3 { font-size: 1.25rem; color: #4b5563; margin-top: 0.5rem; }
+                        .cert-body { text-align: center; padding: 2rem 0; }
+                        .cert-body p { font-size: 1.1rem; line-height: 2; color: #374151; margin-bottom: 1rem; }
+                        .cert-body .cert-name { font-size: 2.5rem; font-weight: 900; color: #1a5f2a; margin: 1.5rem 0; font-family: 'Tajawal', sans-serif; }
+                        .cert-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #e5e7eb; }
+                        .cert-sig { text-align: center; }
+                        .cert-sig-line { width: 150px; height: 1px; background: #1f2937; margin-bottom: 0.5rem; }
+                        .cert-sig p { font-size: 0.9rem; color: #4b5563; }
+                    </style>
+                </head>
+                <body>${printContent}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => printWindow.print(), 500);
+        }
+
+        function generateLetter() {
+            const to = document.getElementById('letterTo').value;
+            const subject = document.getElementById('letterSubject').value;
+            const body = document.getElementById('letterBody').value;
+            
+            if (!to || !subject || !body) {
+                showToast('الرجاء ملء جميع الحقول', 'warning');
+                return;
+            }
+            
+            appData.letters.push({
+                id: Date.now(), to, subject, body,
+                date: new Date().toISOString().split('T')[0]
+            });
+            
+            closeModal('createLetterModal');
+            updateDashboardStats();
+            showToast('تم إنشاء الخطاب بنجاح', 'success');
+        }
+
+        // ==================== ATTENDANCE & QR ====================
+        function startScanner() {
+            const scannerContainer = document.getElementById('attendanceScanner');
+            
+            if (qrScanner) {
+                qrScanner.stop().catch(() => {});
+            }
+            
+            qrScanner = new Html5Qrcode('attendanceScanner');
+            
+            qrScanner.start(
+                { facingMode: 'environment' },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    handleAttendanceScan(decodedText);
+                },
+                (error) => {
+                    // Ignore scan errors
+                }
+            ).catch(err => {
+                showToast('خطأ في تشغيل الكاميرا: ' + err, 'error');
+            });
+        }
+
+        function stopScanner() {
+            if (qrScanner) {
+                qrScanner.stop().then(() => {
+                    showToast('تم إيقاف الماسح', 'info');
+                }).catch(() => {});
+                qrScanner = null;
+            }
+        }
+
+        function toggleFlash() {
+            showToast('الفلاش غير مدعوم في هذا الجهاز', 'warning');
+        }
+
+        function handleAttendanceScan(decodedText) {
+            try {
+                let data;
+                try {
+                    data = JSON.parse(decodedText);
+                } catch (e) {
+                    // If not JSON, treat as member ID
+                    data = { id: decodedText.trim() };
+                }
+                
+                const member = appData.members.find(m => m.id === data.id || m.id === decodedText.trim());
+                if (member) {
+                    recordAttendance(member);
+                } else {
+                    showToast('العضو غير موجود: ' + decodedText, 'error');
+                }
+            } catch (e) {
+                showToast('خطأ في قراءة QR', 'error');
+            }
+        }
+
+        function manualAttendance() {
+            const id = document.getElementById('manualAttendanceId').value.trim();
+            if (!id) {
+                showToast('الرجاء إدخال رقم العضوية', 'warning');
+                return;
+            }
+            
+            const member = appData.members.find(m => m.id === id);
+            if (member) {
+                recordAttendance(member);
+                document.getElementById('manualAttendanceId').value = '';
+            } else {
+                showToast('العضو غير موجود: ' + id, 'error');
+            }
+        }
+
+        function recordAttendance(member) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ar-DZ');
+            
+            // Check if already recorded today
+            const today = now.toISOString().split('T')[0];
+            const alreadyRecorded = appData.attendance.some(a => 
+                a.memberId === member.id && a.date === today
+            );
+            
+            if (alreadyRecorded) {
+                showToast(`${member.fullName} مسجل مسبقاً`, 'warning');
+                return;
+            }
+            
+            appData.attendance.push({
+                memberId: member.id,
+                memberName: member.fullName,
+                date: today,
+                time: timeStr,
+                status: 'present'
+            });
+            
+            renderAttendance();
+            showToast(`تم تسجيل حضور: ${member.fullName}`, 'success');
+        }
+
+        function renderAttendance() {
+            const container = document.getElementById('todayAttendance');
+            const today = new Date().toISOString().split('T')[0];
+            const todayRecords = appData.attendance.filter(a => a.date === today);
+            
+            document.getElementById('todayAttCount').textContent = `${todayRecords.length} حاضر`;
+            
+            if (todayRecords.length === 0) {
+                container.innerHTML = `
+                    <div class="empty" style="padding: 2rem;">
+                        <i class="fas fa-user-clock"></i>
+                        <h3>لا يوجد حضور مسجل</h3>
+                        <p>استخدم الماسح أو الإدخال اليدوي</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = todayRecords.map(r => `
+                <div class="attendance-item">
+                    <div class="td-avatar" style="width: 36px; height: 36px; font-size: 0.85rem;">${r.memberName.charAt(0)}</div>
+                    <div class="att-name">${r.memberName}</div>
+                    <div class="att-time"><i class="fas fa-clock"></i> ${r.time}</div>
+                    <span class="att-status present">حاضر</span>
+                </div>
+            `).join('');
+        }
+
+        // ==================== SETTINGS ====================
+        function saveSettings() {
+            appData.settings.forumName = document.getElementById('forumName').value;
+            appData.settings.forumSlogan = document.getElementById('forumSlogan').value;
+            DATA_URLS.members = document.getElementById('membersJsonUrl').value;
+            DATA_URLS.initiatives = document.getElementById('initiativesJsonUrl').value;
+            
+            showToast('تم حفظ الإعدادات بنجاح', 'success');
+        }
+
+        // ==================== TOAST ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Close quick search when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-box')) {
+                document.getElementById('memberQuickResults').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>'''
+
+with open('/mnt/agents/output/nazaha_system.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("File saved successfully!")
+print(f"Size: {len(html_content)} characters")
