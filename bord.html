@@ -449,7 +449,7 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
              onkeydown="if(event.key==='Enter'){event.preventDefault();window.doAuth();}">
     </div>
     <div class="auth-err" id="authErr"></div>
-    <button onclick="window.doAuth()"
+    <button id="loginBtn" onclick="window.doAuth()"
             style="width:100%;justify-content:center;padding:13px;font-size:14px;margin-top:12px;"
             class="btn btn-primary">
       <i class="fas fa-unlock-alt"></i> دخول
@@ -482,7 +482,7 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
         <div><div class="sb-title">nazaha.dz</div><div class="sb-ver">لوحة التحكم v4.0</div></div>
       </div>
     </div>
-    <div class="sb-profile" onclick="openModal('profileModal')">
+    <div class="sb-profile">
       <div class="sb-av" id="sbAv"><span id="sbInit">م</span></div>
       <div style="flex:1;min-width:0;">
         <div class="sb-pname" id="sbName">مدير النظام</div>
@@ -502,15 +502,11 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
       <button class="nav-item" onclick="showSection('courses',this)"><i class="fas fa-graduation-cap"></i> الدورات الداخلية<span class="nav-badge" id="bCourse" style="display:none">0</span></button>
       <button class="nav-item" onclick="showSection('evaluations',this)"><i class="fas fa-chart-line"></i> التقييم البشري<span class="nav-badge" id="bEval" style="display:none">0</span></button>
       <button class="nav-item" onclick="showSection('penalties',this)"><i class="fas fa-gavel"></i> متابعة العقوبات<span class="nav-badge" id="bPen" style="display:none">0</span></button>
-      <button class="nav-item" onclick="showSection('devices',this)"><i class="fas fa-laptop"></i> إدارة الأجهزة<span class="nav-badge" id="bDev" style="display:none">0</span></button>
-
       <div class="nav-sec">التواصل والمنصة</div>
       
-      <button class="nav-item" onclick="showSection('adminChat',this)"><i class="fas fa-comments"></i> المراسلة الداخلية (المسؤولين)<span class="nav-badge" id="bAdminChat" style="display:none">0</span></button>
       <button class="nav-item" onclick="showSection('digitalPlatform',this)"><i class="fas fa-globe"></i> إدارة المنصة الرقمية<span class="nav-badge" id="bDigital" style="display:none">0</span></button>
 
       <div class="nav-sec" style="margin-top:10px;">النظام</div>
-      <button class="nav-item" onclick="openModal('profileModal')"><i class="fas fa-user-circle"></i> بروفيل المدير</button>
       <button class="nav-item" onclick="showSection('settings',this)"><i class="fas fa-cog"></i> إعدادات النظام</button>
       <button class="nav-item" onclick="showSection('logs',this)"><i class="fas fa-history"></i> سجل النشاطات</button>
       <button class="nav-item" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIco"></i> <span id="themeLabel">الوضع المظلم</span></button>
@@ -528,7 +524,7 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
         </button>
         <button class="btn-icon" onclick="refreshAll()" title="تحديث"><i class="fas fa-sync-alt" id="refreshIco"></i></button>
         <button class="btn-icon" onclick="toggleTheme()"><i class="fas fa-moon" id="topThemeIco"></i></button>
-        <button class="btn-icon" onclick="openModal('profileModal')"><i class="fas fa-user-circle"></i></button>
+        
       </div>
     </header>
 
@@ -856,56 +852,8 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
         </div>
       </div>
 
-      <!-- DEVICES -->
-      <div id="section-devices" class="section">
-        <div class="section-hdr">
-          <h2 class="section-title">إدارة الأجهزة والجلسات</h2>
-          <div class="section-acts">
-            <button class="btn btn-danger btn-sm" onclick="killAllSessions()"><i class="fas fa-power-off"></i> إنهاء جميع الجلسات</button>
-          </div>
-        </div>
-        <div class="filters-bar">
-          <div class="search-box"><i class="fas fa-search"></i><input type="text" id="devQ" placeholder="بحث بـ IP أو الجهاز..." oninput="renderDevices()"></div>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>IP</th><th>الجهاز</th><th>النظام</th><th>المتصفح</th><th>الموقع</th><th>آخر نشاط</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
-            <tbody id="devBody"></tbody>
-          </table>
-        </div>
-      </div>
-
       <!-- REVIEWS -->
       <!-- MESSAGES -->
-      <!-- ADMIN CHAT (Internal with Admins only) -->
-      <div id="section-adminChat" class="section">
-        <div class="section-hdr">
-          <h2 class="section-title">المراسلة الداخلية — المسؤولين فقط</h2>
-          <div class="section-acts">
-            <button class="btn btn-success btn-sm" onclick="openModal('newAdminChatModal')"><i class="fas fa-edit"></i> محادثة جديدة</button>
-            <button class="btn btn-outline btn-sm" onclick="showMyMessagingId()"><i class="fas fa-id-badge"></i> معرّف المراسلة</button>
-            <button class="btn btn-outline btn-sm" onclick="searchByMessagingId()"><i class="fas fa-search"></i> بحث بمعرّف</button>
-          </div>
-        </div>
-        <div id="myMessagingIdBanner" style="display:none;background:rgba(46,204,90,.08);border:1px solid var(--primary-light);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:14px;align-items:center;gap:12px;">
-          <i class="fas fa-id-badge" style="color:var(--primary-light);font-size:18px;"></i>
-          <div>
-            <div style="font-size:11px;color:var(--text-muted);">معرّف مراسلتك — شاركه مع الآخرين لكي يجدوك</div>
-            <div id="myMessagingIdVal" style="font-family:var(--mono);font-weight:900;font-size:17px;color:var(--primary);letter-spacing:2px;"></div>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="copyMessagingId()"><i class="fas fa-copy"></i> نسخ</button>
-        </div>
-        <div class="msg-layout">
-          <div class="msg-sb" id="adminChatSb">
-            <div class="msg-sb-hdr"><h3>المسؤولين</h3><button class="btn-icon" onclick="openModal('newAdminChatModal')" style="width:28px;height:28px;font-size:13px;"><i class="fas fa-plus"></i></button></div>
-            <div class="msg-sb-search"><input type="text" placeholder="بحث أو أدخل معرّف #..." id="adminChatQ" oninput="filterAdminChats()"></div>
-            <div class="msg-contacts" id="adminChatContacts"><div class="loading-row"><i class="fas fa-spinner fa-pulse" style="font-size:18px;color:var(--primary-light);"></i></div></div>
-          </div>
-          <div class="msg-main" id="adminChatMain">
-            <div class="msg-empty"><i class="fas fa-comments"></i><p>اختر مسؤولاً للمحادثة</p><p style="font-size:11px;margin-top:8px;">أو ابحث بمعرّف المراسلة <strong>#XXXXXXXX</strong></p></div>
-          </div>
-        </div>
-      </div>
 
       <!-- SETTINGS -->
       <div id="section-settings" class="section">
@@ -972,6 +920,12 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
 
         <!-- ACCOUNTS TAB -->
         <div id="dpPane-accounts" class="dp-pane">
+          <div class="section-hdr" style="margin-bottom:10px;">
+            <div></div>
+            <div class="section-acts">
+              <button class="btn btn-success" onclick="openAddDPUser()"><i class="fas fa-user-plus"></i> إضافة مستخدم منصة</button>
+            </div>
+          </div>
           <div class="filters-bar">
             <div class="search-box"><i class="fas fa-search"></i><input type="text" id="dpUsersQ" placeholder="بحث بالاسم أو البريد..." oninput="renderDPUsers()"></div>
             <select class="filter-sel" id="dpUserTypeF" onchange="renderDPUsers()">
@@ -981,10 +935,10 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
             </select>
             <select class="filter-sel" id="dpUserStatusF" onchange="renderDPUsers()">
               <option value="all">جميع الحالات</option>
-              <option value="verified">موثق</option>
+              <option value="verified">موثق ✓</option>
               <option value="restricted">مقيّد</option>
               <option value="suspended">موقوف</option>
-              <option value="normal">عادي</option>
+              <option value="normal">غير موثق</option>
             </select>
           </div>
           <div class="table-wrap">
@@ -1222,26 +1176,38 @@ body.dark .topbar{background:rgba(16,26,18,.92);}
   </div>
 </div>
 
-<!-- PROFILE MODAL -->
-<div class="modal-ov" id="profileModal">
-  <div class="modal-box" style="max-width:480px;">
-    <div class="modal-hdr"><h3 class="modal-title"><i class="fas fa-user-circle" style="color:var(--primary-light);margin-left:8px;"></i>بروفيل المدير</h3><button class="modal-close" onclick="closeModal('profileModal')"><i class="fas fa-times"></i></button></div>
+<!-- ADD PLATFORM USER MODAL -->
+<div class="modal-ov" id="addDPUserModal">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-hdr"><h3 class="modal-title"><i class="fas fa-user-plus" style="color:var(--primary-light);margin-left:8px;"></i>إضافة مستخدم للمنصة</h3><button class="modal-close" onclick="closeModal('addDPUserModal')"><i class="fas fa-times"></i></button></div>
     <div class="modal-body">
-      <div style="text-align:center;margin-bottom:18px;">
-        <div class="prof-photo-area" id="profPhotoArea" onclick="document.getElementById('profPhotoIn').click()"><i class="fas fa-camera" id="profIco"></i></div>
-        <input type="file" id="profPhotoIn" accept="image/*" style="display:none;" onchange="handleProfPhoto(this)">
-        <p style="font-size:10.5px;color:var(--text-muted);margin-top:5px;">انقر لتغيير الصورة</p>
+      <div style="background:rgba(46,204,90,.07);border:1px solid var(--primary-light);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--primary-dark);">
+        <i class="fas fa-info-circle" style="margin-left:6px;"></i>
+        المستخدم سيُضاف مباشرةً لقاعدة البيانات ويستطيع تسجيل الدخول فوراً بالبريد وكلمة المرور المحددة.
       </div>
       <div class="form-grid">
-        <div class="form-group full"><label class="form-label">الاسم الكامل</label><input type="text" id="profName" class="form-input"></div>
-        <div class="form-group full"><label class="form-label">البريد الإلكتروني</label><input type="email" id="profEmail" class="form-input"></div>
-        <div class="form-group full"><label class="form-label">المنصب / الدور</label><input type="text" id="profRole" class="form-input"></div>
-        <div class="form-group full"><label class="form-label">الهاتف</label><input type="tel" id="profPhone" class="form-input"></div>
+        <div class="form-group"><label class="form-label">الاسم الكامل *</label><input type="text" id="dpuFullName" class="form-input" placeholder="الاسم واللقب"></div>
+        <div class="form-group"><label class="form-label">البريد الإلكتروني *</label><input type="email" id="dpuEmail" class="form-input" placeholder="user@email.com"></div>
+        <div class="form-group"><label class="form-label">كلمة المرور *</label><input type="password" id="dpuPassword" class="form-input" placeholder="6 أحرف على الأقل"></div>
+        <div class="form-group"><label class="form-label">رقم الهاتف</label><input type="tel" id="dpuPhone" class="form-input" placeholder="0XXXXXXXXX"></div>
+        <div class="form-group"><label class="form-label">نوع الحساب *</label>
+          <select id="dpuType" class="form-select" onchange="toggleDPUserTypeFields()">
+            <option value="member">منخرط</option>
+            <option value="volunteer">متطوع</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">الولاية</label><input type="text" id="dpuWilaya" class="form-input" placeholder="الولاية"></div>
+        <div class="form-group" id="dpuMemberNumGroup"><label class="form-label">رقم العضوية (7 أرقام يبدأ بـ 8)</label><input type="text" id="dpuMemberNum" class="form-input" placeholder="تلقائي إذا تُرك فارغاً" maxlength="7"></div>
+        <div class="form-group" id="dpuVolNumGroup" style="display:none;"><label class="form-label">رقم التطوع (8 أرقام يبدأ بـ 7)</label><input type="text" id="dpuVolNum" class="form-input" placeholder="تلقائي إذا تُرك فارغاً" maxlength="8"></div>
+        <div class="form-group full"><label class="form-label">
+          <input type="checkbox" id="dpuVerified" checked style="width:14px;height:14px;margin-left:7px;">
+          <span style="color:var(--primary);font-weight:800;">✓ موثق مباشرةً</span> (يستطيع الدخول فوراً)
+        </label></div>
       </div>
     </div>
     <div class="modal-ftr">
-      <button class="btn btn-outline" onclick="closeModal('profileModal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> حفظ</button>
+      <button class="btn btn-outline" onclick="closeModal('addDPUserModal')">إلغاء</button>
+      <button class="btn btn-primary" id="dpuSaveBtn" onclick="saveDPUser()"><i class="fas fa-user-plus"></i> إضافة مستخدم</button>
     </div>
   </div>
 </div>
@@ -1563,26 +1529,38 @@ async function hashPassword(pwd) {
 window.doAuth = async function() {
   const pwd = document.getElementById('authPwd').value;
   const err = document.getElementById('authErr');
+  const loginBtn = document.getElementById('loginBtn');
   if(!pwd){ err.textContent = 'أدخل كلمة المرور'; return; }
 
-  const hash = await hashPassword(pwd);
-  if(hash === ADMIN_PASS_HASH) {
-    localStorage.setItem(AUTH_KEY, '1');
-    sessionStorage.setItem(SESSION_KEY, Date.now().toString());
-    setCsrfToken();
-    document.getElementById('authOv').style.display = 'none';
-    err.textContent = '';
-    logActivity('auth', 'تسجيل دخول المدير');
-    boot();
-    playSound('success');
-  } else {
-    err.textContent = '✗ كلمة المرور غير صحيحة';
-    document.getElementById('authPwd').value = '';
-    playSound('error');
-    const box = document.querySelector('.auth-box');
-    box.style.animation = 'none'; box.offsetHeight;
-    box.style.animation = 'shakeErr .4s ease';
-    logActivity('auth_fail', 'محاولة دخول فاشلة');
+  // Disable button temporarily to prevent double-click
+  if(loginBtn) { loginBtn.disabled = true; loginBtn.textContent = 'جاري التحقق...'; }
+  err.textContent = '';
+
+  try {
+    const hash = await hashPassword(pwd);
+    if(hash === ADMIN_PASS_HASH) {
+      localStorage.setItem(AUTH_KEY, '1');
+      sessionStorage.setItem(SESSION_KEY, Date.now().toString());
+      setCsrfToken();
+      document.getElementById('authOv').style.display = 'none';
+      err.textContent = '';
+      logActivity('auth', 'تسجيل دخول المدير');
+      boot();
+      playSound('success');
+    } else {
+      err.textContent = '✗ كلمة المرور غير صحيحة';
+      document.getElementById('authPwd').value = '';
+      playSound('error');
+      const box = document.querySelector('.auth-box');
+      box.style.animation = 'none'; box.offsetHeight;
+      box.style.animation = 'shakeErr .4s ease';
+      logActivity('auth_fail', 'محاولة دخول فاشلة');
+    }
+  } catch(e) {
+    err.textContent = 'خطأ في التحقق — حاول مجدداً';
+  } finally {
+    // ALWAYS re-enable the button — no matter what
+    if(loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'دخول'; }
   }
 };
 
@@ -1736,17 +1714,17 @@ window.closeModal = function(id) {
   m.classList.remove('active');
   setTimeout(() => { if(!m.classList.contains('active')) m.style.display = 'none'; }, 300);
 };
-['detailModal','formModal','contentModal','profileModal','cardModal','certModal',
+['detailModal','formModal','contentModal','cardModal','certModal',
  'activityModal','equipmentModal','courseModal','evalModal','penaltyModal',
- 'newAdminChatModal'].forEach(id => {
+ 'addDPUserModal','dpUserActionModal','dpEditPostModal'].forEach(id => {
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', e => { if(e.target === el) closeModal(id); });
 });
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape') {
-    ['detailModal','formModal','contentModal','profileModal','cardModal','certModal',
+    ['detailModal','formModal','contentModal','cardModal','certModal',
      'activityModal','equipmentModal','courseModal','evalModal','penaltyModal',
-     'newAdminChatModal'].forEach(closeModal);
+     'addDPUserModal','dpUserActionModal','dpEditPostModal'].forEach(closeModal);
   }
 });
 
@@ -1769,9 +1747,9 @@ window.showSection = function(id, el) {
   const titles = {
     dashboard:'لوحة المؤشرات', requests:'الطلبات الواردة', members:'قائمة المنخرطين',
     volunteers:'قائمة المتطوعين', activities:'النشاطات واللوجستيك', courses:'الدورات الداخلية',
-    evaluations:'التقييم البشري', penalties:'متابعة العقوبات', devices:'إدارة الأجهزة',
+    evaluations:'التقييم البشري', penalties:'متابعة العقوبات',
     reviews:'التقييمات الخارجية', content:'المحتوى', messages:'رسائل التواصل',
-    adminChat:'المراسلة الداخلية', settings:'إعدادات النظام', logs:'سجل النشاطات',
+    settings:'إعدادات النظام', logs:'سجل النشاطات',
     digitalPlatform:'إدارة المنصة الرقمية'
   };
   document.getElementById('pageTitle').textContent = titles[id] || '';
@@ -1784,8 +1762,6 @@ window.showSection = function(id, el) {
   if(id === 'courses') loadCourses();
   if(id === 'evaluations') loadEvaluations();
   if(id === 'penalties') loadPenalties();
-  if(id === 'devices') loadDevices();
-  if(id === 'adminChat') initAdminChat();
   if(id === 'settings') loadSettings();
   if(id === 'logs') loadLogs();
   if(id === 'dashboard') initDashboard();
@@ -1839,9 +1815,7 @@ window.saveProfile = function() {
    BOOT
    ════════════════════════════════════════════════════════════════ */
 async function boot() {
-  loadProfile();
   loadSettings();
-  trackDevice();
   startListeners();
   await initDashboard();
 }
@@ -1980,15 +1954,11 @@ function startListeners() {
     });
   } catch(e) { console.warn(e); }
 
-  // Admin chats
+  // Digital Platform users (live count)
   try {
-    const q = query(collection(db, 'adminChats'), where('participants', 'array-contains', 'admin'), orderBy('lastAt', 'desc'));
+    const q = query(collection(db, 'users'));
     onSnapshot(q, snap => {
-      allAdminChats = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      const unread = allAdminChats.reduce((a, c) => a + (c.unreadAdmin || 0), 0);
-      badge('bAdminChat', unread);
-      renderAdminChatContacts();
-      if(currentAdminChatId) renderAdminChatMsgs();
+      badge('bDigital', snap.docs.filter(d => !d.data().isVerified).length);
     });
   } catch(e) { console.warn(e); }
 }
@@ -4305,8 +4275,17 @@ window.approveVerification = async function(id) {
   if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
 
   try {
-    const user = allDPVerifications.find(x => x.id === id);
-    if(!user) { showToast('المستخدم غير موجود','error'); return; }
+    // BUG FIX: Search in BOTH arrays (verifications list AND all users list)
+    let user = allDPVerifications.find(x => x.id === id);
+    if(!user) user = allDPUsers.find(x => x.id === id);
+    if(!user) {
+      // Last resort: fetch directly from Firestore
+      try {
+        const docSnap = await getDoc(doc(db, 'users', id));
+        if(docSnap.exists()) user = {id: docSnap.id, ...docSnap.data()};
+      } catch(e2) {}
+    }
+    if(!user) { showToast('المستخدم غير موجود في قاعدة البيانات — جرّب التحديث','error'); return; }
 
     // Send email notification to admin
     sendEmail('verification', {
@@ -4379,9 +4358,9 @@ window.approveVerification = async function(id) {
       await setDoc(doc(db, 'members', id), userData, {merge: true});
     }
 
-    showToast(`✓ تم تفعيل حساب: ${user.fullName || user.displayName || ''}`, 'success');
+    showToast(`✓ تم تفعيل وتوثيق: ${user.fullName || user.displayName || ''}`, 'success');
     playSound('success');
-    logActivity('approve', `تفعيل حساب: ${user.fullName || user.displayName || ''}`, {userId: id});
+    logActivity('approve', `تفعيل وتوثيق حساب: ${user.fullName || user.displayName || ''}`, {userId: id});
 
     // Refresh all related data
     await loadDPVerifications();
@@ -4691,21 +4670,23 @@ function renderDPUsers() {
   if(!tb) return;
   if(!list.length){ tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><h4>لا يوجد مستخدمون</h4></div></td></tr>`; return; }
   tb.innerHTML = list.map(u => {
-    const verClass = u.isVerified ? 'b-approved' : 'b-pending';
-    const verLabel = u.isVerified ? 'موثق' : 'معلق';
+    // Real verified badge with green checkmark icon
+    const verBadge = u.isVerified 
+      ? `<span class="badge b-approved" style="gap:5px;"><i class="fas fa-check-circle" style="color:#1a6b2f;font-size:12px;"></i> موثق</span>`
+      : `<span class="badge b-pending">معلق</span>`;
     const statusClass = u.status === 'suspended' ? 'b-rejected' : u.status === 'restricted' ? 'b-pending' : 'b-approved';
     const statusLabel = u.status === 'suspended' ? 'موقوف' : u.status === 'restricted' ? 'مقيّد' : 'عادي';
     return `<tr>
       <td><div class="ucell"><div class="uav">${(u.fullName||u.displayName||'?').charAt(0)}</div><div><div class="uname">${esc(u.fullName || u.displayName || '—')}</div><div class="usub">${esc(u.email || '')}</div></div></div></td>
       <td><span class="badge ${u.userType==='volunteer'?'b-info':'b-approved'}">${u.userType==='volunteer'?'متطوع':'منخرط'}</span></td>
       <td><span style="font-family:var(--mono);font-weight:800;color:var(--primary);">${u.points || 0}</span></td>
-      <td><span class="badge ${verClass}">${verLabel}</span></td>
+      <td>${verBadge}</td>
       <td><span class="badge ${statusClass}">${statusLabel}</span></td>
       <td style="font-size:11px;">${fmt(u.lastActive || u.createdAt)}</td>
       <td><div class="tbl-acts">
         <button class="btn-icon" onclick="viewDPUser('${u.id}')" title="عرض"><i class="fas fa-eye"></i></button>
-        ${!u.isVerified ? `<button class="btn-icon" style="color:var(--primary-light);" onclick="approveVerification('${u.id}')" title="تفعيل"><i class="fas fa-check"></i></button>` : ''}
-        <button class="btn-icon" style="color:var(--warning);" onclick="restrictDPUser('${u.id}')" title="تقييد"><i class="fas fa-ban"></i></button>
+        ${!u.isVerified ? `<button class="btn-icon" style="color:var(--primary-light);" onclick="approveVerification('${u.id}')" title="تفعيل وتوثيق"><i class="fas fa-check"></i></button>` : ''}
+        <button class="btn-icon" style="color:var(--warning);" onclick="restrictDPUser('${u.id}')" title="تقييد/رفع تقييد"><i class="fas fa-ban"></i></button>
         <button class="btn-icon" style="color:var(--danger);" onclick="deleteDPUser('${u.id}')" title="حذف"><i class="fas fa-trash"></i></button>
       </div></td>
     </tr>`;
@@ -5074,6 +5055,129 @@ function drawReviewsStatsChart() {
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
 }
+
+/* ════════════════════════════════════════════════════════════════
+   ADD PLATFORM USER — إضافة مستخدم جديد للمنصة
+   ════════════════════════════════════════════════════════════════ */
+window.openAddDPUser = function() {
+  // Reset form
+  ['dpuFullName','dpuEmail','dpuPassword','dpuPhone','dpuWilaya','dpuMemberNum','dpuVolNum'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('dpuType').value = 'member';
+  document.getElementById('dpuVerified').checked = true;
+  document.getElementById('dpuMemberNumGroup').style.display = '';
+  document.getElementById('dpuVolNumGroup').style.display = 'none';
+  openModal('addDPUserModal');
+};
+
+window.toggleDPUserTypeFields = function() {
+  const isMember = document.getElementById('dpuType').value === 'member';
+  document.getElementById('dpuMemberNumGroup').style.display = isMember ? '' : 'none';
+  document.getElementById('dpuVolNumGroup').style.display = isMember ? 'none' : '';
+};
+
+window.saveDPUser = async function() {
+  const btn = document.getElementById('dpuSaveBtn');
+  if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإضافة...'; }
+  try {
+    const fullName = sanitizeInput(document.getElementById('dpuFullName').value);
+    const email = sanitizeInput(document.getElementById('dpuEmail').value);
+    const password = document.getElementById('dpuPassword').value;
+    const phone = sanitizeInput(document.getElementById('dpuPhone').value);
+    const userType = document.getElementById('dpuType').value;
+    const wilaya = sanitizeInput(document.getElementById('dpuWilaya').value);
+    const isVerified = document.getElementById('dpuVerified').checked;
+
+    if(!fullName) throw new Error('أدخل الاسم الكامل');
+    if(!email || !email.includes('@')) throw new Error('أدخل بريداً إلكترونياً صحيحاً');
+    if(!password || password.length < 6) throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+
+    // Check if email already exists in users collection
+    const existQ = query(collection(db, 'users'), where('email', '==', email));
+    const existSnap = await getDocs(existQ);
+    if(!existSnap.empty) throw new Error('هذا البريد الإلكتروني مسجل مسبقاً في قاعدة البيانات');
+
+    // Hash password with SHA-256
+    const pwdHash = await hashPassword(password);
+
+    // Generate unique ID
+    let membershipNumber = null, volunteerNumber = null;
+    if(userType === 'member') {
+      const manualNum = sanitizeInput(document.getElementById('dpuMemberNum').value);
+      membershipNumber = manualNum || await generateUniqueId(8, 7, 'members', 'membershipNumber');
+    } else {
+      const manualNum = sanitizeInput(document.getElementById('dpuVolNum').value);
+      volunteerNumber = manualNum || await generateUniqueId(7, 8, 'volunteers', 'volunteerNumber');
+    }
+
+    const now = serverTimestamp();
+    const userData = {
+      fullName,
+      displayName: fullName,
+      email,
+      passwordHash: pwdHash,
+      phone: phone || '',
+      userType,
+      addressWilaya: wilaya || '',
+      isVerified,
+      status: 'normal',
+      points: 0,
+      createdAt: now,
+      lastActive: now,
+      createdBy: 'admin'
+    };
+    if(membershipNumber) userData.membershipNumber = membershipNumber;
+    if(volunteerNumber) userData.volunteerNumber = volunteerNumber;
+
+    // Add to users collection
+    const userRef = await addDoc(collection(db, 'users'), userData);
+
+    // If verified, also add to members/volunteers collection
+    if(isVerified) {
+      const collData = {
+        fullName, email, phone: phone || '',
+        addressWilaya: wilaya || '',
+        type: userType === 'volunteer' ? 'تطوع' : 'انخراط',
+        status: 'approved',
+        approvedAt: now,
+        timestamp: now
+      };
+      if(userType === 'member') {
+        collData.membershipNumber = membershipNumber;
+        await setDoc(doc(db, 'members', userRef.id), collData);
+      } else {
+        collData.volunteerNumber = volunteerNumber;
+        await setDoc(doc(db, 'volunteers', userRef.id), collData);
+      }
+    }
+
+    // Send welcome notification
+    await addDoc(collection(db, 'notifications'), {
+      userId: userRef.id,
+      title: 'مرحباً بك في نزاهة! 🎉',
+      body: `أهلاً ${fullName}، تم إنشاء حسابك بنجاح.${isVerified ? ' حسابك مفعّل ويمكنك تسجيل الدخول الآن.' : ' بانتظار مراجعة الحساب.'}`,
+      type: 'welcome',
+      read: false,
+      timestamp: now
+    });
+
+    showToast(`✓ تم إضافة المستخدم: ${fullName}${isVerified ? ' (موثق)' : ''}`, 'success');
+    playSound('success');
+    logActivity('create', `إضافة مستخدم منصة: ${fullName} (${email})`, {userId: userRef.id});
+    closeModal('addDPUserModal');
+    await loadDPUsers();
+    await Promise.all([loadMembers(), loadVolunteers(), loadStats()]);
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> إضافة مستخدم'; }
+  }
+};
+
+// Make addDPUserModal closeable via overlay click
+const dpuModal = document.getElementById('addDPUserModal');
+if(dpuModal) dpuModal.addEventListener('click', e => { if(e.target === dpuModal) closeModal('addDPUserModal'); });
 
 /* ════════════════════════════════════════════════════════════════
    RESPONSIVE FIXES
