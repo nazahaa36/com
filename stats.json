@@ -1,5 +1,10 @@
 {
-  "members": 35,
-  "partners": 5,
-  "visitors": 10000
+  "members": 25,
+  "partners": 04,
+  "visitors": 10000,
+  "events": 5,
+  "training": 00,
+  "lectures": 00,
+  "competitions": 00,
+  "states": 10
 }
