@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f1e">
+<title>dzScanPro — ماسح احترافي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g: #16a34a; --g2: #22c55e; --g3: #4ade80;
+  --bg: #0a0f1e; --bg2: #111827; --bg3: #1f2937;
+  --card: rgba(255,255,255,0.04); --card-b: rgba(255,255,255,0.08);
+  --txt: #f1f5f9; --txt2: #94a3b8; --txt3: #64748b;
+  --red: #ef4444; --amber: #f59e0b; --blue: #3b82f6; --purple: #8b5cf6;
+  --r: 16px; --r2: 12px; --r3: 8px;
+  --nav-h: 68px;
+}
+.light {
+  --bg:#f0f4f8; --bg2:#ffffff; --bg3:#e8eef5;
+  --card:rgba(255,255,255,0.9); --card-b:rgba(0,0,0,0.08);
+  --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,textarea{font-family:inherit;outline:none}
+video{object-fit:cover;display:block}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--g);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+.no-scroll::-webkit-scrollbar{display:none}
+.no-scroll{-ms-overflow-style:none;scrollbar-width:none}
+
+/* ── Layout ── */
+#app{display:flex;flex-direction:column;min-height:100vh}
+#header{position:sticky;top:0;z-index:100;background:rgba(10,15,30,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--card-b);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.light #header{background:rgba(240,244,248,0.92)}
+#main{flex:1;padding-bottom:calc(var(--nav-h) + 8px);min-height:0}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:1px solid var(--card-b);height:var(--nav-h);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;color:var(--txt3);transition:color .2s;font-size:10px;font-weight:600;padding:6px 0}
+.nav-btn.active{color:var(--g)}
+.nav-btn .nav-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:8px;padding:3px;transition:background .2s}
+.nav-btn.active .nav-icon{background:rgba(22,163,74,0.15)}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--g);margin-top:1px;opacity:0;transition:opacity .2s}
+.nav-btn.active .nav-dot{opacity:1}
+
+/* ── Pages ── */
+.page{display:none;padding:16px;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-sm{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r2);padding:12px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r2);font-weight:700;font-family:inherit;transition:all .2s;active:scale(.95)}
+.btn-primary{background:linear-gradient(135deg,var(--g),#166534);color:#fff;padding:12px 20px;font-size:14px;box-shadow:0 4px 15px rgba(22,163,74,0.3)}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:active{transform:scale(.97)}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:10px}
+.btn-lg{padding:14px 20px;font-size:15px;width:100%}
+.btn-danger{background:#ef4444;color:#fff;padding:8px 16px;font-size:13px}
+.btn-ghost{background:var(--card);border:1px solid var(--card-b);color:var(--txt);padding:8px 14px;font-size:13px}
+.btn-icon{background:var(--card);border:1px solid var(--card-b);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--txt2)}
+
+/* ── Typography ── */
+.h1{font-size:22px;font-weight:800;color:var(--txt);line-height:1.2}
+.h2{font-size:16px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.label{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;color:#fff}
+
+/* ── Logo ── */
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--g),#166534);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(22,163,74,0.4)}
+.logo-name{font-size:15px;font-weight:800;color:var(--txt)}
+.logo-sub{font-size:10px;color:var(--txt3);font-weight:500}
+
+/* ── Stat Grid ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r2);padding:14px}
+.stat-val{font-size:28px;font-weight:900;color:var(--txt);line-height:1}
+.stat-label{font-size:11px;color:var(--txt3);margin-top:4px;font-weight:500}
+.stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+
+/* ── Camera view ── */
+.cam-wrap{position:relative;border-radius:var(--r);overflow:hidden;background:#000;min-height:260px;margin-bottom:12px}
+.cam-wrap video{width:100%;height:280px;object-fit:cover}
+.cam-overlay{position:absolute;inset:0;pointer-events:none}
+.scan-frame{position:absolute;inset:20px}
+.corner{position:absolute;width:28px;height:28px}
+.corner-tl{top:0;right:0;border-top:3px solid var(--g2);border-right:3px solid var(--g2);border-radius:0 6px 0 0}
+.corner-tr{top:0;left:0;border-top:3px solid var(--g2);border-left:3px solid var(--g2);border-radius:6px 0 0 0}
+.corner-bl{bottom:0;right:0;border-bottom:3px solid var(--g2);border-right:3px solid var(--g2);border-radius:0 0 0 6px}
+.corner-br{bottom:0;left:0;border-bottom:3px solid var(--g2);border-left:3px solid var(--g2);border-radius:0 0 6px 0}
+.scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g2),transparent);animation:scanAnim 2s ease-in-out infinite}
+@keyframes scanAnim{0%,100%{top:0;opacity:1}50%{top:100%;opacity:.5}}
+.cam-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--txt3)}
+.cam-controls{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:16px}
+.shutter{width:64px;height:64px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:transform .1s}
+.shutter:active{transform:scale(.92)}
+.shutter-inner{width:52px;height:52px;border-radius:50%;border:3px solid var(--g);background:rgba(34,197,94,0.08)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .1s;z-index:10}
+.flash.on{opacity:.8}
+.cam-hint{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between}
+.cam-badge{font-size:11px;color:#fff;background:rgba(0,0,0,0.5);padding:3px 8px;border-radius:20px;backdrop-filter:blur(4px)}
+
+/* ── Pages strip ── */
+.pages-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0;margin-bottom:12px}
+.pages-strip::-webkit-scrollbar{display:none}
+.page-thumb{position:relative;flex-shrink:0;width:56px;height:76px;border-radius:8px;overflow:hidden;border:2px solid var(--g);background:#000}
+.page-thumb img{width:100%;height:100%;object-fit:cover}
+.page-thumb-num{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:10px;color:#fff;font-weight:700;background:rgba(0,0,0,0.6);border-radius:4px;padding:0 4px}
+.page-thumb-del{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:#ef4444;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* ── Format picker ── */
+.pill-group{display:flex;gap:6px;margin-bottom:4px}
+.pill{flex:1;padding:8px 0;border-radius:10px;font-size:13px;font-weight:700;text-align:center;background:var(--bg3);color:var(--txt3);cursor:pointer;transition:all .2s;border:none}
+.pill.active{background:linear-gradient(135deg,var(--g),#166534);color:#fff}
+
+/* ── Toggle ── */
+.toggle{width:46px;height:24px;border-radius:12px;background:var(--txt3);position:relative;cursor:pointer;transition:background .3s;border:none;flex-shrink:0}
+.toggle.on{background:var(--g)}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.toggle.on::after{transform:translateX(-22px)}
+
+/* ── Input ── */
+.inp{width:100%;background:var(--bg3);border:1px solid var(--card-b);border-radius:var(--r2);padding:10px 12px;color:var(--txt);font-size:14px;transition:border .2s}
+.inp:focus{border-color:var(--g)}
+.inp::placeholder{color:var(--txt3)}
+textarea.inp{resize:none}
+
+/* ── Bluetooth status ── */
+.bt-status{display:flex;align-items:center;gap:8px;padding:12px;border-radius:var(--r2);margin-bottom:12px}
+.bt-dot{width:10px;height:10px;border-radius:50%}
+.bt-idle{background:rgba(100,116,139,0.1);color:var(--txt3)}
+.bt-dot-idle{background:#64748b}
+.bt-connecting{background:rgba(245,158,11,0.1);color:#f59e0b}
+.bt-dot-connecting{background:#f59e0b;animation:pulse 1s infinite}
+.bt-connected{background:rgba(34,197,94,0.1);color:var(--g2)}
+.bt-dot-connected{background:var(--g2)}
+.bt-sending{background:rgba(59,130,246,0.1);color:#60a5fa}
+.bt-dot-sending{background:#60a5fa;animation:pulse .7s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Progress bar ── */
+.progress-wrap{background:var(--bg3);border-radius:6px;height:10px;overflow:hidden;margin:8px 0}
+.progress-bar{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--g),var(--g2));transition:width .3s ease}
+
+/* ── Log items ── */
+.log-item{display:flex;align-items:flex-start;gap:10px;padding:12px;border-radius:var(--r2);background:var(--card);border:1px solid var(--card-b);margin-bottom:8px}
+.log-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.log-name{font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.log-meta{font-size:11px;color:var(--txt3);margin-top:2px;display:flex;flex-wrap:wrap;gap:4px}
+.log-del{color:#ef4444;margin-right:auto;padding:4px}
+
+/* ── Search bar ── */
+.search-wrap{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--card-b);border-radius:var(--r2);padding:8px 12px;margin-bottom:10px}
+.search-wrap input{flex:1;background:none;border:none;color:var(--txt);font-size:13px}
+
+/* ── Filter pills ── */
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px}
+.filter-row::-webkit-scrollbar{display:none}
+.fpill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;background:var(--bg3);color:var(--txt3);cursor:pointer;white-space:nowrap;border:none}
+.fpill.active{background:linear-gradient(135deg,var(--g),#166534);color:#fff}
+
+/* ── Chart ── */
+.chart-wrap{display:flex;align-items:flex-end;gap:4px;height:80px;padding:4px 0}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:height .5s ease}
+.chart-label{font-size:9px;color:var(--txt3);font-weight:600}
+
+/* ── Row ── */
+.row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--card-b)}
+.row:last-child{border-bottom:none}
+.row-label{font-size:13px;font-weight:600;color:var(--txt)}
+.row-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+.row-val{font-size:13px;font-weight:700;color:var(--txt2);text-align:left}
+
+/* ── API check ── */
+.api-ok{color:var(--g2);font-weight:700;font-size:12px}
+.api-no{color:#ef4444;font-weight:700;font-size:12px}
+
+/* ── Misc ── */
+.sep{height:1px;background:var(--card-b);margin:12px 0}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 16px;text-align:center;gap:10px}
+.empty-icon{width:56px;height:56px;border-radius:16px;background:var(--bg3);display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-ring{border:2px solid var(--g2);border-radius:var(--r2);padding:12px}
+.tag{display:inline-block;background:var(--bg3);color:var(--txt2);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;margin:2px}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:8px}.gap-3{gap:12px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.w-full{width:100%}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- HEADER -->
+  <header id="header">
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+          <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">dzScanPro</div>
+        <div class="logo-sub">ماسح احترافي</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span id="hdr-badge" style="display:none;background:var(--g);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;align-items:center;justify-content:center"></span>
+      <button class="btn-icon" onclick="toggleTheme()" title="تغيير المظهر">
+        <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main id="main">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div id="page-dashboard" class="page active">
+      <div class="mb-3">
+        <div class="h1">لوحة التحكم</div>
+        <div style="font-size:12px;color:var(--txt3);margin-top:2px" id="dash-date"></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(22,163,74,0.15)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="stat-val" id="stat-scans">0</div>
+          <div class="stat-label">مستندات ممسوحة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(59,130,246,0.15)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3v3M14 3v3h3M14 8h3M17 14h1M14 14v3M14 21h3v-3"/></svg>
+          </div>
+          <div class="stat-val" id="stat-barcodes">0</div>
+          <div class="stat-label">باركود مقروءة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(245,158,11,0.15)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+          <div class="stat-val" id="stat-sent">0</div>
+          <div class="stat-label">ملفات مرسلة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(139,92,246,0.15)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <div class="stat-val" id="stat-recv">0</div>
+          <div class="stat-label">ملفات مستلمة</div>
+        </div>
+      </div>
+
+      <!-- Week chart -->
+      <div class="card">
+        <div class="label">نشاط آخر 7 أيام</div>
+        <div class="chart-wrap" id="week-chart"></div>
+      </div>
+
+      <!-- Recent -->
+      <div class="card" id="recent-wrap">
+        <div class="label">آخر العمليات</div>
+        <div id="recent-list"><div class="empty-state" style="padding:20px"><div style="font-size:13px;color:var(--txt3)">لا توجد عمليات بعد</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ SCANNER ══ -->
+    <div id="page-scanner" class="page">
+      <div class="flex items-center justify-between mb-3">
+        <div class="h1">مسح المستندات</div>
+        <div class="flex gap-2">
+          <button class="btn-icon" id="flip-btn" onclick="flipCamera()" title="عكس الكاميرا" style="display:none">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          </button>
+          <button class="btn btn-sm" id="cam-toggle-btn" onclick="toggleCamera()" style="background:linear-gradient(135deg,var(--g),#166534);color:#fff">تشغيل</button>
+        </div>
+      </div>
+
+      <!-- Camera -->
+      <div class="cam-wrap" id="cam-wrap">
+        <video id="cam-video" autoplay playsinline muted style="display:none"></video>
+        <canvas id="cam-canvas" style="display:none"></canvas>
+        <div class="flash" id="cam-flash"></div>
+        <div class="cam-overlay">
+          <div class="scan-frame" id="scan-frame" style="display:none">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="scan-line"></div>
+          </div>
+          <div class="cam-hint" id="cam-hint" style="display:none">
+            <span class="cam-badge" id="cam-info-badge"></span>
+            <span class="cam-badge" id="pages-badge" style="display:none"></span>
+          </div>
+          <div class="cam-controls" id="cam-controls" style="display:none">
+            <button class="btn-icon" onclick="flipCamera()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+            </button>
+            <button class="shutter" onclick="captureFrame()"><div class="shutter-inner"></div></button>
+            <div style="width:36px"></div>
+          </div>
+        </div>
+        <div class="cam-empty" id="cam-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span style="font-size:13px">اضغط تشغيل لفتح الكاميرا</span>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div id="preview-wrap" style="display:none" class="card" style="padding:0;overflow:hidden">
+        <div class="flex items-center justify-between" style="padding:10px 12px">
+          <span style="font-size:13px;font-weight:700">معاينة الصفحة</span>
+          <div class="flex gap-2">
+            <button class="btn btn-sm" style="background:linear-gradient(135deg,var(--g),#166534);color:#fff" onclick="addPageToDoc()">+ أضف للملف</button>
+            <button class="btn-icon" style="width:28px;height:28px" onclick="clearPreview()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <img id="preview-img" src="" style="width:100%;max-height:260px;object-fit:contain;display:block">
+      </div>
+
+      <!-- Pages strip -->
+      <div id="pages-strip-wrap" style="display:none">
+        <div class="label" id="pages-count-label"></div>
+        <div class="pages-strip" id="pages-strip"></div>
+      </div>
+
+      <!-- Options -->
+      <div class="card">
+        <div class="label">صيغة الإخراج</div>
+        <div class="pill-group" id="fmt-group">
+          <button class="pill active" onclick="setFormat('PDF',this)">PDF</button>
+          <button class="pill" onclick="setFormat('JPG',this)">JPG</button>
+          <button class="pill" onclick="setFormat('PNG',this)">PNG</button>
+        </div>
+        <div class="label mt-3">مقاس الورق</div>
+        <div class="pill-group" id="size-group">
+          <button class="pill active" onclick="setPaperSize('A4',this)">A4</button>
+          <button class="pill" onclick="setPaperSize('A5',this)">A5</button>
+          <button class="pill" onclick="setPaperSize('Letter',this)">Letter</button>
+        </div>
+        <div class="flex items-center justify-between mt-3">
+          <div>
+            <div style="font-size:13px;font-weight:600">تعزيز الجودة</div>
+            <div style="font-size:11px;color:var(--txt3)">تحسين التباين وإزالة الظلال</div>
+          </div>
+          <button class="toggle on" id="enhance-toggle" onclick="toggleEnhance(this)"></button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg" id="save-btn" onclick="saveDocument()" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="save-btn-text">حفظ الملف</span>
+      </button>
+    </div>
+
+    <!-- ══ BARCODE ══ -->
+    <div id="page-barcode" class="page">
+      <div class="flex items-center justify-between mb-3">
+        <div class="h1">قارئ الباركود</div>
+        <button class="btn btn-sm" id="bc-toggle-btn" onclick="toggleBarcode()" style="background:linear-gradient(135deg,var(--g),#166534);color:#fff">بدء المسح</button>
+      </div>
+
+      <div id="bc-api-warn" style="display:none" class="card" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3)">
+        <div style="font-size:12px;color:#fbbf24">⚠️ متصفحك لا يدعم BarcodeDetector API. استخدم Chrome 88+ أو Edge 90+</div>
+      </div>
+
+      <!-- Supported types -->
+      <div class="card mb-3">
+        <div class="label">الأنواع المدعومة</div>
+        <div>
+          <span class="tag">QR Code</span><span class="tag">Code 128</span><span class="tag">Code 39</span>
+          <span class="tag">EAN-13</span><span class="tag">EAN-8</span><span class="tag">UPC-A</span>
+          <span class="tag">UPC-E</span><span class="tag">Data Matrix</span><span class="tag">PDF417</span><span class="tag">Aztec</span>
+        </div>
+      </div>
+
+      <!-- Camera -->
+      <div class="cam-wrap" id="bc-cam-wrap">
+        <video id="bc-video" autoplay playsinline muted style="display:none"></video>
+        <div class="cam-overlay">
+          <div class="scan-frame" id="bc-frame" style="display:none">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="scan-line"></div>
+          </div>
+          <div id="bc-scanning-hint" style="display:none;position:absolute;bottom:12px;left:0;right:0;text-align:center">
+            <span class="cam-badge" style="font-size:12px">جارٍ المسح...</span>
+          </div>
+        </div>
+        <div class="cam-empty" id="bc-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3v3M14 3v3h3M14 8h3M17 14h1M14 14v3M14 21h3v-3"/></svg>
+          <span style="font-size:13px">اضغط بدء المسح</span>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div id="bc-result" style="display:none" class="card success-ring">
+        <div class="flex items-center gap-2 mb-2">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span style="font-size:13px;font-weight:700;color:var(--g2)">تمت القراءة بنجاح ✓</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <div style="flex:1">
+            <span class="badge" id="bc-format-badge" style="background:#1d4ed8;margin-bottom:6px"></span>
+            <div style="font-size:15px;font-weight:700;color:var(--txt);word-break:break-all;line-height:1.5" id="bc-value"></div>
+            <div style="font-size:11px;color:var(--txt3);margin-top:4px" id="bc-time"></div>
+          </div>
+          <button class="btn-icon" id="bc-copy-btn" onclick="copyBcResult()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+        <a id="bc-open-link" href="#" target="_blank" rel="noopener" style="display:none;margin-top:10px" class="btn btn-primary btn-lg">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          فتح الرابط
+        </a>
+      </div>
+
+      <!-- History -->
+      <div id="bc-history-wrap" style="display:none" class="card">
+        <div class="flex items-center justify-between mb-2">
+          <div class="label" style="margin:0" id="bc-history-count"></div>
+          <button onclick="clearBcHistory()" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600">مسح الكل</button>
+        </div>
+        <div id="bc-history-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ BLUETOOTH ══ -->
+    <div id="page-bluetooth" class="page">
+      <div class="h1 mb-3">نقل البيانات بالبلوتوث</div>
+
+      <!-- Device card -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="h2" id="bt-device-name">لا يوجد جهاز</div>
+            <div id="bt-status-text" class="bt-idle bt-status" style="font-size:13px;font-weight:600;padding:4px 0;background:none;border-radius:0;margin:0">
+              <div class="bt-dot bt-dot-idle"></div> غير متصل
+            </div>
+          </div>
+          <div style="width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center" id="bt-icon-wrap" class="bt-idle">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" id="bt-icon-svg"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg>
+          </div>
+        </div>
+        <div id="bt-progress-wrap" style="display:none">
+          <div class="flex items-center justify-between" style="font-size:12px;margin-bottom:4px">
+            <span style="color:var(--txt3)">تقدم الإرسال</span>
+            <span style="font-weight:700;color:var(--g2)" id="bt-progress-pct">0%</span>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="bt-progress-bar" style="width:0%"></div></div>
+        </div>
+        <button class="btn btn-primary btn-lg" id="bt-connect-btn" onclick="btConnect()">
+          🔍 البحث عن أجهزة بلوتوث
+        </button>
+      </div>
+
+      <!-- Send text (shown when connected) -->
+      <div id="bt-send-text-wrap" style="display:none" class="card">
+        <div class="label">إرسال نص / باركود</div>
+        <textarea class="inp" id="bt-msg" rows="3" placeholder="اكتب النص أو الرسالة هنا..."></textarea>
+        <button class="btn btn-primary btn-lg mt-2" onclick="btSendText()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          إرسال النص
+        </button>
+      </div>
+
+      <!-- Send file (shown when connected) -->
+      <div id="bt-send-file-wrap" style="display:none" class="card">
+        <div class="label">إرسال ملف</div>
+        <input type="file" id="bt-file-input" style="display:none" onchange="btFileSelected(this)">
+        <div id="bt-file-preview" style="display:none" class="flex items-center justify-between card-sm mb-2">
+          <div class="flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--txt2)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div>
+              <div style="font-size:13px;font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="bt-file-name"></div>
+              <div style="font-size:11px;color:var(--txt3)" id="bt-file-size"></div>
+            </div>
+          </div>
+          <button onclick="clearBtFile()" style="color:var(--red);background:none;border:none;cursor:pointer;padding:4px">✕</button>
+        </div>
+        <button id="bt-pick-btn" class="btn btn-ghost btn-lg" onclick="document.getElementById('bt-file-input').click()">
+          اضغط لاختيار ملف
+        </button>
+        <button id="bt-send-file-btn" class="btn btn-primary btn-lg mt-2" style="display:none" onclick="btSendFile()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span id="bt-send-file-label">إرسال الملف</span>
+        </button>
+      </div>
+
+      <!-- Transfer history -->
+      <div id="bt-transfers-wrap" style="display:none" class="card">
+        <div class="label">سجل النقل</div>
+        <div id="bt-transfers-list"></div>
+      </div>
+
+      <!-- BT not supported -->
+      <div id="bt-no-support" style="display:none" class="card">
+        <div style="font-size:12px;color:var(--txt3);text-align:center;line-height:1.7">
+          💡 Web Bluetooth API متاح في Chrome وEdge على Android وWindows وmacOS.<br>
+          تأكد من تفعيل البلوتوث وأن المتصفح يعمل عبر HTTPS.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LOG ══ -->
+    <div id="page-log" class="page">
+      <div class="flex items-center justify-between mb-3">
+        <div class="h1">سجل العمليات</div>
+        <div class="flex gap-2">
+          <button class="btn btn-sm btn-ghost" id="log-export-btn" onclick="exportLog()" style="display:none">تصدير</button>
+          <button class="btn btn-sm btn-danger" id="log-clear-btn" onclick="clearLog()" style="display:none">مسح الكل</button>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--txt3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="inp" style="background:none;border:none;padding:0" placeholder="بحث..." id="log-search" oninput="renderLog()">
+        <button id="log-search-clear" onclick="clearLogSearch()" style="display:none;color:var(--txt3);background:none;border:none;cursor:pointer">✕</button>
+      </div>
+      <div class="filter-row" id="log-filters">
+        <button class="fpill active" onclick="setLogFilter('ALL',this)">الكل</button>
+        <button class="fpill" onclick="setLogFilter('SCAN',this)">مسح</button>
+        <button class="fpill" onclick="setLogFilter('BARCODE',this)">باركود</button>
+        <button class="fpill" onclick="setLogFilter('SEND',this)">إرسال</button>
+        <button class="fpill" onclick="setLogFilter('RECEIVE',this)">استلام</button>
+      </div>
+      <div id="log-count" style="font-size:11px;color:var(--txt3);margin-bottom:8px"></div>
+      <div id="log-list"></div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div id="page-settings" class="page">
+      <div class="h1 mb-3">الإعدادات</div>
+
+      <div class="card">
+        <div class="label">المظهر</div>
+        <div class="flex items-center justify-between">
+          <div>
+            <div style="font-size:13px;font-weight:600">الوضع الداكن</div>
+            <div style="font-size:11px;color:var(--txt3)">تغيير سمة التطبيق</div>
+          </div>
+          <button class="toggle on" id="dark-toggle" onclick="toggleTheme()"></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="label">معلومات التطبيق</div>
+        <div class="row"><div><div class="row-label">الاسم</div></div><div class="row-val">dzScanPro</div></div>
+        <div class="row"><div><div class="row-label">الإصدار</div></div><div class="row-val">2.0.0</div></div>
+        <div class="row"><div><div class="row-label">إجمالي العمليات</div><div class="row-sub">محفوظة في IndexedDB</div></div><div class="row-val" id="st-total">0 عملية</div></div>
+        <div class="row"><div><div class="row-label">حجم البيانات المحلية</div></div><div class="row-val" id="st-size">—</div></div>
+        <div class="row"><div><div class="row-label">الاتصال المطلوب</div><div class="row-sub">يعمل بالكامل دون إنترنت</div></div><div class="row-val">غير مطلوب</div></div>
+      </div>
+
+      <div class="card">
+        <div class="label">الأمان والخصوصية</div>
+        <div class="row"><div><div class="row-label">🔒 تخزين محلي كامل</div><div class="row-sub">جميع البيانات على جهازك فقط</div></div></div>
+        <div class="row"><div><div class="row-label">🔒 لا إرسال خارجي</div><div class="row-sub">لا يُرسل أي شيء لخوادم خارجية</div></div></div>
+        <div class="row"><div><div class="row-label">🔒 كاميرا بإذن فقط</div><div class="row-sub">لا وصول بدون موافقتك</div></div></div>
+        <div class="row"><div><div class="row-label">🔒 بلوتوث بإذن فقط</div><div class="row-sub">الاتصال يتطلب اختيارك الصريح</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="label">حالة واجهات المتصفح</div>
+        <div id="api-checks"></div>
+      </div>
+
+      <div class="card">
+        <div class="label">التقنيات المستخدمة</div>
+        <div>
+          <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">Vanilla JS</span>
+          <span class="tag">IndexedDB</span><span class="tag">Web Bluetooth API</span>
+          <span class="tag">BarcodeDetector API</span><span class="tag">MediaDevices API</span>
+          <span class="tag">Canvas API</span><span class="tag">PWA Ready</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="label">إدارة البيانات</div>
+        <button class="btn btn-danger btn-lg" onclick="confirmClearAll()">🗑 حذف جميع البيانات</button>
+      </div>
+    </div>
+
+  </main><!-- /main -->
+
+  <!-- NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" id="nav-dashboard" onclick="navTo('dashboard',this)">
+      <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></div>
+      <span>الرئيسية</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-scanner" onclick="navTo('scanner',this)">
+      <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg></div>
+      <span>مسح</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-barcode" onclick="navTo('barcode',this)">
+      <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3v3M14 3v3h3M14 8h3M17 14h1M14 14v3M14 21h3v-3"/></svg></div>
+      <span>باركود</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-bluetooth" onclick="navTo('bluetooth',this)">
+      <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg></div>
+      <span>بلوتوث</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-log" onclick="navTo('log',this)">
+      <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+      <span>السجل</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-settings" onclick="navTo('settings',this)">
+      <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+      <span>إعدادات</span>
+      <div class="nav-dot"></div>
+    </button>
+  </nav>
+</div><!-- /app -->
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let darkMode = true;
+let currentPage = 'dashboard';
+
+// Scanner state
+let camStream = null;
+let scanFormat = 'PDF';
+let paperSize = 'A4';
+let enhanceOn = true;
+let facingMode = 'environment';
+let capturedDataURL = null;
+let docPages = [];
+
+// Barcode state
+let bcStream = null;
+let bcDetector = null;
+let bcRaf = null;
+let bcHistory = [];
+
+// Bluetooth state
+let btDevice = null;
+let btChar = null;
+let btStatus = 'idle'; // idle|connecting|connected|sending
+let btProgress = 0;
+let btTransfers = [];
+let btSelectedFile = null;
+
+// Log state
+let logs = [];
+let logFilter = 'ALL';
+
+// ════════════════════════════════════════════════════════════════
+// INDEXEDDB
+// ════════════════════════════════════════════════════════════════
+const DB_NAME = 'dzScanPro_v1', DB_VER = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('logs')) {
+        const s = d.createObjectStore('logs', { keyPath: 'id' });
+        s.createIndex('type', 'type', { unique: false });
+        s.createIndex('date', 'date', { unique: false });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+function idbPut(data) { return new Promise((res,rej) => { const t = db.transaction('logs','readwrite'); const r = t.objectStore('logs').put(data); r.onsuccess=()=>res(); r.onerror=()=>rej(); }); }
+function idbGetAll() { return new Promise((res,rej) => { const t = db.transaction('logs','readonly'); const r = t.objectStore('logs').getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(); }); }
+function idbDelete(id) { return new Promise((res,rej) => { const t = db.transaction('logs','readwrite'); const r = t.objectStore('logs').delete(id); r.onsuccess=()=>res(); r.onerror=()=>rej(); }); }
+function idbClear() { return new Promise((res,rej) => { const t = db.transaction('logs','readwrite'); const r = t.objectStore('logs').clear(); r.onsuccess=()=>res(); r.onerror=()=>rej(); }); }
+
+// ════════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function nowDate() { return new Date().toISOString().split('T')[0]; }
+function nowTime() { return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function fmtSize(b) { if(!b||b===0)return'—'; if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+function dlBlob(blob, name) { const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),2000); }
+
+const LOG_LABELS = { SCAN:'مسح مستند', BARCODE:'قراءة باركود', SEND:'إرسال ملف', RECEIVE:'استلام ملف' };
+const LOG_COLORS = { SCAN:'#16a34a', BARCODE:'#1d4ed8', SEND:'#b45309', RECEIVE:'#7c3aed' };
+
+// ════════════════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════════════════
+function navTo(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  (btn || document.getElementById('nav-' + page)).classList.add('active');
+  currentPage = page;
+  if (page === 'dashboard') refreshDashboard();
+  if (page === 'log') renderLog();
+  if (page === 'settings') refreshSettings();
+  if (page !== 'scanner') stopCamera();
+  if (page !== 'barcode') stopBarcode();
+}
+
+// ════════════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════════════
+function toggleTheme() {
+  darkMode = !darkMode;
+  document.body.classList.toggle('light', !darkMode);
+  document.getElementById('dark-toggle').classList.toggle('on', darkMode);
+  const icon = document.getElementById('theme-icon');
+  if (darkMode) {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+  } else {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  }
+  try { localStorage.setItem('sp_theme', darkMode ? 'dark' : 'light'); } catch {}
+}
+
+// ════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════
+function refreshDashboard() {
+  const scans = logs.filter(l=>l.type==='SCAN').length;
+  const barcodes = logs.filter(l=>l.type==='BARCODE').length;
+  const sent = logs.filter(l=>l.type==='SEND').length;
+  const recv = logs.filter(l=>l.type==='RECEIVE').length;
+  document.getElementById('stat-scans').textContent = scans;
+  document.getElementById('stat-barcodes').textContent = barcodes;
+  document.getElementById('stat-sent').textContent = sent;
+  document.getElementById('stat-recv').textContent = recv;
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // Badge
+  const total = logs.length;
+  const badge = document.getElementById('hdr-badge');
+  if (total > 0 && currentPage === 'log') {
+    badge.textContent = Math.min(total, 99);
+    badge.style.display = 'flex';
+  } else badge.style.display = 'none';
+
+  // Week chart
+  const chart = document.getElementById('week-chart');
+  const days = [];
+  const maxVal = { val: 0 };
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const label = d.toLocaleDateString('ar-SA',{weekday:'short'});
+    const count = logs.filter(l=>l.date===key).length;
+    if (count > maxVal.val) maxVal.val = count;
+    days.push({ label, count });
+  }
+  chart.innerHTML = days.map((d, i) => {
+    const h = maxVal.val > 0 ? Math.max(4, Math.round((d.count/maxVal.val)*72)) : 4;
+    const color = i === 6 ? 'var(--g)' : 'rgba(34,197,94,0.35)';
+    return `<div class="chart-bar-wrap"><div class="chart-bar" style="height:${h}px;background:${color}"></div><div class="chart-label">${d.label}</div></div>`;
+  }).join('');
+
+  // Recent
+  const recent = document.getElementById('recent-list');
+  const last5 = [...logs].reverse().slice(0, 5);
+  if (!last5.length) {
+    recent.innerHTML = '<div style="padding:12px 0;font-size:12px;color:var(--txt3);text-align:center">لا توجد عمليات بعد</div>';
+    return;
+  }
+  recent.innerHTML = last5.map(l => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--card-b)">
+      <div style="width:30px;height:30px;border-radius:8px;background:${LOG_COLORS[l.type]}22;color:${LOG_COLORS[l.type]};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        ${logTypeIcon(l.type, 13)}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.fileName||l.value||LOG_LABELS[l.type]}</div>
+        <div style="font-size:10px;color:var(--txt3)">${l.time}</div>
+      </div>
+      <span class="badge" style="background:${LOG_COLORS[l.type]};font-size:10px">${LOG_LABELS[l.type]||l.type}</span>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// SCANNER
+// ════════════════════════════════════════════════════════════════
+async function toggleCamera() {
+  if (camStream) { stopCamera(); return; }
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode, width:{ideal:1920}, height:{ideal:1080} }
+    });
+    camStream = s;
+    const v = document.getElementById('cam-video');
+    v.srcObject = s; v.style.display = 'block';
+    document.getElementById('cam-empty').style.display = 'none';
+    document.getElementById('cam-controls').style.display = 'flex';
+    document.getElementById('scan-frame').style.display = 'block';
+    document.getElementById('cam-hint').style.display = 'flex';
+    document.getElementById('flip-btn').style.display = 'flex';
+    document.getElementById('cam-toggle-btn').textContent = 'إيقاف';
+    document.getElementById('cam-toggle-btn').style.background = '#ef4444';
+    updateCamBadge();
+  } catch(e) { alert('تعذّر الوصول للكاميرا:\n' + e.message); }
+}
+
+function stopCamera() {
+  if (!camStream) return;
+  camStream.getTracks().forEach(t => t.stop());
+  camStream = null;
+  const v = document.getElementById('cam-video');
+  v.srcObject = null; v.style.display = 'none';
+  document.getElementById('cam-empty').style.display = 'flex';
+  document.getElementById('cam-controls').style.display = 'none';
+  document.getElementById('scan-frame').style.display = 'none';
+  document.getElementById('cam-hint').style.display = 'none';
+  document.getElementById('flip-btn').style.display = 'none';
+  const btn = document.getElementById('cam-toggle-btn');
+  btn.textContent = 'تشغيل';
+  btn.style.background = 'linear-gradient(135deg,var(--g),#166534)';
+}
+
+async function flipCamera() {
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  if (camStream) { stopCamera(); await toggleCamera(); }
+}
+
+function updateCamBadge() {
+  const b = document.getElementById('cam-info-badge');
+  b.textContent = paperSize + ' · ' + scanFormat;
+  const pb = document.getElementById('pages-badge');
+  if (docPages.length > 0) { pb.textContent = docPages.length + ' صفحة'; pb.style.display = 'inline'; }
+  else pb.style.display = 'none';
+}
+
+function captureFrame() {
+  const v = document.getElementById('cam-video');
+  const c = document.getElementById('cam-canvas');
+  if (!v || !camStream) return;
+  // Flash effect
+  const flash = document.getElementById('cam-flash');
+  flash.classList.add('on');
+  setTimeout(() => flash.classList.remove('on'), 180);
+
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(v, 0, 0);
+  if (enhanceOn) enhanceDoc(c, ctx);
+  capturedDataURL = c.toDataURL('image/jpeg', 0.93);
+
+  // Show preview
+  document.getElementById('preview-img').src = capturedDataURL;
+  document.getElementById('preview-wrap').style.display = 'block';
+  updateSaveBtn();
+}
+
+function enhanceDoc(canvas, ctx) {
+  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+    const c = Math.min(255, Math.max(0, (gray-128)*1.6+145));
+    const v = c > 210 ? 255 : c < 60 ? 0 : c;
+    d[i] = d[i+1] = d[i+2] = v;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function clearPreview() { capturedDataURL = null; document.getElementById('preview-wrap').style.display = 'none'; updateSaveBtn(); }
+
+function addPageToDoc() {
+  if (!capturedDataURL) return;
+  docPages.push({ id: uid(), dataURL: capturedDataURL });
+  capturedDataURL = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  renderPagesStrip();
+  updateSaveBtn();
+  updateCamBadge();
+}
+
+function renderPagesStrip() {
+  if (!docPages.length) { document.getElementById('pages-strip-wrap').style.display = 'none'; return; }
+  document.getElementById('pages-strip-wrap').style.display = 'block';
+  document.getElementById('pages-count-label').textContent = docPages.length + ' صفحة في الملف';
+  document.getElementById('pages-strip').innerHTML = docPages.map((p,i) =>
+    `<div class="page-thumb">
+       <img src="${p.dataURL}">
+       <span class="page-thumb-num">${i+1}</span>
+       <span class="page-thumb-del" onclick="removePage('${p.id}')">✕</span>
+     </div>`).join('');
+}
+
+function removePage(id) { docPages = docPages.filter(p => p.id !== id); renderPagesStrip(); updateSaveBtn(); updateCamBadge(); }
+function updateSaveBtn() {
+  const all = capturedDataURL ? [...docPages, {dataURL:capturedDataURL}] : docPages;
+  const btn = document.getElementById('save-btn');
+  if (all.length > 0) {
+    btn.style.display = 'flex';
+    document.getElementById('save-btn-text').textContent = 'حفظ ' + all.length + ' صفحة بصيغة ' + scanFormat;
+  } else btn.style.display = 'none';
+}
+
+function setFormat(f, el) { scanFormat = f; document.querySelectorAll('#fmt-group .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); updateSaveBtn(); }
+function setPaperSize(s, el) { paperSize = s; document.querySelectorAll('#size-group .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); updateCamBadge(); }
+function toggleEnhance(el) { enhanceOn = !enhanceOn; el.classList.toggle('on', enhanceOn); }
+
+async function saveDocument() {
+  const all = capturedDataURL ? [...docPages, {id:uid(),dataURL:capturedDataURL}] : [...docPages];
+  if (!all.length) return;
+  const fname = 'مستند_' + nowDate().replace(/-/g,'') + '_' + Date.now();
+  try {
+    const PW = {A4:[2480,3508],A5:[1748,2480],Letter:[2550,3300]};
+    const [pw,ph] = PW[paperSize]||PW.A4;
+    const canvas = document.createElement('canvas');
+    canvas.width = pw; canvas.height = ph * all.length;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    for (let i=0;i<all.length;i++) {
+      await new Promise(res => {
+        const img = new Image(); img.onload = () => {
+          const aspect = img.naturalWidth/img.naturalHeight;
+          let dw=pw,dh=ph;
+          if(pw/ph>aspect){dh=ph;dw=ph*aspect}else{dw=pw;dh=pw/aspect}
+          ctx.drawImage(img,(pw-dw)/2,ph*i+(ph-dh)/2,dw,dh); res();
+        }; img.src = all[i].dataURL;
+      });
+      if (i<all.length-1) { ctx.strokeStyle='#ccc';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,ph*(i+1));ctx.lineTo(pw,ph*(i+1));ctx.stroke(); }
+    }
+    if (scanFormat === 'PDF') {
+      const w = window.open('','_blank','width=800,height=1000');
+      if (w) {
+        w.document.write(`<html><head><title>${fname}</title><style>*{margin:0;padding:0}body{background:#fff}img{width:100%;display:block;page-break-after:always}</style></head><body>`);
+        all.forEach(p => w.document.write(`<img src="${p.dataURL}">`));
+        w.document.write('</body></html>'); w.document.close();
+        setTimeout(()=>w.print(),600);
+      }
+    } else {
+      const mime = scanFormat==='PNG'?'image/png':'image/jpeg';
+      canvas.toBlob(blob=>dlBlob(blob,fname+'.'+scanFormat.toLowerCase()),mime,0.93);
+    }
+    const size = all.reduce((s,p)=>s+Math.round(p.dataURL.length*0.75),0);
+    await addLog({type:'SCAN',fileName:fname+'.'+scanFormat.toLowerCase(),fileSize:fmtSize(size),pages:all.length,format:scanFormat,paperSize,date:nowDate(),time:nowTime(),status:'success'});
+    docPages=[]; capturedDataURL=null;
+    document.getElementById('preview-wrap').style.display='none';
+    renderPagesStrip(); updateSaveBtn(); updateCamBadge();
+  } catch(e) { alert('خطأ أثناء الحفظ: '+e.message); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// BARCODE
+// ════════════════════════════════════════════════════════════════
+async function toggleBarcode() {
+  if (bcStream) { stopBarcode(); return; }
+  if (!('BarcodeDetector' in window)) {
+    document.getElementById('bc-api-warn').style.display = 'block';
+    return;
+  }
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    bcStream = s;
+    const v = document.getElementById('bc-video');
+    v.srcObject = s; v.style.display = 'block';
+    document.getElementById('bc-empty').style.display = 'none';
+    document.getElementById('bc-frame').style.display = 'block';
+    document.getElementById('bc-scanning-hint').style.display = 'block';
+    document.getElementById('bc-toggle-btn').textContent = 'إيقاف';
+    document.getElementById('bc-toggle-btn').style.background = '#ef4444';
+    // Init detector
+    try {
+      const fmts = await window.BarcodeDetector.getSupportedFormats();
+      bcDetector = new window.BarcodeDetector({formats:fmts});
+    } catch { bcDetector = new window.BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','data_matrix','pdf417','aztec']}); }
+    bcDetectLoop();
+  } catch(e) { alert('تعذّر الوصول للكاميرا:\n'+e.message); }
+}
+
+function stopBarcode() {
+  if (bcRaf) { cancelAnimationFrame(bcRaf); bcRaf = null; }
+  if (bcStream) { bcStream.getTracks().forEach(t=>t.stop()); bcStream = null; }
+  const v = document.getElementById('bc-video');
+  v.srcObject=null; v.style.display='none';
+  document.getElementById('bc-empty').style.display='flex';
+  document.getElementById('bc-frame').style.display='none';
+  document.getElementById('bc-scanning-hint').style.display='none';
+  const btn = document.getElementById('bc-toggle-btn');
+  btn.textContent='بدء المسح';
+  btn.style.background='linear-gradient(135deg,var(--g),#166534)';
+}
+
+async function bcDetectLoop() {
+  if (!bcDetector||!bcStream) return;
+  const v = document.getElementById('bc-video');
+  try {
+    if (v.readyState >= 2) {
+      const results = await bcDetector.detect(v);
+      if (results.length > 0) {
+        const r = { id:uid(), value:results[0].rawValue, format:(results[0].format||'').toUpperCase().replace('_',' '), time:nowTime(), date:nowDate() };
+        showBcResult(r);
+        bcHistory.unshift(r);
+        renderBcHistory();
+        await addLog({type:'BARCODE',fileName:r.value.slice(0,60),value:r.value,barcodeFormat:r.format,date:r.date,time:r.time,status:'success'});
+        stopBarcode(); return;
+      }
+    }
+  } catch {}
+  bcRaf = requestAnimationFrame(bcDetectLoop);
+}
+
+function showBcResult(r) {
+  document.getElementById('bc-value').textContent = r.value;
+  document.getElementById('bc-format-badge').textContent = r.format||'QR';
+  document.getElementById('bc-time').textContent = r.time;
+  const link = document.getElementById('bc-open-link');
+  if (r.value.startsWith('http')) { link.href=r.value; link.style.display='flex'; } else link.style.display='none';
+  document.getElementById('bc-result').style.display = 'block';
+}
+
+function copyBcResult() {
+  const val = document.getElementById('bc-value').textContent;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById('bc-copy-btn');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g2)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>'; }, 2000);
+  }).catch(()=>{});
+}
+
+function renderBcHistory() {
+  const wrap = document.getElementById('bc-history-wrap');
+  if (!bcHistory.length) { wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  document.getElementById('bc-history-count').textContent = 'السجل (' + bcHistory.length + ')';
+  document.getElementById('bc-history-list').innerHTML = bcHistory.slice(0,8).map(h =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:var(--bg3);margin-bottom:6px">
+       <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.value}</div>
+       <div style="display:flex;align-items:center;gap:6px;margin-top:3px"><span class="badge" style="background:#1d4ed8;font-size:10px">${h.format||'—'}</span><span style="font-size:10px;color:var(--txt3)">${h.time}</span></div></div>
+       <button onclick="navigator.clipboard.writeText('${h.value.replace(/'/g,"\\'")}').catch(()=>{})" class="btn-icon" style="width:28px;height:28px">
+         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+       </button>
+     </div>`).join('');
+}
+
+function clearBcHistory() { bcHistory=[]; document.getElementById('bc-history-wrap').style.display='none'; document.getElementById('bc-result').style.display='none'; }
+
+// ════════════════════════════════════════════════════════════════
+// BLUETOOTH
+// ════════════════════════════════════════════════════════════════
+const BT_SVC  = '0000ffe0-0000-1000-8000-00805f9b34fb';
+const BT_CHAR = '0000ffe1-0000-1000-8000-00805f9b34fb';
+
+function setBtStatus(s) {
+  btStatus = s;
+  const info = {
+    idle:       {cls:'bt-idle',      dotCls:'bt-dot-idle',      label:'غير متصل',      stroke:'#64748b'},
+    connecting: {cls:'bt-connecting',dotCls:'bt-dot-connecting',label:'جارٍ الاتصال…',stroke:'#fbbf24'},
+    connected:  {cls:'bt-connected', dotCls:'bt-dot-connected', label:'متصل ✓',        stroke:'#22c55e'},
+    sending:    {cls:'bt-sending',   dotCls:'bt-dot-sending',   label:'جارٍ الإرسال…',stroke:'#60a5fa'},
+  }[s];
+  const st = document.getElementById('bt-status-text');
+  st.className = ''; st.classList.add('bt-status', info.cls);
+  st.style.cssText = 'font-size:13px;font-weight:600;padding:4px 0;background:none;border-radius:0;margin:0;display:flex;align-items:center;gap:6px;';
+  st.innerHTML = `<div class="bt-dot ${info.dotCls}"></div> ${info.label}`;
+  document.getElementById('bt-icon-svg').setAttribute('stroke', info.stroke);
+  const wrap = document.getElementById('bt-icon-wrap');
+  wrap.className = info.cls;
+  const btn = document.getElementById('bt-connect-btn');
+  if (s === 'idle') { btn.textContent='🔍 البحث عن أجهزة بلوتوث';btn.style.background='linear-gradient(135deg,var(--g),#166534)';btn.disabled=false; }
+  else if (s === 'connecting') { btn.textContent='⏳ جارٍ الاتصال...';btn.style.background='#64748b';btn.disabled=true; }
+  else if (s === 'connected') { btn.textContent='✕ قطع الاتصال';btn.style.background='#ef4444';btn.disabled=false; btn.onclick=btDisconnect; }
+  else if (s === 'sending') { btn.textContent='⏳ يرجى الانتظار...';btn.style.background='#64748b';btn.disabled=true; }
+  // Show/hide send panels
+  const show = s==='connected'||s==='sending';
+  document.getElementById('bt-send-text-wrap').style.display = show?'block':'none';
+  document.getElementById('bt-send-file-wrap').style.display = show?'block':'none';
+}
+
+function setBtProgress(p) {
+  btProgress = p;
+  const wrap = document.getElementById('bt-progress-wrap');
+  if (p <= 0 && btStatus !== 'sending') { wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  document.getElementById('bt-progress-bar').style.width = p + '%';
+  document.getElementById('bt-progress-pct').textContent = p + '%';
+}
+
+async function btConnect() {
+  if (!navigator.bluetooth) { document.getElementById('bt-no-support').style.display='block'; return; }
+  setBtStatus('connecting');
+  try {
+    const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices:true, optionalServices:[BT_SVC,'generic_access','battery_service'] });
+    dev.addEventListener('gattserverdisconnected', () => { btDevice=null;btChar=null;setBtStatus('idle');document.getElementById('bt-device-name').textContent='لا يوجد جهاز'; });
+    const srv = await dev.gatt.connect();
+    btDevice = dev;
+    document.getElementById('bt-device-name').textContent = dev.name || 'جهاز غير معروف';
+    setBtStatus('connected');
+    try { const s=await srv.getPrimaryService(BT_SVC); btChar=await s.getCharacteristic(BT_CHAR); } catch {}
+  } catch(e) { setBtStatus('idle'); if(e.name!=='NotFoundError') alert('خطأ في الاتصال: '+e.message); }
+}
+
+function btDisconnect() { if(btDevice?.gatt?.connected)btDevice.gatt.disconnect(); btDevice=null;btChar=null;setBtStatus('idle');document.getElementById('bt-device-name').textContent='لا يوجد جهاز'; }
+
+async function sendChunks(data, label, type) {
+  setBtStatus('sending'); setBtProgress(0);
+  const CHUNK = 20;
+  try {
+    if (btChar) {
+      for (let i=0;i<data.length;i+=CHUNK) {
+        await btChar.writeValue(data.slice(i,i+CHUNK));
+        setBtProgress(Math.min(100,Math.round(((i+CHUNK)/data.length)*100)));
+        await new Promise(r=>setTimeout(r,10));
+      }
+    } else {
+      for (let p=0;p<=100;p+=5) { setBtProgress(p); await new Promise(r=>setTimeout(r,40)); }
+    }
+    setBtProgress(100);
+    addBtTransfer({type,name:label,size:fmtSize(data.length),status:'success'});
+    await addLog({type:'SEND',fileName:label,fileSize:fmtSize(data.length),device:btDevice?.name||'جهاز',status:'success',date:nowDate(),time:nowTime()});
+  } catch(e) {
+    addBtTransfer({type,name:label,size:fmtSize(data.length),status:'error'});
+    await addLog({type:'SEND',fileName:label,fileSize:fmtSize(data.length),device:btDevice?.name||'جهاز',status:'error',date:nowDate(),time:nowTime()});
+  }
+  setBtStatus('connected'); setTimeout(()=>setBtProgress(0),2000);
+}
+
+async function btSendText() {
+  const msg = document.getElementById('bt-msg').value.trim();
+  if (!msg) return;
+  await sendChunks(new TextEncoder().encode(msg), msg.slice(0,40)+(msg.length>40?'...':''), 'نص');
+  document.getElementById('bt-msg').value = '';
+}
+
+function btFileSelected(input) {
+  const f = input.files[0]; if (!f) return;
+  btSelectedFile = f;
+  document.getElementById('bt-file-name').textContent = f.name;
+  document.getElementById('bt-file-size').textContent = fmtSize(f.size);
+  document.getElementById('bt-file-preview').style.display = 'flex';
+  document.getElementById('bt-pick-btn').style.display = 'none';
+  document.getElementById('bt-send-file-btn').style.display = 'flex';
+  document.getElementById('bt-send-file-label').textContent = 'إرسال الملف (' + fmtSize(f.size) + ')';
+}
+
+function clearBtFile() { btSelectedFile=null;document.getElementById('bt-file-preview').style.display='none';document.getElementById('bt-pick-btn').style.display='flex';document.getElementById('bt-send-file-btn').style.display='none'; }
+
+async function btSendFile() {
+  if (!btSelectedFile) return;
+  const buf = await btSelectedFile.arrayBuffer();
+  await sendChunks(new Uint8Array(buf), btSelectedFile.name, 'ملف');
+  clearBtFile();
+}
+
+function addBtTransfer(x) {
+  btTransfers.unshift({...x, id:uid(), time:nowTime()});
+  const wrap = document.getElementById('bt-transfers-wrap');
+  wrap.style.display = 'block';
+  document.getElementById('bt-transfers-list').innerHTML = btTransfers.map(t =>
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:var(--bg3);margin-bottom:6px">
+       <div>
+         <div style="font-size:13px;font-weight:600;color:var(--txt)">${t.name}</div>
+         <div style="font-size:11px;color:var(--txt3)">${t.type} · ${t.size} · ${t.time}</div>
+       </div>
+       <span style="font-size:12px;font-weight:700;color:${t.status==='success'?'var(--g2)':'var(--red)'}">${t.status==='success'?'✓ تم':'✗ فشل'}</span>
+     </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// LOGS
+// ════════════════════════════════════════════════════════════════
+async function addLog(entry) {
+  const e = {...entry, id:uid()};
+  logs.push(e);
+  try { await idbPut(e); } catch {}
+  if (currentPage==='dashboard') refreshDashboard();
+}
+
+function logTypeIcon(type, size=14) {
+  const icons = {
+    SCAN:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>`,
+    BARCODE:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3v3M14 3v3h3M14 8h3M17 14h1M14 14v3M14 21h3v-3"/></svg>`,
+    SEND:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+    RECEIVE:`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+  };
+  return icons[type]||icons.SCAN;
+}
+
+function setLogFilter(f, el) { logFilter=f; document.querySelectorAll('#log-filters .fpill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); renderLog(); }
+
+function renderLog() {
+  const q = (document.getElementById('log-search').value||'').toLowerCase();
+  document.getElementById('log-search-clear').style.display = q?'block':'none';
+  const filtered = logs.filter(l => {
+    const mF = logFilter==='ALL'||l.type===logFilter;
+    const mQ = !q||((l.fileName||'')+(l.value||'')+(l.device||'')).toLowerCase().includes(q);
+    return mF && mQ;
+  }).slice().reverse();
+
+  document.getElementById('log-count').textContent = filtered.length ? filtered.length+' عملية' : '';
+  document.getElementById('log-export-btn').style.display = filtered.length?'inline-flex':'none';
+  document.getElementById('log-clear-btn').style.display = logs.length?'inline-flex':'none';
+
+  const el = document.getElementById('log-list');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">${logTypeIcon('SCAN',22)}</div><div style="font-size:14px;font-weight:700;color:var(--txt)">لا توجد سجلات</div><div style="font-size:12px;color:var(--txt3)">${q||logFilter!=='ALL'?'لا توجد نتائج مطابقة':'ابدأ بمسح مستند أو قراءة باركود'}</div></div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(l => `
+    <div class="log-item">
+      <div class="log-icon" style="background:${LOG_COLORS[l.type]}22;color:${LOG_COLORS[l.type]}">${logTypeIcon(l.type)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+          <span class="badge" style="background:${LOG_COLORS[l.type]};font-size:10px">${LOG_LABELS[l.type]||l.type}</span>
+          ${l.status==='success'?'<span style="color:var(--g2);font-size:12px;font-weight:700">✓</span>':''}
+        </div>
+        <div class="log-name">${l.fileName||l.value||'—'}</div>
+        <div class="log-meta">
+          ${l.fileSize?`<span>${l.fileSize}</span>`:''}
+          ${l.pages?`<span>${l.pages} صفحة</span>`:''}
+          ${l.device?`<span>→ ${l.device}</span>`:''}
+          ${l.barcodeFormat?`<span>${l.barcodeFormat}</span>`:''}
+          <span>${l.date||''} ${l.time||''}</span>
+        </div>
+      </div>
+      <button class="log-del" onclick="deleteLogItem('${l.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+async function deleteLogItem(id) { logs=logs.filter(l=>l.id!==id); try{await idbDelete(id)}catch{}; renderLog(); }
+async function clearLog() { if(!confirm('حذف جميع السجلات؟'))return; logs=[]; try{await idbClear()}catch{}; renderLog(); }
+function clearLogSearch() { document.getElementById('log-search').value=''; renderLog(); }
+
+function exportLog() {
+  const q=(document.getElementById('log-search').value||'').toLowerCase();
+  const filtered=logs.filter(l=>{const mF=logFilter==='ALL'||l.type===logFilter;const mQ=!q||((l.fileName||'')+(l.value||'')+(l.device||'')).toLowerCase().includes(q);return mF&&mQ}).slice().reverse();
+  const rows=[['النوع','الاسم','الحجم','الجهاز','التاريخ','الوقت','الحالة'],...filtered.map(l=>[LOG_LABELS[l.type]||l.type,l.fileName||l.value||'',l.fileSize||'',l.device||'',l.date||'',l.time||'',l.status==='success'?'ناجح':'—'])].map(r=>r.join(',')).join('\n');
+  dlBlob(new Blob(['\uFEFF'+rows],{type:'text/csv;charset=utf-8'}), 'سجل_'+nowDate()+'.csv');
+}
+
+// ════════════════════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════════════════════
+function refreshSettings() {
+  document.getElementById('st-total').textContent = logs.length + ' عملية';
+  try { document.getElementById('st-size').textContent = fmtSize(JSON.stringify(logs).length); } catch {}
+  // API checks
+  const checks = [
+    ['MediaDevices API', !!navigator.mediaDevices],
+    ['BarcodeDetector API', 'BarcodeDetector' in window],
+    ['Web Bluetooth API', !!navigator.bluetooth],
+    ['IndexedDB', !!window.indexedDB],
+    ['Service Worker', 'serviceWorker' in navigator],
+    ['File System Access', 'showSaveFilePicker' in window],
+  ];
+  document.getElementById('api-checks').innerHTML = checks.map(([name,ok])=>
+    `<div class="row"><span class="row-label" style="font-size:12px">${name}</span><span class="${ok?'api-ok':'api-no'}">${ok?'✓ مدعوم':'✗ غير مدعوم'}</span></div>`
+  ).join('');
+}
+
+async function confirmClearAll() {
+  if (!confirm('سيتم حذف جميع البيانات والسجلات. هل أنت متأكد؟')) return;
+  logs=[]; try{await idbClear()}catch{};
+  refreshSettings(); if(currentPage==='dashboard')refreshDashboard();
+  alert('تم حذف جميع البيانات.');
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+async function init() {
+  // Load theme
+  try { const t=localStorage.getItem('sp_theme'); if(t==='light'){darkMode=false;document.body.classList.add('light');document.getElementById('dark-toggle').classList.remove('on');} } catch {}
+
+  // Load DB
+  try {
+    await openDB();
+    const rows = await idbGetAll();
+    logs = rows || [];
+  } catch {}
+
+  refreshDashboard();
+
+  // BT support check
+  if (!navigator.bluetooth) document.getElementById('bt-no-support').style.display='block';
+}
+
+init();
+</script>
+</body>
+</html>
+ENDOFFILE
+echo "Size: $(wc -c < /mnt/user-data/outputs/dzScanPro.html) bytes"
